@@ -169,6 +169,20 @@
       fill: #ffd2bb;
     }
 
+    .wa.apkfoot {
+      background: var(--orange);
+      margin-right: 8px;
+    }
+
+    .wa.apkfoot:hover {
+      background: #ff7a38;
+    }
+
+    .installcard .apk {
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
     .installcard .close {
       position: absolute;
       top: 6px;
@@ -841,6 +855,7 @@
         <small id="installHow">Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.</small>
       </div>
       <button class="btn" id="installBtn" hidden>Installer</button>
+      <a class="btn apk" id="apkLink" href="CoranMP3.apk" download hidden>Télécharger l'APK</a>
       <button class="close" id="installClose" aria-label="Fermer">×</button>
     </div>
 
@@ -871,6 +886,10 @@
       <div class="sadaqa">صدقة جارية</div>
       <p><b>Tirgani Badreddine</b></p>
       <p class="dua">لا تنسونا من صالح دعائكم</p>
+      <a class="wa apkfoot" id="apkFoot" href="CoranMP3.apk" download>
+        <svg viewBox="0 0 24 24"><path d="M17.6 9.48 19.44 6.3a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+        Application Android (APK)
+      </a>
       <a class="wa" href="https://wa.me/212602834831" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24">
           <path
@@ -981,14 +1000,15 @@
     const pad = n => String(n).padStart(3, '0');
     // En local : le dossier ali-jaber/. En ligne (GitHub Pages) : le CDN de mp3quran.net,
     // car GitHub refuse les fichiers de plus de 100 Mo.
-    const LOCAL = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    const APP = !!window.Capacitor; // application Android (Capacitor)
+    const LOCAL = !APP && ['localhost', '127.0.0.1', ''].includes(location.hostname);
     const AUDIO_BASE = LOCAL ? new URL('ali-jaber/', location.href).href : 'https://cdn.mp3quran.net/audio/ali-jaber/r1/';
     const audioUrl = n => `${AUDIO_BASE}${pad(n)}.mp3`;
     const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f'’\-]/g, '').replace(/\s+/g, ' ');
     const fmt = t => isFinite(t) ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}` : '0:00';
     const mb = b => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`;
     const type = n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise';
-    const canOffline = 'caches' in window && 'serviceWorker' in navigator && location.protocol.startsWith('http');
+    const canOffline = 'caches' in window && window.isSecureContext && (APP || 'serviceWorker' in navigator);
     const downloaded = new Set();
     let current = 1, filter = 'all';
 
@@ -1021,14 +1041,31 @@
 
     /* ---------- Lecture ---------- */
     const playable = n => navigator.onLine || !canOffline || downloaded.has(n);
+    let selectToken = 0, blobUrl = null;
+
+    // Dans l'application Android, pas de service worker : une sourate gardée est lue
+    // directement depuis le cache via une URL blob. Sur le site, le service worker s'en charge.
+    async function sourceFor(n) {
+      if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+      if (APP && downloaded.has(n)) {
+        const res = await (await caches.open(AUDIO_CACHE)).match(audioUrl(n));
+        if (res) return blobUrl = URL.createObjectURL(await res.blob());
+      }
+      return audioUrl(n);
+    }
 
     function select(n, autoplay, startAt = 0) {
       if (autoplay && !playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
       current = n;
       const [tr, ar, fr, v] = S[n - 1];
-      audio.src = audioUrl(n);
-      audio.playbackRate = +$('rate').value;
-      if (startAt) audio.addEventListener('loadedmetadata', () => audio.currentTime = startAt, { once: true });
+      const token = ++selectToken;
+      sourceFor(n).then(src => {
+        if (token !== selectToken) return; // une autre sourate a été choisie entre-temps
+        audio.src = src;
+        audio.playbackRate = +$('rate').value;
+        if (startAt) audio.addEventListener('loadedmetadata', () => audio.currentTime = startAt, { once: true });
+        if (autoplay) audio.play().catch(() => { });
+      });
       $('pNum').textContent = n;
       $('pTr').textContent = tr;
       $('pAr').textContent = 'سورة ' + ar;
@@ -1037,7 +1074,6 @@
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(n).classList.add('active');
       save();
-      if (autoplay) audio.play().catch(() => { });
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: `${n}. ${tr} — سورة ${ar}`, artist: 'Ali Jaber', album: 'القرآن الكريم',
@@ -1269,7 +1305,7 @@
     const ua = navigator.userAgent;
     const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/.test(ua);
-    const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const installed = APP || matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     let installDismissed = false;
     try { installDismissed = localStorage.getItem('installDismissed') === '1'; } catch { }
     const SHARE_ICON = '<svg class="share" viewBox="0 0 24 24"><path d="M12 2 7.5 6.5l1.4 1.4L11 5.8V15h2V5.8l2.1 2.1 1.4-1.4zM5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h-4v2h2v8H7v-8h2v-2z"/></svg>';
@@ -1303,11 +1339,11 @@
     if (isIOS) {
       showInstallCard(`Dans Safari, touchez ${SHARE_ICON} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`, false);
     } else if (isAndroid) {
-      // Navigateurs Android sans fenêtre d'installation (Firefox…) : instructions via le menu
-      setTimeout(() => {
-        if (!installEvt) showInstallCard('Ouvrez le menu <b>⋮</b> du navigateur, puis <b>« Installer l’application »</b> ou <b>« Ajouter à l’écran d’accueil »</b>.', false);
-      }, 3000);
+      // Android : proposer l'application (APK) en téléchargement direct
+      $('apkLink').hidden = false;
+      showInstallCard('Téléchargez l’application Android (4 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.', false);
     }
+    if (APP) $('apkFoot').hidden = true; // déjà dans l'application
     $('install').onclick = doInstall;
     $('installBtn').onclick = doInstall;
     $('installClose').onclick = () => {
@@ -1319,7 +1355,7 @@
     /* ---------- Démarrage ---------- */
     (async () => {
       if (canOffline) {
-        navigator.serviceWorker.register('sw.js');
+        if (!APP) navigator.serviceWorker.register('sw.js');
         $('offline').hidden = false;
         for (const req of await (await caches.open(AUDIO_CACHE)).keys()) {
           const m = /(\d{3})\.mp3$/.exec(req.url);

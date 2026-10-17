@@ -1,0 +1,15 @@
+{
+  "name": "coran-mp3-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "copy-web": "rm -rf www && mkdir -p www && cp -R ../index.html ../manifest.webmanifest ../icon.svg ../icon-192.png ../icon-512.png ../fonts www/",
+    "sync": "npm run copy-web && npx cap sync android",
+    "apk": "npm run sync && cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew assembleRelease -q && cp app/build/outputs/apk/release/app-release.apk ../../CoranMP3.apk"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  }
+}

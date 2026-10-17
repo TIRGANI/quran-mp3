@@ -2,3 +2,7 @@
 ali-jaber/
 .DS_Store
 Lancer Coran.command
+
+# Application Android : dépendances et fichiers générés
+mobile/node_modules/
+mobile/www/
