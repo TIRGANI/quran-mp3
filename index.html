@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>القرآن الكريم — Ali Jaber</title>
+  <meta name="description" content="Écouter les 114 sourates du Saint Coran, récitation Ali Jaber, même hors ligne.">
+  <meta name="theme-color" content="#04091e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Coran MP3">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <style>
+    :root {
+      --orange: #f7631b;
+      --orange-soft: #fff1ea;
+      --navy: #04091e;
+      --navy-2: #0d1640;
+      --ink: #222;
+      --muted: #777;
+      --line: #eee;
+      --bg: #f9f9ff;
+      --white: #fff;
+      --green: #1e9e63;
+      --ar: "Amiri", "Geeza Pro", "Traditional Arabic", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 300 15px/1.6 "Changa", -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    /* Barre du haut */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .topbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 64px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      padding-left: 10px;
+      border-left: 4px solid var(--orange);
+    }
+
+    .logo span {
+      color: var(--orange);
+    }
+
+    .topbar .right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 400;
+      padding: 3px 10px;
+      border-radius: 33px;
+      background: #e8f6ef;
+      color: var(--green);
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status.off {
+      background: #fdecec;
+      color: #c0392b;
+    }
+
+    .install {
+      border: 0;
+      background: var(--orange);
+      color: #fff;
+      border-radius: 33px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Bannière */
+    .banner {
+      position: relative;
+      text-align: center;
+      color: #fff;
+      padding: 56px 0 72px;
+      background: radial-gradient(circle at 20% 20%, #1b2a7a 0, transparent 55%),
+        radial-gradient(circle at 85% 80%, #3a1a5e 0, transparent 50%),
+        linear-gradient(135deg, var(--navy-2), var(--navy));
+      overflow: hidden;
+    }
+
+    .banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .07;
+      background-image: radial-gradient(#fff 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    .banner h1 {
+      position: relative;
+      margin: 0;
+      font-family: var(--ar);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .banner h2 {
+      position: relative;
+      margin: 6px 0 0;
+      font-weight: 300;
+      font-size: 18px;
+      opacity: .85;
+    }
+
+    .banner .basmala {
+      position: relative;
+      font-family: var(--ar);
+      font-size: 24px;
+      color: #ffd2bb;
+      margin-bottom: 10px;
+    }
+
+    /* Recherche + filtres */
+    .tools {
+      position: relative;
+      margin: -28px auto 18px;
+      max-width: 860px;
+      background: var(--white);
+      border-radius: 33px;
+      box-shadow: 0 10px 30px rgba(4, 9, 30, .12);
+      padding: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tools input {
+      flex: 1;
+      min-width: 180px;
+      border: 0;
+      outline: 0;
+      padding: 10px 16px;
+      font: inherit;
+      font-weight: 400;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--ink);
+      border-radius: 33px;
+      padding: 8px 16px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .chip:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .chip.on {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    /* Panneau hors ligne */
+    .offline {
+      max-width: 860px;
+      margin: 0 auto 28px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .offline .txt {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .offline .txt b {
+      font-weight: 600;
+    }
+
+    .offline .txt small {
+      display: block;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .bar {
+      height: 6px;
+      background: var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--orange);
+      transition: width .3s;
+    }
+
+    .autosave {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .autosave input {
+      accent-color: var(--orange);
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: 1px solid var(--orange);
+      background: var(--orange);
+      color: #fff;
+      border-radius: 33px;
+      padding: 8px 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--orange);
+    }
+
+    .btn.ghost.danger {
+      border-color: #ddd;
+      color: var(--muted);
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 8px 0 24px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 22px;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Grille des sourates */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .card:hover {
+      border-color: var(--orange);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(247, 99, 27, .12);
+    }
+
+    .card:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 2px;
+    }
+
+    .card.active {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .card.unavailable {
+      opacity: .45;
+    }
+
+    .num {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      font-size: 14px;
+    }
+
+    .num::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 2px solid var(--orange);
+      border-radius: 8px;
+      transform: rotate(45deg);
+      transition: .2s;
+    }
+
+    .card.active .num {
+      color: #fff;
+    }
+
+    .card.active .num::before {
+      background: var(--orange);
+    }
+
+    .num b {
+      position: relative;
+      font-weight: 600;
+    }
+
+    .info {
+      min-width: 0;
+    }
+
+    .info .tr {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .info .meta {
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .card .ar {
+      margin-left: auto;
+      font-family: var(--ar);
+      font-size: 22px;
+      font-weight: 700;
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    .card .ar small {
+      display: block;
+      font-family: "Changa", sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .dl {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      position: relative;
+      transition: .2s;
+    }
+
+    .dl:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .dl svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .dl .ok,
+    .dl .ring {
+      display: none;
+    }
+
+    .dl.done {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .dl.done .get {
+      display: none;
+    }
+
+    .dl.done .ok {
+      display: block;
+    }
+
+    .dl.done:hover {
+      background: #c0392b;
+      border-color: #c0392b;
+    }
+
+    .dl.loading {
+      border-color: transparent;
+      color: var(--orange);
+      background: conic-gradient(var(--orange) calc(var(--p, 0) * 1%), var(--line) 0);
+    }
+
+    .dl.loading::after {
+      content: attr(data-p);
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--white);
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .dl.loading .get {
+      display: none;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 0;
+    }
+
+    /* Pied de page */
+    .footer {
+      margin-top: 48px;
+      background: var(--navy);
+      color: rgba(255, 255, 255, .85);
+      text-align: center;
+      padding: 36px 0 170px;
+    }
+
+    .footer .sadaqa {
+      font-family: var(--ar);
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffd2bb;
+      line-height: 1.3;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    .footer b {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .footer .dua {
+      font-size: 13px;
+      opacity: .7;
+    }
+
+    .wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      background: #25d366;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 33px;
+      padding: 9px 18px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .wa:hover {
+      background: #1ebe5a;
+    }
+
+    .wa svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 150px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 33px;
+      font-size: 14px;
+      z-index: 20;
+      max-width: calc(100% - 32px);
+      text-align: center;
+    }
+
+    /* Lecteur fixe en bas */
+    .player {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      background: var(--navy);
+      color: #fff;
+      padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -6px 24px rgba(0, 0, 0, .2);
+    }
+
+    .player .container {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .now {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      flex: 1;
+    }
+
+    .now .ar {
+      font-family: var(--ar);
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffd2bb;
+    }
+
+    .now .tr {
+      font-weight: 600;
+    }
+
+    .now>div:nth-child(2) {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .now .tr {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .now .meta {
+      font-size: 12px;
+      opacity: .7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .now .ar {
+      white-space: nowrap;
+      flex: none;
+    }
+
+    .ctrls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ib {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      transition: .2s;
+    }
+
+    .ib:hover {
+      background: rgba(255, 255, 255, .2);
+    }
+
+    .ib.main {
+      width: 52px;
+      height: 52px;
+      background: var(--orange);
+    }
+
+    .ib.main:hover {
+      background: #ff7a38;
+    }
+
+    .ib svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .ib.main svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .progress {
+      flex: 2;
+      min-width: 240px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type=range] {
+      flex: 1;
+      accent-color: var(--orange);
+      cursor: pointer;
+    }
+
+    .opts {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+    }
+
+    .opts label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      opacity: .85;
+    }
+
+    .opts input[type=checkbox] {
+      accent-color: var(--orange);
+    }
+
+    .opts select {
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 4px 6px;
+      font: inherit;
+    }
+
+    .opts select option {
+      color: var(--ink);
+    }
+
+    @media (max-width: 640px) {
+      .banner h1 {
+        font-size: 46px;
+      }
+
+      .footer {
+        padding-bottom: 240px;
+      }
+
+      .player .container {
+        gap: 10px;
+      }
+
+      .progress {
+        order: 3;
+        flex-basis: 100%;
+      }
+
+      .opts {
+        order: 4;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="logo">Coran <span>MP3</span></div>
+      <div class="right">
+        <span>Récitation : <b>Ali Jaber</b></span>
+        <span class="status" id="status">En ligne</span>
+        <button class="install" id="install" hidden>Installer l'app</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="banner">
+    <div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <h1>القرآن الكريم</h1>
+    <h2>Écouter les 114 sourates du Saint Coran</h2>
+  </section>
+
+  <div class="container">
+    <div class="tools">
+      <input type="search" id="q" placeholder="Rechercher une sourate (nom, traduction ou numéro)…">
+      <button class="chip on" data-f="all">Toutes</button>
+      <button class="chip" data-f="m">Mecquoises</button>
+      <button class="chip" data-f="d">Médinoises</button>
+      <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
+    </div>
+
+    <div class="offline" id="offline" hidden>
+      <div class="txt">
+        <b>Écoute hors connexion</b> — <span id="offCount">0 / 114 sourates</span>
+        <small id="offInfo">Téléchargez des sourates pour les écouter sans internet.</small>
+        <div class="bar"><i id="offBar"></i></div>
+        <label class="autosave"><input type="checkbox" id="autoSave" checked> Garder automatiquement les sourates
+          écoutées (et la suivante) pour les réécouter sans connexion</label>
+      </div>
+      <button class="btn" id="dlAll">Tout télécharger (2,2 Go)</button>
+      <button class="btn ghost" id="dlCancel" hidden>Annuler</button>
+      <button class="btn ghost danger" id="rmAll" hidden>Tout supprimer</button>
+    </div>
+
+    <div class="section-title">
+      <h3>سور القرآن الكريم</h3>
+      <p id="count">114 sourates</p>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>Aucune sourate ne correspond.</div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="sadaqa">صدقة جارية</div>
+      <p>Sadaqa jariya — <b>Tirgani Badreddine</b></p>
+      <p class="dua">N’oubliez pas de faire une douaa · لا تنسونا من صالح دعائكم</p>
+      <a class="wa" href="https://wa.me/212602834831" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z" />
+        </svg>
+
+      </a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <div class="player">
+    <div class="container">
+      <div class="now">
+        <div class="num"><b id="pNum">1</b></div>
+        <div>
+          <div class="tr" id="pTr">Al-Fatiha</div>
+          <div class="meta" id="pMeta"></div>
+        </div>
+        <div class="ar" id="pAr"></div>
+      </div>
+      <div class="ctrls">
+        <button class="ib" id="prev" title="Précédente"><svg viewBox="0 0 24 24">
+            <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+          </svg></button>
+        <button class="ib main" id="play" title="Lecture / Pause (Espace)">
+          <svg viewBox="0 0 24 24" id="icPlay">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <svg viewBox="0 0 24 24" id="icPause" hidden>
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+          </svg>
+        </button>
+        <button class="ib" id="next" title="Suivante"><svg viewBox="0 0 24 24">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+          </svg></button>
+      </div>
+      <div class="progress">
+        <span id="cur">0:00</span>
+        <input type="range" id="seek" min="0" max="1000" value="0">
+        <span id="dur">0:00</span>
+      </div>
+      <div class="opts">
+        <label><input type="checkbox" id="auto" checked> Enchaîner</label>
+        <label><input type="checkbox" id="loop"> Répéter</label>
+        <select id="rate" title="Vitesse">
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+    // [translittération, arabe, français, versets]
+    const S = [
+      ["Al-Fatiha", "الفاتحة", "L'Ouverture", 7], ["Al-Baqara", "البقرة", "La Vache", 286], ["Al-Imran", "آل عمران", "La Famille d'Imran", 200],
+      ["An-Nisa", "النساء", "Les Femmes", 176], ["Al-Ma'ida", "المائدة", "La Table servie", 120], ["Al-An'am", "الأنعام", "Les Bestiaux", 165],
+      ["Al-A'raf", "الأعراف", "Les Murailles", 206], ["Al-Anfal", "الأنفال", "Le Butin", 75], ["At-Tawba", "التوبة", "Le Repentir", 129],
+      ["Yunus", "يونس", "Jonas", 109], ["Hud", "هود", "Hûd", 123], ["Yusuf", "يوسف", "Joseph", 111], ["Ar-Ra'd", "الرعد", "Le Tonnerre", 43],
+      ["Ibrahim", "إبراهيم", "Abraham", 52], ["Al-Hijr", "الحجر", "Al-Hijr", 99], ["An-Nahl", "النحل", "Les Abeilles", 128],
+      ["Al-Isra", "الإسراء", "Le Voyage nocturne", 111], ["Al-Kahf", "الكهف", "La Caverne", 110], ["Maryam", "مريم", "Marie", 98],
+      ["Ta-Ha", "طه", "Tâ-Hâ", 135], ["Al-Anbiya", "الأنبياء", "Les Prophètes", 112], ["Al-Hajj", "الحج", "Le Pèlerinage", 78],
+      ["Al-Mu'minun", "المؤمنون", "Les Croyants", 118], ["An-Nur", "النور", "La Lumière", 64], ["Al-Furqan", "الفرقان", "Le Discernement", 77],
+      ["Ash-Shu'ara", "الشعراء", "Les Poètes", 227], ["An-Naml", "النمل", "Les Fourmis", 93], ["Al-Qasas", "القصص", "Le Récit", 88],
+      ["Al-Ankabut", "العنكبوت", "L'Araignée", 69], ["Ar-Rum", "الروم", "Les Romains", 60], ["Luqman", "لقمان", "Luqmân", 34],
+      ["As-Sajda", "السجدة", "La Prosternation", 30], ["Al-Ahzab", "الأحزاب", "Les Coalisés", 73], ["Saba", "سبأ", "Saba", 54],
+      ["Fatir", "فاطر", "Le Créateur", 45], ["Ya-Sin", "يس", "Yâ-Sîn", 83], ["As-Saffat", "الصافات", "Les Rangés", 182], ["Sad", "ص", "Sâd", 88],
+      ["Az-Zumar", "الزمر", "Les Groupes", 75], ["Ghafir", "غافر", "Le Pardonneur", 85], ["Fussilat", "فصلت", "Les Versets détaillés", 54],
+      ["Ash-Shura", "الشورى", "La Consultation", 53], ["Az-Zukhruf", "الزخرف", "L'Ornement", 89], ["Ad-Dukhan", "الدخان", "La Fumée", 59],
+      ["Al-Jathiya", "الجاثية", "L'Agenouillée", 37], ["Al-Ahqaf", "الأحقاف", "Al-Ahqâf", 35], ["Muhammad", "محمد", "Muhammad", 38],
+      ["Al-Fath", "الفتح", "La Victoire éclatante", 29], ["Al-Hujurat", "الحجرات", "Les Appartements", 18], ["Qaf", "ق", "Qâf", 45],
+      ["Adh-Dhariyat", "الذاريات", "Qui éparpillent", 60], ["At-Tur", "الطور", "At-Tûr", 49], ["An-Najm", "النجم", "L'Étoile", 62],
+      ["Al-Qamar", "القمر", "La Lune", 55], ["Ar-Rahman", "الرحمن", "Le Tout Miséricordieux", 78], ["Al-Waqi'a", "الواقعة", "L'Événement", 96],
+      ["Al-Hadid", "الحديد", "Le Fer", 29], ["Al-Mujadila", "المجادلة", "La Discussion", 22], ["Al-Hashr", "الحشر", "L'Exode", 24],
+      ["Al-Mumtahana", "الممتحنة", "L'Éprouvée", 13], ["As-Saff", "الصف", "Le Rang", 14], ["Al-Jumu'a", "الجمعة", "Le Vendredi", 11],
+      ["Al-Munafiqun", "المنافقون", "Les Hypocrites", 11], ["At-Taghabun", "التغابن", "La Grande Perte", 18], ["At-Talaq", "الطلاق", "Le Divorce", 12],
+      ["At-Tahrim", "التحريم", "L'Interdiction", 12], ["Al-Mulk", "الملك", "La Royauté", 30], ["Al-Qalam", "القلم", "La Plume", 52],
+      ["Al-Haqqa", "الحاقة", "Celle qui montre la vérité", 52], ["Al-Ma'arij", "المعارج", "Les Voies d'ascension", 44], ["Nuh", "نوح", "Noé", 28],
+      ["Al-Jinn", "الجن", "Les Djinns", 28], ["Al-Muzzammil", "المزمل", "L'Enveloppé", 20], ["Al-Muddaththir", "المدثر", "Le Revêtu d'un manteau", 56],
+      ["Al-Qiyama", "القيامة", "La Résurrection", 40], ["Al-Insan", "الإنسان", "L'Homme", 31], ["Al-Mursalat", "المرسلات", "Les Envoyés", 50],
+      ["An-Naba", "النبأ", "La Nouvelle", 40], ["An-Nazi'at", "النازعات", "Les Anges qui arrachent", 46], ["Abasa", "عبس", "Il s'est renfrogné", 42],
+      ["At-Takwir", "التكوير", "L'Obscurcissement", 29], ["Al-Infitar", "الانفطار", "La Rupture", 19], ["Al-Mutaffifin", "المطففين", "Les Fraudeurs", 36],
+      ["Al-Inshiqaq", "الانشقاق", "La Déchirure", 25], ["Al-Buruj", "البروج", "Les Constellations", 22], ["At-Tariq", "الطارق", "L'Astre nocturne", 17],
+      ["Al-A'la", "الأعلى", "Le Très-Haut", 19], ["Al-Ghashiya", "الغاشية", "L'Enveloppante", 26], ["Al-Fajr", "الفجر", "L'Aube", 30],
+      ["Al-Balad", "البلد", "La Cité", 20], ["Ash-Shams", "الشمس", "Le Soleil", 15], ["Al-Layl", "الليل", "La Nuit", 21],
+      ["Ad-Duha", "الضحى", "Le Jour montant", 11], ["Ash-Sharh", "الشرح", "L'Ouverture de la poitrine", 8], ["At-Tin", "التين", "Le Figuier", 8],
+      ["Al-Alaq", "العلق", "L'Adhérence", 19], ["Al-Qadr", "القدر", "La Destinée", 5], ["Al-Bayyina", "البينة", "La Preuve", 8],
+      ["Az-Zalzala", "الزلزلة", "La Secousse", 8], ["Al-Adiyat", "العاديات", "Les Coursiers", 11], ["Al-Qari'a", "القارعة", "Le Fracas", 11],
+      ["At-Takathur", "التكاثر", "La Course aux richesses", 8], ["Al-Asr", "العصر", "Le Temps", 3], ["Al-Humaza", "الهمزة", "Les Calomniateurs", 9],
+      ["Al-Fil", "الفيل", "L'Éléphant", 5], ["Quraysh", "قريش", "Quraych", 4], ["Al-Ma'un", "الماعون", "L'Ustensile", 7],
+      ["Al-Kawthar", "الكوثر", "L'Abondance", 3], ["Al-Kafirun", "الكافرون", "Les Infidèles", 6], ["An-Nasr", "النصر", "Le Secours", 3],
+      ["Al-Masad", "المسد", "Les Fibres", 5], ["Al-Ikhlas", "الإخلاص", "Le Monothéisme pur", 4], ["Al-Falaq", "الفلق", "L'Aube naissante", 5],
+      ["An-Nas", "الناس", "Les Hommes", 6]
+    ];
+    // Taille de chaque MP3 en octets (pour afficher l'espace nécessaire)
+    const SIZES = [1379102, 249129842, 106186963, 111106551, 78298847, 85859100, 78162591, 36442532, 72082748, 53962960, 53626920, 50674666, 24442923, 24058609, 20314531, 51754883, 41890629, 41770883, 26410882, 34403098, 33970514, 34667040, 33370535, 37656641, 25258572, 37522751, 33874590, 38794806, 26794574, 22547061, 14531020, 9491063, 34690866, 22306940, 21179077, 18715210, 24315029, 18178546, 30298532, 30898510, 20818591, 21970905, 23242965, 9634631, 11866534, 10477820, 14267080, 14435099, 9586984, 9227114, 10186965, 8866628, 9480760, 9730551, 12874650, 12250847, 16186767, 12418869, 11578767, 9466615, 6034746, 5026632, 5602790, 6610907, 8123080, 7210885, 8962550, 8219002, 7691120, 6178945, 5794626, 6802746, 5170830, 6442890, 4488449, 7008741, 5890554, 6442884, 5842906, 4522569, 3058670, 2315121, 5122556, 3083122, 3011022, 1762786, 1979079, 2818555, 3994687, 2362767, 1834885, 2170923, 1307001, 779120, 1018608, 1906982, 826766, 2362770, 1066887, 1186632, 1114534, 875044, 539001, 970965, 730843, 658746, 875041, 443082, 922690, 682570, 730845, 390837, 707022, 910671];
+    const MEDINAN = new Set([2, 3, 4, 5, 8, 9, 13, 22, 24, 33, 47, 48, 49, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 99, 110]);
+    const AUDIO_CACHE = 'audio-v1'; // même nom que dans sw.js
+
+    const $ = id => document.getElementById(id);
+    const audio = $('audio'), grid = $('grid');
+    const pad = n => String(n).padStart(3, '0');
+    // En local : le dossier ali-jaber/. En ligne (GitHub Pages) : le CDN de mp3quran.net,
+    // car GitHub refuse les fichiers de plus de 100 Mo.
+    const LOCAL = ['localhost', '127.0.0.1', ''].includes(location.hostname);
+    const AUDIO_BASE = LOCAL ? new URL('ali-jaber/', location.href).href : 'https://cdn.mp3quran.net/audio/ali-jaber/r1/';
+    const audioUrl = n => `${AUDIO_BASE}${pad(n)}.mp3`;
+    const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f'’\-]/g, '').replace(/\s+/g, ' ');
+    const fmt = t => isFinite(t) ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}` : '0:00';
+    const mb = b => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`;
+    const type = n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise';
+    const canOffline = 'caches' in window && 'serviceWorker' in navigator && location.protocol.startsWith('http');
+    const downloaded = new Set();
+    let current = 1, filter = 'all';
+
+    const ICON_GET = '<svg class="get" viewBox="0 0 24 24"><path d="M11 4h2v9.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6zM5 18h14v2H5z"/></svg>';
+    const ICON_OK = '<svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+
+    S.forEach(([tr, ar, fr, v], i) => {
+      const n = i + 1;
+      const c = document.createElement('div');
+      c.className = 'card';
+      c.tabIndex = 0;
+      c.setAttribute('role', 'button');
+      c.dataset.n = n;
+      c.dataset.t = MEDINAN.has(n) ? 'd' : 'm';
+      c.dataset.search = norm(`${n} ${tr} ${tr.replace(/-/g, ' ')} ${fr} ${ar} سورة ${ar}`);
+      c.innerHTML = `<div class="num"><b>${n}</b></div>
+    <div class="info"><div class="tr">${tr}</div><div class="meta">${fr}<br>${v} versets · ${type(n)} · ${mb(SIZES[i])}</div></div>
+    <div class="ar">${ar}<small>${MEDINAN.has(n) ? 'مدنية' : 'مكية'}</small></div>
+    ${canOffline ? `<button class="dl" title="Télécharger pour écouter hors ligne">${ICON_GET}${ICON_OK}</button>` : ''}`;
+      c.onclick = e => {
+        if (e.target.closest('.dl')) return;
+        if (!playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
+        (n === current && audio.src) ? toggle() : select(n, true);
+      };
+      c.onkeydown = e => { if (e.key === 'Enter') c.click(); };
+      c.querySelector('.dl')?.addEventListener('click', () => onDlClick(n));
+      grid.appendChild(c);
+    });
+    const card = n => grid.children[n - 1];
+
+    /* ---------- Lecture ---------- */
+    const playable = n => navigator.onLine || !canOffline || downloaded.has(n);
+
+    function select(n, autoplay, startAt = 0) {
+      if (autoplay && !playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
+      current = n;
+      const [tr, ar, fr, v] = S[n - 1];
+      audio.src = audioUrl(n);
+      audio.playbackRate = +$('rate').value;
+      if (startAt) audio.addEventListener('loadedmetadata', () => audio.currentTime = startAt, { once: true });
+      $('pNum').textContent = n;
+      $('pTr').textContent = tr;
+      $('pAr').textContent = 'سورة ' + ar;
+      $('pMeta').textContent = `${fr} · ${v} versets · ${type(n)}`;
+      document.title = `سورة ${ar} — ${tr}`;
+      document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
+      card(n).classList.add('active');
+      save();
+      if (autoplay) audio.play().catch(() => { });
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `${n}. ${tr} — سورة ${ar}`, artist: 'Ali Jaber', album: 'القرآن الكريم',
+          artwork: [{ src: 'icon-512.png', sizes: '512x512', type: 'image/png' }],
+        });
+      }
+    }
+    // Prochaine sourate jouable dans une direction (saute celles non téléchargées hors ligne)
+    function step(dir) {
+      for (let n = current + dir; n >= 1 && n <= 114; n += dir) if (playable(n)) return select(n, true);
+      if (!navigator.onLine) toast('Aucune autre sourate téléchargée dans cette direction.');
+    }
+    function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); }
+    function save() { try { localStorage.setItem('lecteur', JSON.stringify({ n: current, t: audio.currentTime || 0 })); } catch { } }
+
+    $('play').onclick = toggle;
+    $('prev').onclick = () => step(-1);
+    $('next').onclick = () => step(1);
+    $('rate').onchange = e => audio.playbackRate = +e.target.value;
+    $('loop').onchange = e => audio.loop = e.target.checked;
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
+      navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
+    }
+
+    audio.addEventListener('play', () => { $('icPlay').toggleAttribute('hidden', true); $('icPause').toggleAttribute('hidden', false); });
+    audio.addEventListener('pause', () => { $('icPlay').toggleAttribute('hidden', false); $('icPause').toggleAttribute('hidden', true); save(); });
+    audio.addEventListener('loadedmetadata', () => $('dur').textContent = fmt(audio.duration));
+    audio.addEventListener('error', () => { if (!navigator.onLine) toast('Cette sourate n’est pas disponible hors ligne.'); });
+    let lastSave = 0, seeking = false;
+    audio.addEventListener('timeupdate', () => {
+      $('cur').textContent = fmt(audio.currentTime);
+      if (!seeking && audio.duration) $('seek').value = audio.currentTime / audio.duration * 1000;
+      if (Date.now() - lastSave > 5000) { lastSave = Date.now(); save(); }
+    });
+    audio.addEventListener('ended', () => { if ($('auto').checked) step(1); });
+
+    $('seek').addEventListener('input', e => {
+      seeking = true;
+      if (audio.duration) $('cur').textContent = fmt(e.target.value / 1000 * audio.duration);
+    });
+    $('seek').addEventListener('change', e => {
+      if (audio.duration) audio.currentTime = e.target.value / 1000 * audio.duration;
+      seeking = false;
+    });
+
+    /* ---------- Recherche et filtres ---------- */
+    function applyFilter() {
+      const q = norm($('q').value.trim());
+      let shown = 0;
+      for (const c of grid.children) {
+        const n = +c.dataset.n;
+        const okF = filter === 'all' || (filter === 'dl' ? downloaded.has(n) : c.dataset.t === filter);
+        const ok = okF && (!q || c.dataset.search.includes(q));
+        c.hidden = !ok;
+        if (ok) shown++;
+      }
+      $('count').textContent = `${shown} sourate${shown > 1 ? 's' : ''}`;
+      $('empty').hidden = shown > 0;
+    }
+    $('q').addEventListener('input', applyFilter);
+    document.querySelectorAll('.chip').forEach(ch => ch.onclick = () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === ch));
+      filter = ch.dataset.f;
+      applyFilter();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
+      if (e.code === 'Space' && !e.target.closest('.card, button')) { e.preventDefault(); toggle(); }
+      if (e.code === 'ArrowRight' && e.shiftKey) step(1);
+      if (e.code === 'ArrowLeft' && e.shiftKey) step(-1);
+    });
+
+    let toastTimer;
+    function toast(msg) {
+      $('toast').textContent = msg;
+      $('toast').hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => $('toast').hidden = true, 3500);
+    }
+
+    /* ---------- Connexion ---------- */
+    function updateOnline() {
+      const on = navigator.onLine;
+      $('status').textContent = on ? 'En ligne' : 'Hors ligne';
+      $('status').classList.toggle('off', !on);
+      for (const c of grid.children) c.classList.toggle('unavailable', !playable(+c.dataset.n));
+    }
+    addEventListener('online', updateOnline);
+    addEventListener('offline', updateOnline);
+
+    /* ---------- Téléchargements hors ligne ---------- */
+    let queue = [], running = null; // running = { n, ctrl }
+
+    function setDlState(n, state, p = 0) {
+      const b = card(n).querySelector('.dl');
+      if (!b) return;
+      b.classList.toggle('done', state === 'done');
+      b.classList.toggle('loading', state === 'loading');
+      b.style.setProperty('--p', Math.round(p * 100));
+      b.dataset.p = state === 'loading' ? `${Math.round(p * 100)}%` : '';
+      b.title = state === 'done' ? 'Disponible hors ligne — cliquer pour supprimer'
+        : state === 'loading' ? 'Téléchargement… cliquer pour annuler' : 'Télécharger pour écouter hors ligne';
+    }
+
+    function updatePanel() {
+      const bytes = [...downloaded].reduce((s, n) => s + SIZES[n - 1], 0);
+      const total = SIZES.reduce((a, b) => a + b, 0);
+      $('offCount').textContent = `${downloaded.size} / 114 sourates (${mb(bytes)})`;
+      $('offBar').style.width = `${bytes / total * 100}%`;
+      const busy = running || queue.length;
+      const left = total - bytes;
+      $('dlAll').hidden = busy || downloaded.size === 114;
+      $('dlAll').textContent = downloaded.size ? `Télécharger le reste (${mb(left)})` : `Tout télécharger (${mb(total)})`;
+      $('dlCancel').hidden = !busy;
+      $('rmAll').hidden = busy || !downloaded.size;
+      $('chipDl').hidden = !downloaded.size;
+      $('offInfo').textContent = busy
+        ? `Téléchargement en cours… ${queue.length + 1} sourate(s) restante(s). Gardez la page ouverte.`
+        : downloaded.size === 114 ? 'Toutes les sourates sont disponibles sans internet.'
+          : 'Téléchargez des sourates (bouton ↓ sur chaque carte) pour les écouter sans internet.';
+      updateOnline();
+    }
+
+    function onDlClick(n) {
+      if (running?.n === n) return running.ctrl.abort();
+      if (queue.includes(n)) { queue = queue.filter(x => x !== n); setDlState(n, 'none'); return updatePanel(); }
+      if (downloaded.has(n)) return remove(n);
+      enqueue([n]);
+    }
+
+    // front = passer devant la file (sourate en cours d'écoute)
+    function enqueue(list, silent = false, front = false) {
+      if (!navigator.onLine) return silent || toast('Connectez-vous à internet pour télécharger.');
+      navigator.storage?.persist?.(); // demande au navigateur de ne pas effacer les fichiers
+      const add = list.filter(n => !downloaded.has(n) && running?.n !== n);
+      queue = front ? [...add, ...queue.filter(n => !add.includes(n))]
+        : [...queue, ...add.filter(n => !queue.includes(n))];
+      add.forEach(n => setDlState(n, 'loading', 0));
+      updatePanel();
+      if (!running) pump();
+    }
+
+    async function pump() {
+      while (queue.length) {
+        const n = queue.shift();
+        const ctrl = new AbortController();
+        running = { n, ctrl };
+        updatePanel();
+        try {
+          await downloadOne(n, ctrl.signal);
+          downloaded.add(n);
+          setDlState(n, 'done');
+        } catch (err) {
+          setDlState(n, 'none');
+          if (err.name !== 'AbortError') {
+            const full = err.name === 'QuotaExceededError';
+            toast(full ? 'Espace de stockage insuffisant sur cet appareil.' : `Échec du téléchargement de la sourate ${n}.`);
+            if (full || !navigator.onLine) { queue.forEach(x => setDlState(x, 'none')); queue = []; }
+          }
+        }
+      }
+      running = null;
+      updatePanel();
+      applyFilter();
+    }
+
+    async function downloadOne(n, signal) {
+      const url = audioUrl(n);
+      const res = await fetch(url, { signal, cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      const total = +res.headers.get('content-length') || SIZES[n - 1];
+      let got = 0, last = 0;
+      // Compte les octets au passage, sans charger tout le fichier en mémoire
+      const counted = res.body.pipeThrough(new TransformStream({
+        transform(chunk, c) {
+          got += chunk.byteLength;
+          if (Date.now() - last > 150) { last = Date.now(); setDlState(n, 'loading', got / total); }
+          c.enqueue(chunk);
+        },
+      }));
+      const cache = await caches.open(AUDIO_CACHE);
+      await cache.put(url, new Response(counted, { headers: { 'Content-Type': 'audio/mpeg' } }));
+    }
+
+    async function remove(n) {
+      await (await caches.open(AUDIO_CACHE)).delete(audioUrl(n));
+      downloaded.delete(n);
+      setDlState(n, 'none');
+      updatePanel();
+      applyFilter();
+    }
+
+    // Garde automatiquement la sourate écoutée et la suivante
+    try { $('autoSave').checked = localStorage.getItem('autoSave') !== '0'; } catch { }
+    $('autoSave').onchange = e => { try { localStorage.setItem('autoSave', e.target.checked ? '1' : '0'); } catch { } };
+    audio.addEventListener('playing', () => {
+      if (!canOffline || !navigator.onLine || !$('autoSave').checked) return;
+      const list = [current, current + 1].filter(n => n <= 114 && !downloaded.has(n));
+      if (list.length) enqueue(list, true, true);
+    });
+
+    $('dlAll').onclick = () => enqueue(S.map((_, i) => i + 1));
+    $('dlCancel').onclick = () => {
+      queue.forEach(n => setDlState(n, 'none'));
+      queue = [];
+      running?.ctrl.abort();
+    };
+    let confirmRm = false;
+    $('rmAll').onclick = async () => {
+      if (!confirmRm) {
+        confirmRm = true;
+        $('rmAll').textContent = 'Confirmer la suppression ?';
+        setTimeout(() => { confirmRm = false; $('rmAll').textContent = 'Tout supprimer'; }, 4000);
+        return;
+      }
+      confirmRm = false;
+      $('rmAll').textContent = 'Tout supprimer';
+      await caches.delete(AUDIO_CACHE);
+      [...downloaded].forEach(n => setDlState(n, 'none'));
+      downloaded.clear();
+      updatePanel();
+      applyFilter();
+    };
+
+    /* ---------- Installation (PWA) ---------- */
+    let installEvt;
+    addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install').hidden = false; });
+    $('install').onclick = async () => { installEvt?.prompt(); installEvt = null; $('install').hidden = true; };
+
+    /* ---------- Démarrage ---------- */
+    (async () => {
+      if (canOffline) {
+        navigator.serviceWorker.register('sw.js');
+        $('offline').hidden = false;
+        for (const req of await (await caches.open(AUDIO_CACHE)).keys()) {
+          const m = /(\d{3})\.mp3$/.exec(req.url);
+          if (m) { downloaded.add(+m[1]); setDlState(+m[1], 'done'); }
+        }
+        updatePanel();
+        // Première visite : garde le Juz 'Amma (sourates 78 à 114, ~71 Mo) pour l'écoute hors ligne.
+        // Une seule fois : si l'utilisateur supprime ensuite ces sourates, on ne les retélécharge pas.
+        let juzDone = false;
+        try { juzDone = localStorage.getItem('juzAmma') === '1'; } catch { }
+        if (!juzDone && navigator.onLine && !navigator.connection?.saveData) {
+          try { localStorage.setItem('juzAmma', '1'); } catch { }
+          const juz = Array.from({ length: 37 }, (_, i) => 78 + i);
+          if (juz.some(n => !downloaded.has(n))) {
+            enqueue(juz, true);
+            toast('Téléchargement du Juz ‘Amma (78 à 114) pour l’écoute hors connexion…');
+          }
+        }
+      }
+      updateOnline();
+      let saved = { n: 1, t: 0 };
+      try { saved = JSON.parse(localStorage.getItem('lecteur')) || saved; } catch { }
+      select(saved.n || 1, false, saved.t || 0);
+      if (saved.n > 1) card(saved.n).scrollIntoView({ block: 'center' });
+    })();
+  </script>
+</body>
+
+</html>
