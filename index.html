@@ -243,13 +243,50 @@
       margin-bottom: 10px;
     }
 
-    /* Choix du récitateur */
-    .reciter {
+    /* Choix de la lecture (Hafs / Warsh) et du récitateur */
+    .pick {
       position: relative;
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 10px;
       margin-top: 18px;
+    }
+
+    .riwaya {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 33px;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .25);
+    }
+
+    .riwaya button {
+      border: 0;
+      background: none;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 33px;
+      padding: 4px 22px;
+      font-family: var(--ar);
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    .riwaya button small {
+      font: 400 13px "Changa", -apple-system, "Segoe UI", sans-serif;
+      opacity: .8;
+      margin-left: 6px;
+    }
+
+    .riwaya button.on {
+      background: var(--orange);
+    }
+
+    .reciter {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       padding: 6px 6px 6px 16px;
       border-radius: 33px;
       background: rgba(255, 255, 255, .1);
@@ -873,10 +910,16 @@
     <div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
     <h1>القرآن الكريم</h1>
     <h2>Écouter les 114 sourates du Saint Coran</h2>
-    <label class="reciter">
-      <span>القارئ · Récitateur</span>
-      <select id="reciter"></select>
-    </label>
+    <div class="pick">
+      <div class="riwaya" id="riwaya" role="group" aria-label="Lecture">
+        <button data-w="0" aria-pressed="true">حفص<small>Hafs</small></button>
+        <button data-w="1" aria-pressed="false">ورش<small>Warsh</small></button>
+      </div>
+      <label class="reciter">
+        <span>القارئ · Récitateur</span>
+        <select id="reciter"></select>
+      </label>
+    </div>
   </section>
 
   <div class="container">
@@ -1061,6 +1104,10 @@
       ['mahmoud-husary/r3', 'Mahmoud Khalil Al-Husary', 'محمود خليل الحصري', 'w', '463,97155,57291,61320,47070,46521,51220,20428,40565,29933,31301,28637,13223,14232,11239,28512,24159,23820,14028,20099,19708,20160,17469,21516,14338,22346,19567,22959,16370,12910,8370,6220,21050,13254,11594,11154,15195,10995,17252,19631,12380,13307,13314,5579,7458,10990,9305,8706,5957,5523,6206,5498,5673,5700,7734,7880,9223,7751,7365,6406,3727,2933,3249,4457,4270,4551,5074,5205,4443,3710,3691,4026,3071,4257,2575,4227,3411,3311,3869,2377,1667,1361,3199,1894,1862,1063,1219,1538,2379,1357,1010,1290,741,448,690,1180,482,1400,636,692,703,617,304,626,451,444,580,232,541,384,434,237,329,428'],
       ['abdulbasit-abdulsamad/r2', 'Abdul Basit Abdus-Samad', 'عبدالباسط عبدالصمد', 'w', '233,39393,23490,24412,20334,19194,21322,7705,15600,10994,12068,10705,5127,5529,4611,12135,9541,9373,5811,7854,8193,7975,6932,8627,5248,9365,7826,8529,6111,5111,3002,2240,7662,4912,4381,4322,5811,4412,6521,7021,4752,4689,5057,2299,2826,3647,3014,3006,2186,2088,2119,1873,1998,1998,2764,2873,3432,2842,2822,2467,1377,1045,1209,1467,1713,1678,1897,1936,1596,1338,1287,1533,1143,1619,967,1545,1357,1268,1147,994,729,584,1275,721,768,420,459,596,885,545,377,518,311,201,283,475,209,604,268,307,275,244,131,248,193,197,244,115,229,147,170,104,147,197'],
       ['ibrahim-dosari/r1', 'Ibrahim Ad-Dossari', 'إبراهيم الدوسري', 'w', '323,51498,31285,33392,25006,25923,29134,10535,20567,14917,16103,14686,7312,7276,6167,15776,12683,12416,7841,10712,10421,10724,9349,11306,6888,12397,10233,12150,8479,6836,4261,3092,11288,7515,6292,6429,8363,6274,9149,10350,7199,7331,7627,3512,4195,5267,4615,4386,3104,3128,3234,2859,2966,2948,3974,4076,4918,4104,3771,3361,1935,1514,1568,1989,2246,2274,2574,2761,2326,1906,1854,1988,1611,2314,1363,2119,1787,1548,1465,1244,923,721,1646,909,917,542,569,728,1106,661,481,650,387,245,355,591,255,728,317,361,336,311,152,305,244,249,291,135,289,183,226,122,181,257'],
+      ['yassen-jazairi/r1', 'Yassine Al-Jazairi', 'ياسين الجزائري', 'w', '549,91060,52135,57271,43904,47373,67297,19080,38720,27602,28631,27457,12299,12440,10135,26829,23107,24718,14151,19233,19114,18889,16263,21357,13626,40617,18195,32473,15436,12850,7659,5590,21381,13003,11358,11495,14144,11011,16681,17999,13951,13135,14038,5836,7834,10604,8930,8434,5761,5652,5629,5044,5577,5904,7088,7201,9169,8109,7322,6930,3665,2947,2995,3628,4532,4407,5021,4889,4225,3509,3532,4102,3040,4161,2361,3963,3018,2960,2714,2272,1560,1268,2761,1526,1510,1041,1028,1366,2064,1279,853,1200,713,399,584,1110,507,1599,549,624,627,457,234,578,365,422,460,229,619,314,406,188,300,354'],
+      ['muhammad-saayed/r1', 'Mohammed Saayed', 'محمد سايد', 'w', '789,137562,74199,73775,54264,61010,64691,23284,44742,30344,33679,29828,13455,13739,12794,34081,28081,27931,17348,23880,23387,23330,20383,24846,15299,22784,21106,27142,20530,15779,9584,7053,24257,14291,12971,12507,16168,12903,21448,24231,16024,14700,15632,6949,9671,12128,10038,10150,7049,6724,7395,6559,7475,7770,9149,8959,11246,8790,8347,7450,4673,3934,4146,4932,5616,5326,6017,5882,5352,4056,4350,5105,3986,5230,3317,5021,3638,3662,3728,3068,2257,1636,3636,2140,2159,1408,1487,1972,2774,1714,1294,1602,983,597,922,1574,763,1971,828,951,915,750,450,848,605,607,706,413,784,540,641,388,625,533'],
+      ['muhammad-abdulkareem/r2', 'Mohammed Abdelkarim', 'محمد عبدالكريم', 'w', '1285,85096,95581,100188,75023,83123,92611,34292,70034,49192,52215,52428,23836,24850,20126,50850,43221,41800,25558,34920,33791,33632,29888,37699,23379,38291,31936,36766,27247,22592,14793,10378,36325,23457,20777,21060,27458,21430,31603,34071,22767,23657,24524,11038,13941,18160,15252,15548,11098,10927,10502,9531,9498,10088,12935,13084,16458,13354,12861,10972,6301,4876,5493,6712,7537,7687,8852,9209,7785,6522,6309,7715,5503,7485,4602,7193,6070,5423,5134,4429,3236,2530,5561,3353,3403,2043,2109,2831,4037,2422,1791,2226,1451,942,1242,1995,1046,2701,1290,1390,1338,1251,672,1194,965,911,1098,624,1164,791,894,541,741,894'],
+      ['ahmad-deeban/r7', 'Ahmad Deeban', 'أحمد ديبان', 'w', '1981,314793,177918,191511,145965,158309,93541,68699,133231,102449,105496,103855,44168,48856,42059,103543,89480,52818,55184,73700,71043,59246,62919,75496,51434,83230,73700,85418,58152,47136,27293,20106,76355,49168,44871,39715,51590,41590,61199,65028,45418,43855,46981,21277,26902,35496,32136,30496,21355,20946,20965,18761,21502,20496,28074,27996,33699,29246,27372,22749,14090,10887,12254,14671,17996,16243,19559,18153,16433,13309,14090,15575,12371,16121,9715,16199,12215,11590,11277,9481,6590,5418,11511,6668,6590,4011,4480,5418,8387,4949,3543,4949,2996,1824,2762,4637,2059,5652,2605,2684,2450,2215,1121,2450,1746,1824,2059,965,2215,1355,1668,809,1278,1668'],
     ].map(([id, fr, ar, w, kb]) => ({ id, fr, ar, warsh: w === 'w', kb: kb.split(',').map(Number) }));
     const MEDINAN = new Set([2, 3, 4, 5, 8, 9, 13, 22, 24, 33, 47, 48, 49, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 99, 110]);
     const AUDIO_CACHE = 'audio-v1'; // même nom que dans sw.js
@@ -1396,30 +1443,44 @@
 
     /* ---------- Choix du récitateur ---------- */
     const rSelect = $('reciter');
-    for (const [label, warsh] of [['Hafs ʿan ʿĀṣim', false], ['Warsh ʿan Nāfiʿ', true]]) {
-      const g = document.createElement('optgroup');
-      g.label = label;
-      for (const r of RECITERS.filter(r => r.warsh === warsh)) g.append(new Option(`${r.ar} — ${r.fr}`, r.id));
-      rSelect.append(g);
-    }
+    // La liste ne montre que les récitateurs de la lecture choisie (Hafs ou Warsh)
     function showReciter() {
+      rSelect.replaceChildren(...RECITERS.filter(r => r.warsh === reciter.warsh).map(r => new Option(`${r.ar} — ${r.fr}`, r.id)));
       rSelect.value = reciter.id;
+      for (const b of $('riwaya').children) {
+        const on = (b.dataset.w === '1') === reciter.warsh;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on);
+      }
       $('rName').textContent = rLabel(reciter);
       for (const c of grid.children) c.querySelector('.sz').textContent = mb(size(+c.dataset.n));
     }
     showReciter();
-    rSelect.onchange = async () => {
+    rSelect.onchange = () => setReciter(rSelect.value);
+    // Passer de Hafs à Warsh (ou l'inverse) reprend le dernier récitateur choisi dans cette lecture
+    $('riwaya').onclick = e => {
+      const b = e.target.closest('button');
+      if (!b || (b.dataset.w === '1') === reciter.warsh) return;
+      let id;
+      try { id = localStorage.getItem('reciter-' + b.dataset.w); } catch { }
+      setReciter(RECITERS.find(r => r.id === id && r.warsh === (b.dataset.w === '1'))?.id
+        || RECITERS.find(r => r.warsh === (b.dataset.w === '1')).id);
+    };
+    async function setReciter(id) {
       const wasPlaying = !audio.paused;
-      reciter = RECITERS.find(r => r.id === rSelect.value) || RECITERS[0];
-      try { localStorage.setItem('reciter', reciter.id); } catch { }
+      reciter = RECITERS.find(r => r.id === id) || RECITERS[0];
+      try {
+        localStorage.setItem('reciter', reciter.id);
+        localStorage.setItem('reciter-' + (reciter.warsh ? 1 : 0), reciter.id);
+      } catch { }
       // Les téléchargements en cours concernent l'ancien récitateur : on les arrête
       queue = [];
       running?.ctrl.abort();
       showReciter();
       if (canOffline) await loadDownloaded();
       select(current, wasPlaying && playable(current));
-      toast(`Récitateur : ${rLabel(reciter)}`);
-    };
+      toast(`${reciter.warsh ? 'Warsh' : 'Hafs'} · ${rLabel(reciter)}`);
+    }
 
     /* ---------- Installation (PWA) ---------- */
     let installEvt;
