@@ -869,7 +869,7 @@
   <footer class="footer">
     <div class="container">
       <div class="sadaqa">صدقة جارية</div>
-      <p>Sadaqa jariya — <b>Tirgani Badreddine</b></p>
+      <p><b>Tirgani Badreddine</b></p>
       <p class="dua">N’oubliez pas de faire une douaa · لا تنسونا من صالح دعائكم</p>
       <a class="wa" href="https://wa.me/212602834831" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24">
@@ -1271,7 +1271,7 @@
     const isAndroid = /Android/.test(ua);
     const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     let installDismissed = false;
-    try { installDismissed = localStorage.getItem('installDismissed') === '1'; } catch {}
+    try { installDismissed = localStorage.getItem('installDismissed') === '1'; } catch { }
     const SHARE_ICON = '<svg class="share" viewBox="0 0 24 24"><path d="M12 2 7.5 6.5l1.4 1.4L11 5.8V15h2V5.8l2.1 2.1 1.4-1.4zM5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h-4v2h2v8H7v-8h2v-2z"/></svg>';
 
     function showInstallCard(how, withButton) {
@@ -1312,7 +1312,7 @@
     $('installBtn').onclick = doInstall;
     $('installClose').onclick = () => {
       $('installCard').hidden = true;
-      try { localStorage.setItem('installDismissed', '1'); } catch {}
+      try { localStorage.setItem('installDismissed', '1'); } catch { }
     };
     addEventListener('appinstalled', () => { hideInstall(); toast('Application installée ✓'); });
 
