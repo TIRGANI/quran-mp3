@@ -1,5 +1,5 @@
 // Service worker : met l'application en cache et sert les sourates téléchargées hors ligne.
-const SHELL = 'shell-v5';
+const SHELL = 'shell-v6';
 const AUDIO = 'audio-v1'; // même nom que dans index.html
 
 self.addEventListener('install', event => {
