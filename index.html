@@ -283,37 +283,170 @@
       background: var(--orange);
     }
 
-    .reciter {
-      display: inline-flex;
-      align-items: center;
+    .rwrap {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .rlist {
+      display: flex;
       gap: 10px;
-      padding: 6px 6px 6px 16px;
-      border-radius: 33px;
-      background: rgba(255, 255, 255, .1);
-      border: 1px solid rgba(255, 255, 255, .25);
-      max-width: calc(100% - 32px);
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      padding: 8px 16px 12px;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
     }
 
-    .reciter span {
-      font-size: 14px;
-      color: #ffd2bb;
-      white-space: nowrap;
+    .rlist::-webkit-scrollbar {
+      display: none;
     }
 
-    .reciter select {
-      min-width: 0;
-      max-width: 100%;
-      font: 400 15px "Changa", -apple-system, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background: var(--white);
-      border: 0;
-      border-radius: 33px;
-      padding: 8px 14px;
+    .rc {
+      position: relative;
+      flex: 0 0 116px;
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 12px 6px 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
       cursor: pointer;
+      transition: transform .15s, background .15s, border-color .15s;
     }
 
-    .reciter select:focus-visible {
+    .rc:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, .12);
+    }
+
+    .rc:focus-visible {
       outline: 2px solid var(--orange);
+      outline-offset: 2px;
+    }
+
+    .rc svg.av {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .35));
+    }
+
+    .rc .an {
+      font-family: var(--ar);
+      font-size: 17px;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .rc .fn {
+      font-size: 11px;
+      line-height: 1.3;
+      opacity: .7;
+      text-align: center;
+    }
+
+    .rc.on {
+      background: var(--white);
+      border-color: var(--white);
+      color: var(--ink);
+      box-shadow: 0 8px 24px rgba(247, 99, 27, .35), 0 0 0 2px var(--orange);
+    }
+
+    .rc.on .fn {
+      color: var(--orange);
+      opacity: 1;
+    }
+
+    /* Petites barres animées sur le récitateur en cours d'écoute */
+    .rc .eq {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: none;
+      gap: 2px;
+      align-items: flex-end;
+      height: 12px;
+    }
+
+    .rc.on .eq {
+      display: flex;
+    }
+
+    .rc .eq i {
+      width: 3px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--orange);
+    }
+
+    body.playing .rc.on .eq i {
+      animation: eq .9s ease-in-out infinite alternate;
+    }
+
+    .rc .eq i:nth-child(2) {
+      animation-delay: -.3s !important;
+    }
+
+    .rc .eq i:nth-child(3) {
+      animation-delay: -.6s !important;
+    }
+
+    @keyframes eq {
+      to {
+        height: 12px;
+      }
+    }
+
+    .rnav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--white);
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+    }
+
+    .rnav svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .rnav.prev {
+      left: -6px;
+    }
+
+    .rnav.next {
+      right: -6px;
+    }
+
+    @media (hover: none), (max-width: 600px) {
+      .rnav {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.playing .rc.on .eq i {
+        animation: none;
+        height: 10px;
+      }
     }
 
     /* Recherche + filtres */
@@ -915,10 +1048,11 @@
         <button data-w="0" aria-pressed="true">حفص<small>Hafs</small></button>
         <button data-w="1" aria-pressed="false">ورش<small>Warsh</small></button>
       </div>
-      <label class="reciter">
-        <span>القارئ · Récitateur</span>
-        <select id="reciter"></select>
-      </label>
+      <div class="rwrap">
+        <button class="rnav prev" id="rPrev" aria-label="Récitateurs précédents"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></button>
+        <div class="rlist" id="rlist" role="radiogroup" aria-label="Récitateur"></div>
+        <button class="rnav next" id="rNext" aria-label="Récitateurs suivants"><svg viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z"/></svg></button>
+      </div>
     </div>
   </section>
 
@@ -1442,11 +1576,48 @@
     }
 
     /* ---------- Choix du récitateur ---------- */
-    const rSelect = $('reciter');
-    // La liste ne montre que les récitateurs de la lecture choisie (Hafs ou Warsh)
-    function showReciter() {
-      rSelect.replaceChildren(...RECITERS.filter(r => r.warsh === reciter.warsh).map(r => new Option(`${r.ar} — ${r.fr}`, r.id)));
-      rSelect.value = reciter.id;
+    // Médaillon de chaque récitateur : étoile à huit branches, couleur propre et initiale du nom
+    const PALETTE = [['#f7631b', '#b8400a'], ['#1e9e63', '#0c5f3b'], ['#3b5bdb', '#1b2c8a'], ['#9c36b5', '#561a68'],
+      ['#e0a030', '#9a6110'], ['#0ca5b0', '#06636a'], ['#d6336c', '#8a1a43'], ['#5c7cfa', '#2f44a8']];
+    function avatar(r, i) {
+      const [c1, c2] = PALETTE[i % PALETTE.length];
+      const letter = r.ar.split(' ').at(-1).replace(/^ال/, '')[0];
+      const sq = 'x="21" y="21" width="58" height="58" rx="7"';
+      return `<svg class="av" viewBox="0 0 100 100" aria-hidden="true">
+        <defs><linearGradient id="av${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
+        <rect ${sq} fill="url(#av${i})"/><rect ${sq} fill="url(#av${i})" transform="rotate(45 50 50)"/>
+        <circle cx="50" cy="50" r="27" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+        <text x="50" y="52" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Amiri, serif" font-size="34" font-weight="700">${letter}</text>
+      </svg>`;
+    }
+    const rList = $('rlist');
+    RECITERS.forEach((r, i) => {
+      const b = document.createElement('button');
+      b.className = 'rc';
+      b.dataset.id = r.id;
+      b.setAttribute('role', 'radio');
+      b.innerHTML = `${avatar(r, i)}<span class="an">${r.ar}</span><span class="fn">${r.fr}</span><span class="eq"><i></i><i></i><i></i></span>`;
+      b.onclick = () => r !== reciter && setReciter(r.id);
+      rList.append(b);
+    });
+    // Fait défiler le carrousel (sans bouger la page) pour centrer le récitateur choisi
+    function centerReciter(smooth) {
+      const b = rList.querySelector('.rc.on');
+      if (b) rList.scrollTo({ left: b.offsetLeft - (rList.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+    }
+    $('rPrev').onclick = () => rList.scrollBy({ left: -rList.clientWidth * .8, behavior: 'smooth' });
+    $('rNext').onclick = () => rList.scrollBy({ left: rList.clientWidth * .8, behavior: 'smooth' });
+    audio.addEventListener('play', () => document.body.classList.add('playing'));
+    audio.addEventListener('pause', () => document.body.classList.remove('playing'));
+    // Le carrousel ne montre que les récitateurs de la lecture choisie (Hafs ou Warsh)
+    function showReciter(smooth) {
+      for (const b of rList.children) {
+        const r = RECITERS.find(x => x.id === b.dataset.id);
+        b.hidden = r.warsh !== reciter.warsh;
+        b.classList.toggle('on', r === reciter);
+        b.setAttribute('aria-checked', r === reciter);
+      }
+      centerReciter(smooth);
       for (const b of $('riwaya').children) {
         const on = (b.dataset.w === '1') === reciter.warsh;
         b.classList.toggle('on', on);
@@ -1456,7 +1627,7 @@
       for (const c of grid.children) c.querySelector('.sz').textContent = mb(size(+c.dataset.n));
     }
     showReciter();
-    rSelect.onchange = () => setReciter(rSelect.value);
+    addEventListener('load', () => centerReciter());
     // Passer de Hafs à Warsh (ou l'inverse) reprend le dernier récitateur choisi dans cette lecture
     $('riwaya').onclick = e => {
       const b = e.target.closest('button');
@@ -1476,10 +1647,10 @@
       // Les téléchargements en cours concernent l'ancien récitateur : on les arrête
       queue = [];
       running?.ctrl.abort();
-      showReciter();
+      showReciter(true);
       if (canOffline) await loadDownloaded();
       select(current, wasPlaying && playable(current));
-      toast(`${reciter.warsh ? 'Warsh' : 'Hafs'} · ${rLabel(reciter)}`);
+      toast(`${reciter.fr} · ${reciter.warsh ? 'Warsh' : 'Hafs'}`);
     }
 
     /* ---------- Installation (PWA) ---------- */
