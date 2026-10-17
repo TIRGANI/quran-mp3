@@ -123,6 +123,66 @@
       font-weight: 600;
     }
 
+    /* Encadré d'installation */
+    .installcard {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--navy-2), var(--navy));
+      color: #fff;
+      border-radius: 18px;
+      padding: 14px 44px 14px 14px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .installcard img {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      flex: none;
+    }
+
+    .installcard .txt {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .installcard .txt b {
+      font-weight: 600;
+    }
+
+    .installcard small {
+      display: block;
+      font-size: 13px;
+      opacity: .85;
+      line-height: 1.5;
+    }
+
+    .installcard .share {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      vertical-align: -3px;
+      fill: #ffd2bb;
+    }
+
+    .installcard .close {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      opacity: .6;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
     /* Bannière */
     .banner {
       position: relative;
@@ -774,6 +834,16 @@
       <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
     </div>
 
+    <div class="installcard" id="installCard" hidden>
+      <img src="icon-192.png" alt="">
+      <div class="txt">
+        <b>Installer l'application sur votre téléphone</b>
+        <small id="installHow">Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.</small>
+      </div>
+      <button class="btn" id="installBtn" hidden>Installer</button>
+      <button class="close" id="installClose" aria-label="Fermer">×</button>
+    </div>
+
     <div class="offline" id="offline" hidden>
       <div class="txt">
         <b>Écoute hors connexion</b> — <span id="offCount">0 / 114 sourates</span>
@@ -1196,8 +1266,55 @@
 
     /* ---------- Installation (PWA) ---------- */
     let installEvt;
-    addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install').hidden = false; });
-    $('install').onclick = async () => { installEvt?.prompt(); installEvt = null; $('install').hidden = true; };
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(ua);
+    const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    let installDismissed = false;
+    try { installDismissed = localStorage.getItem('installDismissed') === '1'; } catch {}
+    const SHARE_ICON = '<svg class="share" viewBox="0 0 24 24"><path d="M12 2 7.5 6.5l1.4 1.4L11 5.8V15h2V5.8l2.1 2.1 1.4-1.4zM5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h-4v2h2v8H7v-8h2v-2z"/></svg>';
+
+    function showInstallCard(how, withButton) {
+      if (installed || installDismissed) return;
+      if (how) $('installHow').innerHTML = how;
+      $('installBtn').hidden = !withButton;
+      $('installCard').hidden = false;
+    }
+    function hideInstall() {
+      $('installCard').hidden = true;
+      $('install').hidden = true;
+    }
+    async function doInstall() {
+      if (!installEvt) return;
+      installEvt.prompt();
+      const { outcome } = await installEvt.userChoice;
+      installEvt = null;
+      if (outcome === 'accepted') hideInstall();
+    }
+
+    // Android / ordinateur (Chrome, Edge, Samsung Internet) : vraie fenêtre d'installation
+    addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      installEvt = e;
+      $('install').hidden = false;
+      showInstallCard(null, true);
+    });
+    // iPhone / iPad : Safari n'a pas de bouton d'installation, on explique la marche à suivre
+    if (isIOS) {
+      showInstallCard(`Dans Safari, touchez ${SHARE_ICON} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`, false);
+    } else if (isAndroid) {
+      // Navigateurs Android sans fenêtre d'installation (Firefox…) : instructions via le menu
+      setTimeout(() => {
+        if (!installEvt) showInstallCard('Ouvrez le menu <b>⋮</b> du navigateur, puis <b>« Installer l’application »</b> ou <b>« Ajouter à l’écran d’accueil »</b>.', false);
+      }, 3000);
+    }
+    $('install').onclick = doInstall;
+    $('installBtn').onclick = doInstall;
+    $('installClose').onclick = () => {
+      $('installCard').hidden = true;
+      try { localStorage.setItem('installDismissed', '1'); } catch {}
+    };
+    addEventListener('appinstalled', () => { hideInstall(); toast('Application installée ✓'); });
 
     /* ---------- Démarrage ---------- */
     (async () => {
