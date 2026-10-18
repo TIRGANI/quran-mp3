@@ -96,6 +96,8 @@
     .topbar .right {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 12px;
       color: var(--muted);
       font-size: 14px;
@@ -137,6 +139,7 @@
     }
 
     .langBtn {
+      display: inline-block;
       border: 1px solid var(--line);
       background: var(--white);
       color: var(--ink);
@@ -145,6 +148,7 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 12.5px;
+      text-decoration: none;
     }
 
     .langBtn:hover {
@@ -1444,6 +1448,7 @@
         <span><span id="recitationLabel">Récitation :</span> <b id="rName">Ali Jaber</b></span>
         <span class="status" id="status">En ligne</span>
         <button class="install" id="install" hidden>Installer l'app</button>
+        <a class="langBtn" id="demoTopLink" href="demo.html">Démo</a>
         <button class="langBtn" id="langBtn" type="button"
           title="Changer la langue de l'interface / تغيير لغة الواجهة">FR / عربي</button>
       </div>
@@ -1800,7 +1805,7 @@
         surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
         emptyMsg: 'Aucune sourate ne correspond.',
         androidApp: 'Application Android',
-        demoLink: 'Voir la démo',
+        demoLink: 'Voir la démo', demoTop: 'Démo',
         prevTitle: 'Précédente', playTitle: 'Lecture / Pause (Espace)', nextTitle: 'Suivante',
         seekAria: 'Position de lecture',
         autoToggle: 'Enchaîner', autoTitle: 'Enchaîner les sourates',
@@ -1866,7 +1871,7 @@
         surahCount: n => `${n} سورة`,
         emptyMsg: 'لا توجد سورة مطابقة.',
         androidApp: 'تطبيق أندرويد',
-        demoLink: 'عرض توضيحي',
+        demoLink: 'عرض توضيحي', demoTop: 'عرض',
         prevTitle: 'السابقة', playTitle: 'تشغيل / إيقاف (مسافة)', nextTitle: 'التالية',
         seekAria: 'موضع التشغيل',
         autoToggle: 'تلقائي', autoTitle: 'الانتقال التلقائي بين السور',
@@ -1949,6 +1954,7 @@
       $('empty').textContent = t('emptyMsg');
       $('androidApp').textContent = t('androidApp');
       $('demoLinkLabel').textContent = t('demoLink');
+      $('demoTopLink').textContent = t('demoTop');
       $('prev').title = t('prevTitle');
       $('play').title = t('playTitle');
       $('next').title = t('nextTitle');
