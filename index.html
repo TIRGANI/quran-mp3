@@ -1191,7 +1191,7 @@
       </div>
       <div class="progress">
         <span id="cur">0:00</span>
-        <input type="range" id="seek" min="0" max="1000" value="0">
+        <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Position de lecture">
         <span id="dur">0:00</span>
       </div>
       <div class="opts">
@@ -1378,12 +1378,11 @@
     // Dans l'application Android, pas de service worker : une sourate gardée est lue
     // directement depuis le cache via une URL blob. Sur le site, le service worker s'en charge.
     async function sourceFor(n) {
-      if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
       if (APP && downloaded.has(n)) {
         const res = await (await caches.open(AUDIO_CACHE)).match(audioUrl(n));
-        if (res) return blobUrl = URL.createObjectURL(await res.blob());
+        if (res) return { url: URL.createObjectURL(await res.blob()), blob: true };
       }
-      return audioUrl(n);
+      return { url: audioUrl(n), blob: false };
     }
 
     function select(n, autoplay, startAt = 0) {
@@ -1391,8 +1390,10 @@
       current = n;
       const [tr, ar, fr, v] = S[n - 1];
       const token = ++selectToken;
-      sourceFor(n).then(src => {
-        if (token !== selectToken) return; // une autre sourate a été choisie entre-temps
+      sourceFor(n).then(({ url: src, blob }) => {
+        if (token !== selectToken) { if (blob) URL.revokeObjectURL(src); return; } // une autre sourate a été choisie entre-temps
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+        blobUrl = blob ? src : null;
         audio.src = src;
         audio.playbackRate = +$('rate').value;
         if (startAt) audio.addEventListener('loadedmetadata', () => audio.currentTime = startAt, { once: true });
@@ -1421,11 +1422,15 @@
     function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); }
     function save() { try { localStorage.setItem('lecteur', JSON.stringify({ n: current, t: audio.currentTime || 0 })); } catch { } }
 
+    try { $('rate').value = localStorage.getItem('rate') || '1'; } catch { }
+    try { $('loop').checked = localStorage.getItem('loop') === '1'; } catch { }
+    audio.loop = $('loop').checked;
+
     $('play').onclick = toggle;
     $('prev').onclick = () => step(-1);
     $('next').onclick = () => step(1);
-    $('rate').onchange = e => audio.playbackRate = +e.target.value;
-    $('loop').onchange = e => audio.loop = e.target.checked;
+    $('rate').onchange = e => { audio.playbackRate = +e.target.value; try { localStorage.setItem('rate', e.target.value); } catch { } };
+    $('loop').onchange = e => { audio.loop = e.target.checked; try { localStorage.setItem('loop', e.target.checked ? '1' : '0'); } catch { } };
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
       navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
@@ -1434,7 +1439,11 @@
     audio.addEventListener('play', () => { $('icPlay').toggleAttribute('hidden', true); $('icPause').toggleAttribute('hidden', false); });
     audio.addEventListener('pause', () => { $('icPlay').toggleAttribute('hidden', false); $('icPause').toggleAttribute('hidden', true); save(); });
     audio.addEventListener('loadedmetadata', () => $('dur').textContent = fmt(audio.duration));
-    audio.addEventListener('error', () => { if (!navigator.onLine) toast('Cette sourate n’est pas disponible hors ligne.'); });
+    audio.addEventListener('error', () => {
+      const code = audio.error?.code;
+      if (!code || code === 1) return; // code 1 = chargement annulé (changement de sourate), pas une vraie erreur
+      toast(!navigator.onLine ? 'Cette sourate n’est pas disponible hors ligne.' : 'Impossible de lire cette sourate. Réessayez ou changez de récitateur.');
+    });
     let lastSave = 0, seeking = false;
     audio.addEventListener('timeupdate', () => {
       $('cur').textContent = fmt(audio.currentTime);
@@ -1499,7 +1508,7 @@
     addEventListener('offline', updateOnline);
 
     /* ---------- Téléchargements hors ligne ---------- */
-    let queue = [], running = null; // running = { n, rid, ctrl }
+    let queue = [], running = null, pumpPromise = null; // running = { n, rid, ctrl }
 
     function setDlState(n, state, p = 0) {
       const b = card(n).querySelector('.dl');
@@ -1549,7 +1558,8 @@
         : [...queue, ...add.filter(n => !queue.includes(n))];
       add.forEach(n => setDlState(n, 'loading', 0));
       updatePanel();
-      if (!running) pump();
+      if (!running) pumpPromise = pump();
+      return pumpPromise;
     }
 
     async function pump() {
@@ -1801,12 +1811,15 @@
         let juzDone = false;
         try { juzDone = localStorage.getItem('juzAmma') === '1'; } catch { }
         if (!juzDone && navigator.onLine && !navigator.connection?.saveData) {
-          try { localStorage.setItem('juzAmma', '1'); } catch { }
           const juz = Array.from({ length: 37 }, (_, i) => 78 + i);
-          if (juz.some(n => !downloaded.has(n))) {
-            enqueue(juz, true);
+          const missing = juz.filter(n => !downloaded.has(n));
+          if (missing.length) {
             toast('Téléchargement du Juz ‘Amma (78 à 114) pour l’écoute hors connexion…');
+            await enqueue(missing, true);
           }
+          // Marque "fait" seulement si le Juz 'Amma est réellement complet (pas en cas d'échec,
+          // de perte de connexion ou d'espace insuffisant) : sinon on réessaiera à la prochaine visite.
+          if (juz.every(n => downloaded.has(n))) { try { localStorage.setItem('juzAmma', '1'); } catch { } }
         }
       }
       updateOnline();
