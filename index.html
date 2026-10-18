@@ -207,6 +207,15 @@
       background: #ff7a38;
     }
 
+    .wa.demolink {
+      background: var(--navy-2);
+      margin-right: 8px;
+    }
+
+    .wa.demolink:hover {
+      background: #182056;
+    }
+
     .installcard .apk {
       text-decoration: none;
       white-space: nowrap;
@@ -1375,7 +1384,8 @@
       border-right: 4px solid var(--orange);
     }
 
-    html[dir="rtl"] .wa.apkfoot {
+    html[dir="rtl"] .wa.apkfoot,
+    html[dir="rtl"] .wa.demolink {
       margin-right: 0;
       margin-left: 8px;
     }
@@ -1527,6 +1537,12 @@
       <div class="sadaqa" lang="ar">صدقة جارية</div>
       <p><b>Tirgani Badreddine</b></p>
       <p class="dua" lang="ar">لا تنسونا من صالح دعائكم</p>
+      <a class="wa demolink" href="demo.html">
+        <svg viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <span id="demoLinkLabel">Voir la démo</span>
+      </a>
       <a class="wa apkfoot" id="apkFoot" href="CoranMP3.apk" download>
         <svg viewBox="0 0 24 24">
           <path
@@ -1784,6 +1800,7 @@
         surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
         emptyMsg: 'Aucune sourate ne correspond.',
         androidApp: 'Application Android',
+        demoLink: 'Voir la démo',
         prevTitle: 'Précédente', playTitle: 'Lecture / Pause (Espace)', nextTitle: 'Suivante',
         seekAria: 'Position de lecture',
         autoToggle: 'Enchaîner', autoTitle: 'Enchaîner les sourates',
@@ -1849,6 +1866,7 @@
         surahCount: n => `${n} سورة`,
         emptyMsg: 'لا توجد سورة مطابقة.',
         androidApp: 'تطبيق أندرويد',
+        demoLink: 'عرض توضيحي',
         prevTitle: 'السابقة', playTitle: 'تشغيل / إيقاف (مسافة)', nextTitle: 'التالية',
         seekAria: 'موضع التشغيل',
         autoToggle: 'تلقائي', autoTitle: 'الانتقال التلقائي بين السور',
@@ -1930,6 +1948,7 @@
       if (!confirmRm) $('rmAll').textContent = t('removeAllBtn');
       $('empty').textContent = t('emptyMsg');
       $('androidApp').textContent = t('androidApp');
+      $('demoLinkLabel').textContent = t('demoLink');
       $('prev').title = t('prevTitle');
       $('play').title = t('playTitle');
       $('next').title = t('nextTitle');
