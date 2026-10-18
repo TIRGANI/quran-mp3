@@ -1,7 +1,7 @@
 {
-  "name": "القرآن الكريم — Ali Jaber",
+  "name": "القرآن الكريم — Coran MP3",
   "short_name": "Coran MP3",
-  "description": "Écouter les 114 sourates du Saint Coran, récitation Ali Jaber, même hors ligne.",
+  "description": "Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
