@@ -1307,6 +1307,33 @@
       color: #04091e;
     }
 
+    .hifdh-meaning-btn {
+      align-self: flex-start;
+      border: 1px solid rgba(247, 99, 27, .4);
+      background: transparent;
+      color: #ffd2bb;
+      border-radius: 33px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: -2px;
+    }
+
+    .hifdh-meaning-btn:hover {
+      background: rgba(247, 99, 27, .15);
+    }
+
+    .hifdh-meaning {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #fff;
+      opacity: .9;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
     @media (max-width: 640px) {
       .banner h1 {
         font-size: 46px;
@@ -1589,6 +1616,8 @@
           </div>
         </div>
         <div class="hifdh-ayah" id="hifdhAyahText" lang="ar" hidden></div>
+        <button type="button" class="hifdh-meaning-btn" id="hifdhMeaningBtn" hidden aria-expanded="false">Signification (FR)</button>
+        <div class="hifdh-meaning" id="hifdhMeaning" hidden></div>
         <div class="hifdh-controls">
           <label><span id="hifdhReciterLabel">Récitateur</span>
             <select id="hifdhReciter" aria-label="Récitateur pour le mode Hifdh"></select>
@@ -1765,6 +1794,7 @@
         hifdhReciterLabel: 'Récitateur', hifdhReciterAria: 'Récitateur pour le mode Hifdh',
         hifdhRepsLabel: 'Répétitions par verset', hifdhRepsAria: 'Nombre de répétitions par verset',
         hifdhStart: 'Démarrer', hifdhStop: 'Arrêter',
+        meaningBtn: 'Signification (FR)', meaningError: 'Signification indisponible pour ce verset.',
         type: n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise',
         verses: v => `${v} verset${v > 1 ? 's' : ''}`,
         cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
@@ -1829,6 +1859,7 @@
         hifdhReciterLabel: 'القارئ', hifdhReciterAria: 'القارئ لوضع الحفظ',
         hifdhRepsLabel: 'عدد التكرار لكل آية', hifdhRepsAria: 'عدد مرات تكرار كل آية',
         hifdhStart: 'ابدأ', hifdhStop: 'إيقاف',
+        meaningBtn: 'المعنى (بالفرنسية)', meaningError: 'المعنى غير متوفر لهذه الآية.',
         type: n => MEDINAN.has(n) ? 'مدنية' : 'مكية',
         verses: v => `${v} آية`,
         cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
@@ -1921,6 +1952,7 @@
         const isBasmala = hifdh.ayah === 0;
         $('pMeta').textContent = isBasmala ? t('hifdhBismillahStatus') : t('hifdhVerseStatus', hifdh.ayah, total, hifdh.rep, reps);
         $('hifdhStatus').textContent = isBasmala ? t('hifdhSurahBismillahStatus', current) : t('hifdhSurahVerseStatus', current, hifdh.ayah, total, hifdh.rep, reps);
+        if (!isBasmala) $('hifdhMeaningBtn').textContent = t('meaningBtn');
       }
 
       // Zones déjà pilotées par leur propre fonction de rendu : on la relance pour la nouvelle langue
@@ -2088,7 +2120,36 @@
       audio.loop = isOn($('loop'));
       $('hifdhGo').textContent = t('hifdhStart');
       $('hifdhAyahText').hidden = true;
+      $('hifdhMeaningBtn').hidden = true;
+      $('hifdhMeaning').hidden = true;
     }
+
+    // Signification (traduction française Hamidullah, api.alquran.cloud), affichée à la demande
+    // pour chaque verset : on ne la récupère que si l'utilisateur clique sur le bouton.
+    const meaningCache = new Map();
+    let hifdhMeaningKey = '';
+    async function toggleHifdhMeaning() {
+      const box = $('hifdhMeaning');
+      if (!box.hidden) { box.hidden = true; $('hifdhMeaningBtn').setAttribute('aria-expanded', 'false'); return; }
+      box.hidden = false;
+      $('hifdhMeaningBtn').setAttribute('aria-expanded', 'true');
+      const s = current, a = hifdh.ayah;
+      const key = `${s}:${a}`;
+      hifdhMeaningKey = key;
+      if (meaningCache.has(key)) { box.textContent = meaningCache.get(key); return; }
+      box.textContent = '…';
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/fr.hamidullah`);
+        const json = await res.json();
+        const text = json?.data?.text;
+        if (!text) throw new Error('empty');
+        meaningCache.set(key, text);
+        if (hifdhMeaningKey === key) box.textContent = text;
+      } catch {
+        if (hifdhMeaningKey === key) box.textContent = t('meaningError');
+      }
+    }
+    $('hifdhMeaningBtn').onclick = toggleHifdhMeaning;
 
     // Texte du verset affiché pendant la répétition (API alquran.cloud, texte uthmani officiel),
     // mis en cache pour ne le récupérer qu'une fois par verset même s'il est répété plusieurs fois.
@@ -2198,11 +2259,17 @@
       audio.src = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${isBasmala ? '000' : pad(hifdh.ayah)}.mp3`;
       audio.play().catch(() => { });
       hifdhWords = null;
+      hifdhMeaningKey = '';
+      $('hifdhMeaning').hidden = true;
+      $('hifdhMeaningBtn').setAttribute('aria-expanded', 'false');
       if (isBasmala) {
         $('hifdhAyahText').innerHTML = `<span class="phrase">${BASMALA}</span>`;
         $('hifdhAyahText').hidden = false;
+        $('hifdhMeaningBtn').hidden = true; // la signification du Bismillah n'est pas un verset numéroté
       } else {
         loadHifdhText(current, hifdh.ayah, reciterRow && reciterRow[2]);
+        $('hifdhMeaningBtn').textContent = t('meaningBtn');
+        $('hifdhMeaningBtn').hidden = false;
       }
       $('pNum').textContent = current;
       $('pTr').textContent = tr;
