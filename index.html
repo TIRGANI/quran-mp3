@@ -1163,7 +1163,7 @@
       flex-basis: 100%;
       font-family: var(--ar);
       font-size: 26px;
-      line-height: 1.8;
+      line-height: 2.1;
       text-align: right;
       direction: rtl;
       color: #ffd2bb;
@@ -1171,6 +1171,24 @@
       border-radius: 12px;
       padding: 14px 18px;
       margin-bottom: 4px;
+    }
+
+    .hifdh-ayah .phrase {
+      display: inline-block;
+      margin: 0 2px;
+    }
+
+    .hifdh-ayah .word {
+      display: inline-block;
+      margin: 0 1px;
+      border-radius: 5px;
+      padding: 0 3px;
+      transition: background .1s, color .1s;
+    }
+
+    .hifdh-ayah .word.active {
+      background: var(--orange);
+      color: #04091e;
     }
 
     @media (max-width: 640px) {
@@ -1611,17 +1629,15 @@
     /* ---------- Mode Hifdh : répétition verset par verset, nombre de répétitions au choix ----------
        Audio par verset (hors ligne non disponible dans ce mode) fourni par everyayah.com, fichiers
        nommés SSSAAA.mp3 (sourate 3 chiffres + verset 3 chiffres), vérifié pour les 114 sourates. */
+    // 3e valeur = identifiant du récitateur sur api.quran.com (quran.com dashboard), utilisé
+    // uniquement pour récupérer les horaires mot par mot ; l'audio reste celui d'everyayah.com.
     const HIFDH_RECITERS = [
-      ['Alafasy_128kbps', 'Mishary Al-Afasy'],
-      ['Abdul_Basit_Murattal_192kbps', 'Abdul Basit (Murattal)'],
-      ['Husary_128kbps', 'Mahmoud Al-Husary'],
-      ['Minshawy_Murattal_128kbps', 'Al-Minshawi'],
-      ['Abdurrahmaan_As-Sudais_192kbps', 'As-Sudais'],
-      ['Hudhaify_128kbps', 'Ali Al-Hudhaifi'],
-      ['Saood_ash-Shuraym_128kbps', 'Ash-Shuraim'],
-      ['MaherAlMuaiqly128kbps', 'Maher Al-Muaiqly'],
-      ['Yasser_Ad-Dussary_128kbps', 'Yasser Ad-Dossari'],
-      ['Muhammad_Ayyoub_128kbps', 'Muhammad Ayyub'],
+      ['Alafasy_128kbps', 'Mishary Al-Afasy', 7],
+      ['Abdul_Basit_Murattal_192kbps', 'Abdul Basit (Murattal)', 2],
+      ['Husary_128kbps', 'Mahmoud Al-Husary', 6],
+      ['Minshawy_Murattal_128kbps', 'Al-Minshawi', 9],
+      ['Abdurrahmaan_As-Sudais_192kbps', 'As-Sudais', 3],
+      ['Saood_ash-Shuraym_128kbps', 'Ash-Shuraim', 10],
     ];
     HIFDH_RECITERS.forEach(([id, fr]) => {
       const o = document.createElement('option');
@@ -1631,9 +1647,11 @@
     try { $('hifdhReciter').value = localStorage.getItem('hifdhReciter') || HIFDH_RECITERS[0][0]; } catch { }
     try { $('hifdhReps').value = localStorage.getItem('hifdhReps') || '3'; } catch { }
 
+    let hifdhWords = null; // { els } quand le verset affiché peut être surligné mot par mot
     function exitHifdh() {
       if (!hifdh) return;
       hifdh = null;
+      hifdhWords = null;
       audio.loop = isOn($('loop'));
       $('hifdhGo').textContent = 'Démarrer';
       $('hifdhAyahText').hidden = true;
@@ -1643,48 +1661,130 @@
     // mis en cache pour ne le récupérer qu'une fois par verset même s'il est répété plusieurs fois.
     const ayahTextCache = new Map();
     let hifdhTextKey = '';
-    async function loadHifdhText(s, a) {
+    const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    // Découpe le verset en phrases, sur les signes d'arrêt (waqf) du texte uthmani :
+    // le texte lui-même n'est jamais modifié, seulement regroupé visuellement pour le suivi.
+    const splitPhrases = text => text.split(/(?<=[ۚۖۗۛۙۘ])\s*/).map(s => s.trim()).filter(Boolean);
+    // Découpe en mots pour le surlignage : un signe d'arrêt isolé est rattaché au mot précédent
+    // (il est toujours accolé à l'écrit), pour que le nombre de mots corresponde aux horaires audio.
+    function tokenizeWords(text) {
+      const words = [];
+      for (const t of text.split(/\s+/).filter(Boolean)) {
+        if (/^[ۚۖۗۛۙۘ]+$/.test(t) && words.length) words[words.length - 1] += t;
+        else words.push(t);
+      }
+      return words;
+    }
+    const BASMALA = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+    const BASMALA_VARIANT = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ'; // orthographe alif-wasla renvoyée par l'API
+    // Première sourate affichée pour une sourate donnée : 1 (= verset 1) pour At-Tawba, qui n'a
+    // pas de Bismillah, et pour Al-Fatiha, dont le verset 1 EST le Bismillah ; 0 ailleurs (Bismillah à part).
+    const firstAyah = n => (n === 1 || n === 9) ? 1 : 0;
+    // L'API renvoie le Bismillah déjà inclus dans le texte du verset 1 de chaque sourate (sauf At-Tawba) :
+    // on l'enlève puisqu'il est déjà affiché séparément, pour éviter de le voir deux fois.
+    function stripLeadingBasmala(text) {
+      // Les signes diacritiques peuvent être encodés dans un ordre différent selon la source :
+      // on normalise (NFC) avant de comparer, pour que la comparaison ne dépende pas de cet ordre.
+      const norm = text.normalize('NFC');
+      for (const b of [BASMALA, BASMALA_VARIANT]) {
+        const bn = b.normalize('NFC');
+        if (norm.startsWith(bn)) return norm.slice(bn.length).trim();
+      }
+      return text;
+    }
+
+    // Horaires mot par mot (api.quran.com), récupérés une fois par sourate + récitateur et mis en cache.
+    const wordTimingCache = new Map();
+    async function loadWordTimings(qdcId, s) {
+      const key = `${qdcId}:${s}`;
+      if (wordTimingCache.has(key)) return wordTimingCache.get(key);
+      const map = new Map();
+      try {
+        const res = await fetch(`https://api.quran.com/api/qdc/audio/reciters/${qdcId}/audio_files?chapter=${s}&segments=true`);
+        const json = await res.json();
+        for (const v of json.audio_files[0].verse_timings) {
+          const ayahNum = +v.verse_key.split(':')[1];
+          map.set(ayahNum, { from: v.timestamp_from, segments: v.segments });
+        }
+      } catch { } // pas bloquant : le texte s'affichera sans surlignage mot par mot
+      wordTimingCache.set(key, map);
+      return map;
+    }
+
+    async function loadHifdhText(s, a, qdcId) {
       const key = `${s}:${a}`;
       hifdhTextKey = key;
       const box = $('hifdhAyahText');
-      if (ayahTextCache.has(key)) {
-        box.textContent = ayahTextCache.get(key);
-        box.hidden = false;
-        return;
+      let text = ayahTextCache.get(key);
+      if (!text) {
+        box.hidden = true;
+        try {
+          const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/quran-uthmani`);
+          const json = await res.json();
+          text = json?.data?.text;
+          if (!text) throw new Error('empty');
+          ayahTextCache.set(key, text);
+        } catch {
+          if (hifdhTextKey === key) box.hidden = true;
+          return;
+        }
       }
-      box.hidden = true;
-      try {
-        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/quran-uthmani`);
-        const json = await res.json();
-        const text = json?.data?.text;
-        if (!text) throw new Error('empty');
-        ayahTextCache.set(key, text);
-        if (hifdhTextKey === key) { box.textContent = text; box.hidden = false; }
-      } catch {
-        if (hifdhTextKey === key) box.hidden = true; // pas bloquant : l'audio continue sans le texte
+      if (hifdhTextKey !== key) return; // un autre verset a été sélectionné entre-temps
+      const stripped = a === 1 && s !== 1 && s !== 9;
+      const displayText = stripped ? stripLeadingBasmala(text) : text;
+      const words = tokenizeWords(displayText);
+
+      // Le surlignage mot par mot n'est tenté que si le nombre de mots correspond exactement
+      // au nombre de segments horodatés : sinon, affichage normal du texte (jamais d'erreur visible).
+      let timing = null;
+      if (qdcId && !stripped) {
+        const timings = await loadWordTimings(qdcId, s);
+        if (hifdhTextKey !== key) return;
+        const entry = timings.get(a);
+        if (entry && entry.segments.length === words.length) timing = entry;
       }
+
+      if (timing) {
+        box.innerHTML = words.map((w, i) =>
+          `<span class="word" data-from="${timing.segments[i][1] - timing.from}" data-to="${timing.segments[i][2] - timing.from}">${esc(w)}</span>`
+        ).join(' ');
+        hifdhWords = { els: [...box.querySelectorAll('.word')] };
+      } else {
+        box.innerHTML = splitPhrases(displayText).map(p => `<span class="phrase">${esc(p)}</span>`).join(' ');
+        hifdhWords = null;
+      }
+      box.hidden = false;
     }
 
     function playHifdhAyah() {
       const total = S[current - 1][3];
       const [tr, ar] = S[current - 1];
       const reps = +$('hifdhReps').value;
-      audio.src = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${pad(hifdh.ayah)}.mp3`;
+      const isBasmala = hifdh.ayah === 0;
+      const reciterRow = HIFDH_RECITERS.find(r => r[0] === $('hifdhReciter').value);
+      audio.src = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${isBasmala ? '000' : pad(hifdh.ayah)}.mp3`;
       audio.play().catch(() => { });
-      loadHifdhText(current, hifdh.ayah);
+      hifdhWords = null;
+      if (isBasmala) {
+        $('hifdhAyahText').innerHTML = `<span class="phrase">${BASMALA}</span>`;
+        $('hifdhAyahText').hidden = false;
+      } else {
+        loadHifdhText(current, hifdh.ayah, reciterRow && reciterRow[2]);
+      }
       $('pNum').textContent = current;
       $('pTr').textContent = tr;
       $('pAr').textContent = `سورة ${ar}`;
-      $('pMeta').textContent = `Verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
-      $('hifdhStatus').textContent = `Sourate ${current} · verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
-      document.title = `Hifdh ${current}:${hifdh.ayah} — ${tr}`;
+      $('pMeta').textContent = isBasmala ? 'Bismillah' : `Verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
+      $('hifdhStatus').textContent = isBasmala ? `Sourate ${current} · Bismillah` : `Sourate ${current} · verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
+      document.title = `Hifdh ${current}:${isBasmala ? 'bismillah' : hifdh.ayah} — ${tr}`;
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(current)?.classList.add('active');
     }
 
     function hifdhStart() {
+      selectToken++; // invalide un éventuel chargement de sourate (select) encore en attente
       audio.loop = false; // la répétition est gérée manuellement, verset par verset
-      hifdh = { ayah: 1, rep: 1 };
+      hifdh = { ayah: firstAyah(current), rep: 1 };
       try {
         localStorage.setItem('hifdhReciter', $('hifdhReciter').value);
         localStorage.setItem('hifdhReps', $('hifdhReps').value);
@@ -1694,11 +1794,12 @@
     }
 
     function hifdhNext() {
+      if (hifdh.ayah === 0) { hifdh.ayah = 1; hifdh.rep = 1; return playHifdhAyah(); } // fin du Bismillah
       const reps = +$('hifdhReps').value;
       if (hifdh.rep < reps) { hifdh.rep++; return playHifdhAyah(); }
       const total = S[current - 1][3];
       if (hifdh.ayah < total) { hifdh.ayah++; hifdh.rep = 1; return playHifdhAyah(); }
-      if (current < 114) { current++; hifdh.ayah = 1; hifdh.rep = 1; return playHifdhAyah(); }
+      if (current < 114) { current++; hifdh.ayah = firstAyah(current); hifdh.rep = 1; return playHifdhAyah(); }
       exitHifdh();
       $('hifdhStatus').textContent = '';
       toast('Mémorisation terminée : les 114 sourates ont été parcourues.');
@@ -1727,7 +1828,12 @@
     audio.addEventListener('error', () => {
       const code = audio.error?.code;
       if (!code || code === 1) return; // code 1 = chargement annulé (changement de sourate), pas une vraie erreur
-      if (hifdh) { toast('Impossible de lire ce verset. Essayez un autre récitateur pour le mode Hifdh.'); return; }
+      if (hifdh) {
+        // Certains récitateurs n'ont pas de fichier Bismillah séparé : on passe directement au verset 1.
+        if (hifdh.ayah === 0) { hifdh.ayah = 1; return playHifdhAyah(); }
+        toast('Impossible de lire ce verset. Essayez un autre récitateur pour le mode Hifdh.');
+        return;
+      }
       toast(!navigator.onLine ? 'Cette sourate n’est pas disponible hors ligne.' : 'Impossible de lire cette sourate. Réessayez ou changez de récitateur.');
     });
     let lastSave = 0, seeking = false;
@@ -1736,6 +1842,12 @@
       if (!seeking) $('dur').textContent = fmtRemain(audio.currentTime, audio.duration);
       if (!seeking && audio.duration) $('seek').value = audio.currentTime / audio.duration * 1000;
       if (Date.now() - lastSave > 5000) { lastSave = Date.now(); save(); }
+      if (hifdh && hifdhWords) {
+        const ms = audio.currentTime * 1000;
+        for (const el of hifdhWords.els) {
+          el.classList.toggle('active', ms >= +el.dataset.from && ms < +el.dataset.to);
+        }
+      }
     });
     audio.addEventListener('ended', () => {
       if (hifdh) return hifdhNext();
