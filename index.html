@@ -1053,33 +1053,124 @@
     .opts {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
       font-size: 13px;
     }
 
-    .opts label {
+    .opts .toggle {
       display: flex;
       align-items: center;
       gap: 6px;
+      border: 0;
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      opacity: .75;
+      border-radius: 33px;
+      padding: 7px 14px;
       cursor: pointer;
-      opacity: .85;
+      font: inherit;
+      font-weight: 500;
+      transition: .2s;
     }
 
-    .opts input[type=checkbox] {
-      accent-color: var(--orange);
+    .opts .toggle svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex: none;
+    }
+
+    .opts .toggle:hover {
+      background: rgba(255, 255, 255, .15);
+      opacity: 1;
+    }
+
+    .opts .toggle[aria-pressed="true"] {
+      background: var(--orange);
+      opacity: 1;
+      box-shadow: 0 2px 10px rgba(247, 99, 27, .4);
+    }
+
+    .opts .toggle:focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 2px;
     }
 
     .opts select {
-      background: rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .08);
       color: #fff;
       border: 0;
-      border-radius: 8px;
-      padding: 4px 6px;
+      border-radius: 33px;
+      padding: 7px 10px;
       font: inherit;
+      font-weight: 500;
+      cursor: pointer;
     }
 
     .opts select option {
       color: var(--ink);
+    }
+
+    /* Panneau du mode Hifdh (répétition verset par verset) */
+    .hifdh-bar {
+      flex-basis: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, .15);
+      font-size: 12.5px;
+    }
+
+    .hifdh-bar label {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      opacity: .85;
+    }
+
+    .hifdh-bar select,
+    .hifdh-bar input[type=number] {
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font: inherit;
+    }
+
+    .hifdh-bar select option {
+      color: var(--ink);
+    }
+
+    .hifdh-bar input[type=number] {
+      width: 60px;
+    }
+
+    .hifdh-bar .btn {
+      padding: 7px 16px;
+      align-self: flex-end;
+    }
+
+    .hifdh-status {
+      opacity: .85;
+      align-self: center;
+    }
+
+    .hifdh-ayah {
+      flex-basis: 100%;
+      font-family: var(--ar);
+      font-size: 26px;
+      line-height: 1.8;
+      text-align: right;
+      direction: rtl;
+      color: #ffd2bb;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 4px;
     }
 
     @media (max-width: 640px) {
@@ -1102,6 +1193,14 @@
 
       .opts {
         order: 4;
+      }
+
+      .opts .toggle {
+        padding: 7px;
+      }
+
+      .opts .toggle span {
+        display: none;
       }
     }
   </style>
@@ -1237,14 +1336,35 @@
         <span id="dur">0:00</span>
       </div>
       <div class="opts">
-        <label><input type="checkbox" id="auto" checked> Enchaîner</label>
-        <label><input type="checkbox" id="loop"> Répéter</label>
+        <button type="button" class="toggle" id="auto" title="Enchaîner les sourates" aria-pressed="true">
+          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+          <span>Enchaîner</span>
+        </button>
+        <button type="button" class="toggle" id="loop" title="Répéter la sourate" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          <span>Répéter</span>
+        </button>
+        <button type="button" class="toggle" id="hifdhToggle" title="Mode Hifdh : répétition verset par verset" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+          <span>Hifdh</span>
+        </button>
         <select id="rate" title="Vitesse">
           <option value="0.75">0.75×</option>
           <option value="1" selected>1×</option>
           <option value="1.25">1.25×</option>
           <option value="1.5">1.5×</option>
         </select>
+      </div>
+      <div class="hifdh-bar" id="hifdhBar" hidden>
+        <div class="hifdh-ayah" id="hifdhAyahText" lang="ar" hidden></div>
+        <label>Récitateur (verset par verset)
+          <select id="hifdhReciter" aria-label="Récitateur pour le mode Hifdh"></select>
+        </label>
+        <label>Répétitions par verset
+          <input type="number" id="hifdhReps" min="1" max="10" value="3" aria-label="Nombre de répétitions par verset">
+        </label>
+        <button type="button" class="btn" id="hifdhGo">Démarrer</button>
+        <span class="hifdh-status" id="hifdhStatus"></span>
       </div>
     </div>
   </div>
@@ -1387,6 +1507,7 @@
     const canOffline = 'caches' in window && window.isSecureContext && (APP || 'serviceWorker' in navigator);
     const downloaded = new Set();
     let current = 1, filter = 'all';
+    let hifdh = null; // { ayah, rep } quand le mode Hifdh (répétition par verset) est actif
 
     const ICON_GET = '<svg class="get" viewBox="0 0 24 24"><path d="M11 4h2v9.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6zM5 18h14v2H5z"/></svg>';
     const ICON_OK = '<svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
@@ -1430,6 +1551,7 @@
     }
 
     function select(n, autoplay, startAt = 0) {
+      exitHifdh();
       if (autoplay && !playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
       current = n;
       const [tr, ar, fr, v] = S[n - 1];
@@ -1466,15 +1588,132 @@
     function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); }
     function save() { try { localStorage.setItem('lecteur', JSON.stringify({ n: current, t: audio.currentTime || 0 })); } catch { } }
 
+    // Boutons bascule (Enchaîner / Répéter) : état reflété par aria-pressed
+    const isOn = b => b.getAttribute('aria-pressed') === 'true';
+    const setOn = (b, on) => b.setAttribute('aria-pressed', on ? 'true' : 'false');
+
     try { $('rate').value = localStorage.getItem('rate') || '1'; } catch { }
-    try { $('loop').checked = localStorage.getItem('loop') === '1'; } catch { }
-    audio.loop = $('loop').checked;
+    try { setOn($('loop'), localStorage.getItem('loop') === '1'); } catch { }
+    audio.loop = isOn($('loop'));
 
     $('play').onclick = toggle;
     $('prev').onclick = () => step(-1);
     $('next').onclick = () => step(1);
     $('rate').onchange = e => { audio.playbackRate = +e.target.value; try { localStorage.setItem('rate', e.target.value); } catch { } };
-    $('loop').onchange = e => { audio.loop = e.target.checked; try { localStorage.setItem('loop', e.target.checked ? '1' : '0'); } catch { } };
+    $('auto').onclick = () => setOn($('auto'), !isOn($('auto')));
+    $('loop').onclick = () => {
+      const on = !isOn($('loop'));
+      setOn($('loop'), on);
+      audio.loop = on;
+      try { localStorage.setItem('loop', on ? '1' : '0'); } catch { }
+    };
+
+    /* ---------- Mode Hifdh : répétition verset par verset, nombre de répétitions au choix ----------
+       Audio par verset (hors ligne non disponible dans ce mode) fourni par everyayah.com, fichiers
+       nommés SSSAAA.mp3 (sourate 3 chiffres + verset 3 chiffres), vérifié pour les 114 sourates. */
+    const HIFDH_RECITERS = [
+      ['Alafasy_128kbps', 'Mishary Al-Afasy'],
+      ['Abdul_Basit_Murattal_192kbps', 'Abdul Basit (Murattal)'],
+      ['Husary_128kbps', 'Mahmoud Al-Husary'],
+      ['Minshawy_Murattal_128kbps', 'Al-Minshawi'],
+      ['Abdurrahmaan_As-Sudais_192kbps', 'As-Sudais'],
+      ['Hudhaify_128kbps', 'Ali Al-Hudhaifi'],
+      ['Saood_ash-Shuraym_128kbps', 'Ash-Shuraim'],
+      ['MaherAlMuaiqly128kbps', 'Maher Al-Muaiqly'],
+      ['Yasser_Ad-Dussary_128kbps', 'Yasser Ad-Dossari'],
+      ['Muhammad_Ayyoub_128kbps', 'Muhammad Ayyub'],
+    ];
+    HIFDH_RECITERS.forEach(([id, fr]) => {
+      const o = document.createElement('option');
+      o.value = id; o.textContent = fr;
+      $('hifdhReciter').appendChild(o);
+    });
+    try { $('hifdhReciter').value = localStorage.getItem('hifdhReciter') || HIFDH_RECITERS[0][0]; } catch { }
+    try { $('hifdhReps').value = localStorage.getItem('hifdhReps') || '3'; } catch { }
+
+    function exitHifdh() {
+      if (!hifdh) return;
+      hifdh = null;
+      audio.loop = isOn($('loop'));
+      $('hifdhGo').textContent = 'Démarrer';
+      $('hifdhAyahText').hidden = true;
+    }
+
+    // Texte du verset affiché pendant la répétition (API alquran.cloud, texte uthmani officiel),
+    // mis en cache pour ne le récupérer qu'une fois par verset même s'il est répété plusieurs fois.
+    const ayahTextCache = new Map();
+    let hifdhTextKey = '';
+    async function loadHifdhText(s, a) {
+      const key = `${s}:${a}`;
+      hifdhTextKey = key;
+      const box = $('hifdhAyahText');
+      if (ayahTextCache.has(key)) {
+        box.textContent = ayahTextCache.get(key);
+        box.hidden = false;
+        return;
+      }
+      box.hidden = true;
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/quran-uthmani`);
+        const json = await res.json();
+        const text = json?.data?.text;
+        if (!text) throw new Error('empty');
+        ayahTextCache.set(key, text);
+        if (hifdhTextKey === key) { box.textContent = text; box.hidden = false; }
+      } catch {
+        if (hifdhTextKey === key) box.hidden = true; // pas bloquant : l'audio continue sans le texte
+      }
+    }
+
+    function playHifdhAyah() {
+      const total = S[current - 1][3];
+      const [tr, ar] = S[current - 1];
+      const reps = +$('hifdhReps').value;
+      audio.src = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${pad(hifdh.ayah)}.mp3`;
+      audio.play().catch(() => { });
+      loadHifdhText(current, hifdh.ayah);
+      $('pNum').textContent = current;
+      $('pTr').textContent = tr;
+      $('pAr').textContent = `سورة ${ar}`;
+      $('pMeta').textContent = `Verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
+      $('hifdhStatus').textContent = `Sourate ${current} · verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
+      document.title = `Hifdh ${current}:${hifdh.ayah} — ${tr}`;
+      document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
+      card(current)?.classList.add('active');
+    }
+
+    function hifdhStart() {
+      audio.loop = false; // la répétition est gérée manuellement, verset par verset
+      hifdh = { ayah: 1, rep: 1 };
+      try {
+        localStorage.setItem('hifdhReciter', $('hifdhReciter').value);
+        localStorage.setItem('hifdhReps', $('hifdhReps').value);
+      } catch { }
+      $('hifdhGo').textContent = 'Arrêter';
+      playHifdhAyah();
+    }
+
+    function hifdhNext() {
+      const reps = +$('hifdhReps').value;
+      if (hifdh.rep < reps) { hifdh.rep++; return playHifdhAyah(); }
+      const total = S[current - 1][3];
+      if (hifdh.ayah < total) { hifdh.ayah++; hifdh.rep = 1; return playHifdhAyah(); }
+      if (current < 114) { current++; hifdh.ayah = 1; hifdh.rep = 1; return playHifdhAyah(); }
+      exitHifdh();
+      $('hifdhStatus').textContent = '';
+      toast('Mémorisation terminée : les 114 sourates ont été parcourues.');
+    }
+
+    $('hifdhToggle').onclick = () => {
+      const show = $('hifdhBar').hidden;
+      $('hifdhBar').hidden = !show;
+      setOn($('hifdhToggle'), show);
+    };
+    $('hifdhGo').onclick = () => {
+      if (hifdh) { exitHifdh(); $('hifdhStatus').textContent = ''; select(current, false); }
+      else hifdhStart();
+    };
+
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
       navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
@@ -1482,23 +1721,34 @@
 
     audio.addEventListener('play', () => { $('icPlay').toggleAttribute('hidden', true); $('icPause').toggleAttribute('hidden', false); });
     audio.addEventListener('pause', () => { $('icPlay').toggleAttribute('hidden', false); $('icPause').toggleAttribute('hidden', true); save(); });
-    audio.addEventListener('loadedmetadata', () => $('dur').textContent = fmt(audio.duration));
+    // Temps restant (compte à rebours), affiché à droite de la barre de progression
+    const fmtRemain = (cur, dur) => isFinite(dur) ? `-${fmt(dur - cur)}` : '0:00';
+    audio.addEventListener('loadedmetadata', () => $('dur').textContent = fmtRemain(audio.currentTime, audio.duration));
     audio.addEventListener('error', () => {
       const code = audio.error?.code;
       if (!code || code === 1) return; // code 1 = chargement annulé (changement de sourate), pas une vraie erreur
+      if (hifdh) { toast('Impossible de lire ce verset. Essayez un autre récitateur pour le mode Hifdh.'); return; }
       toast(!navigator.onLine ? 'Cette sourate n’est pas disponible hors ligne.' : 'Impossible de lire cette sourate. Réessayez ou changez de récitateur.');
     });
     let lastSave = 0, seeking = false;
     audio.addEventListener('timeupdate', () => {
       $('cur').textContent = fmt(audio.currentTime);
+      if (!seeking) $('dur').textContent = fmtRemain(audio.currentTime, audio.duration);
       if (!seeking && audio.duration) $('seek').value = audio.currentTime / audio.duration * 1000;
       if (Date.now() - lastSave > 5000) { lastSave = Date.now(); save(); }
     });
-    audio.addEventListener('ended', () => { if ($('auto').checked) step(1); });
+    audio.addEventListener('ended', () => {
+      if (hifdh) return hifdhNext();
+      if (isOn($('auto'))) step(1);
+    });
 
     $('seek').addEventListener('input', e => {
       seeking = true;
-      if (audio.duration) $('cur').textContent = fmt(e.target.value / 1000 * audio.duration);
+      if (audio.duration) {
+        const t = e.target.value / 1000 * audio.duration;
+        $('cur').textContent = fmt(t);
+        $('dur').textContent = fmtRemain(t, audio.duration);
+      }
     });
     $('seek').addEventListener('change', e => {
       if (audio.duration) audio.currentTime = e.target.value / 1000 * audio.duration;
