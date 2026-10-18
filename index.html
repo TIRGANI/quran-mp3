@@ -975,6 +975,14 @@
       opacity: .7;
     }
 
+    .footer .free-note {
+      max-width: 440px;
+      margin: 14px auto 0;
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: .65;
+    }
+
     .wa {
       display: inline-flex;
       align-items: center;
@@ -1542,6 +1550,7 @@
       <div class="sadaqa" lang="ar">صدقة جارية</div>
       <p><b>Tirgani Badreddine</b></p>
       <p class="dua" lang="ar">لا تنسونا من صالح دعائكم</p>
+      <p class="free-note" id="freeNote">Application 100&nbsp;% gratuite, toutes les fonctionnalités incluses — nous ne demandons rien en retour, si ce n'est une prière pour nous auprès d'Allah.</p>
       <a class="wa demolink" href="demo.html">
         <svg viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z" />
@@ -1806,6 +1815,7 @@
         emptyMsg: 'Aucune sourate ne correspond.',
         androidApp: 'Application Android',
         demoLink: 'Voir la démo', demoTop: 'Démo',
+        freeNote: "Application 100 % gratuite, toutes les fonctionnalités incluses — nous ne demandons rien en retour, si ce n'est une prière pour nous auprès d'Allah.",
         prevTitle: 'Précédente', playTitle: 'Lecture / Pause (Espace)', nextTitle: 'Suivante',
         seekAria: 'Position de lecture',
         autoToggle: 'Enchaîner', autoTitle: 'Enchaîner les sourates',
@@ -1872,6 +1882,7 @@
         emptyMsg: 'لا توجد سورة مطابقة.',
         androidApp: 'تطبيق أندرويد',
         demoLink: 'عرض توضيحي', demoTop: 'عرض',
+        freeNote: 'تطبيق مجاني بالكامل بجميع مميزاته — لا نطلب مقابلًا سوى دعوة صالحة بيننا وبين الله.',
         prevTitle: 'السابقة', playTitle: 'تشغيل / إيقاف (مسافة)', nextTitle: 'التالية',
         seekAria: 'موضع التشغيل',
         autoToggle: 'تلقائي', autoTitle: 'الانتقال التلقائي بين السور',
@@ -1955,6 +1966,7 @@
       $('androidApp').textContent = t('androidApp');
       $('demoLinkLabel').textContent = t('demoLink');
       $('demoTopLink').textContent = t('demoTop');
+      $('freeNote').textContent = t('freeNote');
       $('prev').title = t('prevTitle');
       $('play').title = t('playTitle');
       $('next').title = t('nextTitle');
