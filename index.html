@@ -5,15 +5,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>القرآن الكريم — Coran MP3</title>
-  <meta name="description" content="Écouter les 114 sourates du Saint Coran, avec le récitateur de votre choix, même hors ligne.">
+  
+  <meta name="description"
+    content="Écouter les 114 sourates du Saint Coran, avec le récitateur de votre choix, même hors ligne.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="القرآن الكريم — Coran MP3">
-  <meta property="og:description" content="Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.">
+  <meta property="og:description"
+    content="Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.">
   <meta property="og:image" content="icon-512.png">
   <meta property="og:url" content="https://tirgani.github.io/quran-mp3/">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="القرآن الكريم — Coran MP3">
-  <meta name="twitter:description" content="Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.">
+  <meta name="twitter:description"
+    content="Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.">
   <meta name="twitter:image" content="icon-512.png">
   <meta name="theme-color" content="#04091e">
   <link rel="manifest" href="manifest.webmanifest">
@@ -132,6 +136,22 @@
       font-weight: 600;
     }
 
+    .langBtn {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--ink);
+      border-radius: 33px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+
+    .langBtn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
     /* Encadré d'installation */
     .installcard {
       position: relative;
@@ -206,6 +226,40 @@
       cursor: pointer;
     }
 
+    /* Bannière de mise en avant du mode Hifdh */
+    .hifdhPromo .icon {
+      flex: none;
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: rgba(247, 99, 27, .18);
+      display: grid;
+      place-items: center;
+    }
+
+    .hifdhPromo .icon svg {
+      width: 26px;
+      height: 26px;
+      fill: var(--orange);
+    }
+
+    .hifdhPromo .txt b {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hifdhPromo .badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      background: var(--orange);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 33px;
+    }
+
     /* Bannière */
     .banner {
       position: relative;
@@ -225,6 +279,25 @@
       opacity: .07;
       background-image: radial-gradient(#fff 1px, transparent 1px);
       background-size: 22px 22px;
+    }
+
+    /* Calligraphie décorative en arrière-plan (sourate Qâf, verset 1 : « ق، والقرآن المجيد ») */
+    .banner .calligraphy {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      font-family: var(--ar);
+      font-size: clamp(48px, 12vw, 140px);
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      opacity: .07;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
     }
 
     .banner h1 {
@@ -484,7 +557,8 @@
       right: -6px;
     }
 
-    @media (hover: none), (max-width: 600px) {
+    @media (hover: none),
+    (max-width: 600px) {
       .rnav {
         display: none;
       }
@@ -1096,6 +1170,16 @@
       outline-offset: 2px;
     }
 
+    /* Le bouton Hifdh se distingue des autres options du lecteur, pour le mettre en valeur */
+    .opts .toggle#hifdhToggle:not([aria-pressed="true"]) {
+      background: rgba(247, 99, 27, .18);
+      color: #ffd2bb;
+    }
+
+    .opts .toggle#hifdhToggle:not([aria-pressed="true"]):hover {
+      background: rgba(247, 99, 27, .3);
+    }
+
     .opts select {
       background: rgba(255, 255, 255, .08);
       color: #fff;
@@ -1115,13 +1199,45 @@
     .hifdh-bar {
       flex-basis: 100%;
       display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(247, 99, 27, .08);
+      border: 1px solid rgba(247, 99, 27, .25);
+      font-size: 12.5px;
+    }
+
+    .hifdh-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hifdh-head svg {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      fill: var(--orange);
+    }
+
+    .hifdh-head b {
+      font-size: 14px;
+    }
+
+    .hifdh-head small {
+      display: block;
+      opacity: .75;
+      font-size: 12px;
+      margin-top: 1px;
+    }
+
+    .hifdh-controls {
+      display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, .15);
-      font-size: 12.5px;
     }
 
     .hifdh-bar label {
@@ -1221,6 +1337,64 @@
         display: none;
       }
     }
+
+    /* Interface en arabe (RTL) : la plupart des lignes flexibles se retournent
+       automatiquement grâce à dir="rtl" sur <html> ; seules les propriétés physiques
+       (left/right/margin-left/margin-right) ci-dessous doivent être inversées à la main. */
+    html[dir="rtl"] .logo {
+      padding-left: 0;
+      padding-right: 10px;
+      border-left: 0;
+      border-right: 4px solid var(--orange);
+    }
+
+    html[dir="rtl"] .wa.apkfoot {
+      margin-right: 0;
+      margin-left: 8px;
+    }
+
+    html[dir="rtl"] .installcard .close {
+      right: auto;
+      left: 8px;
+    }
+
+    html[dir="rtl"] .riwaya button small {
+      margin-left: 0;
+      margin-right: 6px;
+    }
+
+    html[dir="rtl"] .rc .eq {
+      right: auto;
+      left: 10px;
+    }
+
+    html[dir="rtl"] .card.active::before {
+      left: auto;
+      right: 0;
+    }
+
+    html[dir="rtl"] .card .ar {
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    @media (min-width: 680px) {
+      html[dir="rtl"] .card:nth-child(odd) {
+        border-right: 0;
+        border-left: 1px solid var(--line);
+      }
+    }
+
+    /* Le carrousel des récitateurs garde un défilement de gauche à droite dans les deux langues :
+       son JS (scrollBy, scrollTo) suppose ce sens, et le mélanger avec du RTL serait peu fiable
+       selon les navigateurs. Seul ce composant reste donc toujours en LTR. */
+    html[dir="rtl"] .rlist {
+      direction: ltr;
+    }
+
+    html[dir="rtl"] .rc {
+      direction: rtl;
+    }
   </style>
 </head>
 
@@ -1230,45 +1404,52 @@
     <div class="container">
       <div class="logo">Coran <span>MP3</span></div>
       <div class="right">
-        <span>Récitation : <b id="rName">Ali Jaber</b></span>
+        <span><span id="recitationLabel">Récitation :</span> <b id="rName">Ali Jaber</b></span>
         <span class="status" id="status">En ligne</span>
         <button class="install" id="install" hidden>Installer l'app</button>
+        <button class="langBtn" id="langBtn" type="button"
+          title="Changer la langue de l'interface / تغيير لغة الواجهة">FR / عربي</button>
       </div>
     </div>
   </div>
 
   <section class="banner">
+    <div class="calligraphy" lang="ar" aria-hidden="true">قٓ ۚ وَٱلْقُرْءَانِ ٱلْمَجِيدِ</div>
     <div class="basmala" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-    <h1 lang="ar">القرآن الكريم</h1>
-    <h2>Écouter les 114 sourates du Saint Coran</h2>
     <div class="pick">
       <div class="riwaya" id="riwaya" role="group" aria-label="Lecture">
         <button data-w="0" aria-pressed="true"><span lang="ar">حفص</span><small>Hafs</small></button>
         <button data-w="1" aria-pressed="false"><span lang="ar">ورش</span><small>Warsh</small></button>
       </div>
-      <input type="search" class="rsearch" id="rSearch" placeholder="Chercher un récitateur…" aria-label="Chercher un récitateur">
+      <input type="search" class="rsearch" id="rSearch" placeholder="Chercher un récitateur…"
+        aria-label="Chercher un récitateur">
       <div class="rwrap">
-        <button class="rnav prev" id="rPrev" aria-label="Récitateurs précédents"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg></button>
+        <button class="rnav prev" id="rPrev" aria-label="Récitateurs précédents"><svg viewBox="0 0 24 24">
+            <path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+          </svg></button>
         <div class="rlist" id="rlist" role="radiogroup" aria-label="Récitateur"></div>
         <p class="rempty" id="rEmpty" hidden>Aucun récitateur trouvé.</p>
-        <button class="rnav next" id="rNext" aria-label="Récitateurs suivants"><svg viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z"/></svg></button>
+        <button class="rnav next" id="rNext" aria-label="Récitateurs suivants"><svg viewBox="0 0 24 24">
+            <path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z" />
+          </svg></button>
       </div>
     </div>
   </section>
 
   <div class="container">
     <div class="tools">
-      <input type="search" id="q" placeholder="Rechercher une sourate (nom, traduction ou numéro)…" aria-label="Rechercher une sourate">
-      <button class="chip on" data-f="all">Toutes</button>
-      <button class="chip" data-f="m">Mecquoises</button>
-      <button class="chip" data-f="d">Médinoises</button>
+      <input type="search" id="q" placeholder="Rechercher une sourate (nom, traduction ou numéro)…"
+        aria-label="Rechercher une sourate">
+      <button class="chip on" id="chipAll" data-f="all">Toutes</button>
+      <button class="chip" id="chipMeccan" data-f="m">Mecquoises</button>
+      <button class="chip" id="chipMedinan" data-f="d">Médinoises</button>
       <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
     </div>
 
     <div class="installcard" id="installCard" hidden>
       <img src="icon-192.png" alt="">
       <div class="txt">
-        <b>Installer l'application sur votre téléphone</b>
+        <b id="installTitle">Installer l'application sur votre téléphone</b>
         <small id="installHow">Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.</small>
       </div>
       <button class="btn" id="installBtn" hidden>Installer</button>
@@ -1276,13 +1457,27 @@
       <button class="close" id="installClose" aria-label="Fermer">×</button>
     </div>
 
+    <div class="installcard hifdhPromo" id="hifdhPromo" hidden>
+      <div class="icon"><svg viewBox="0 0 24 24">
+          <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+        </svg></div>
+      <div class="txt">
+        <b><span id="hifdhPromoTitle">Mode Hifdh</span> <span class="badge" id="hifdhPromoNew">Nouveau</span></b>
+        <small id="hifdhPromoDesc">Mémorisez le Coran verset par verset : répétitions au nombre de votre choix, texte
+          affiché et surligné mot par mot pendant la lecture.</small>
+      </div>
+      <button class="btn" id="hifdhPromoBtn">Essayer</button>
+      <button class="close" id="hifdhPromoClose" aria-label="Fermer">×</button>
+    </div>
+
     <div class="offline" id="offline" hidden>
       <div class="txt">
-        <b>Écoute hors connexion</b> — <span id="offCount">0 / 114 sourates</span>
+        <b id="offlineTitle">Écoute hors connexion</b> — <span id="offCount">0 / 114 sourates</span>
         <small id="offInfo">Téléchargez des sourates pour les écouter sans internet.</small>
         <div class="bar"><i id="offBar"></i></div>
-        <label class="autosave"><input type="checkbox" id="autoSave" checked> Garder automatiquement les sourates
-          écoutées (et la suivante) pour les réécouter sans connexion</label>
+        <label class="autosave"><input type="checkbox" id="autoSave" checked> <span id="autoSaveLabel">Garder
+            automatiquement les sourates
+            écoutées (et la suivante) pour les réécouter sans connexion</span></label>
       </div>
       <button class="btn" id="dlAll">Tout télécharger (2,2 Go)</button>
       <button class="btn ghost" id="dlCancel" hidden>Annuler</button>
@@ -1308,7 +1503,7 @@
           <path
             d="M17.6 9.48 19.44 6.3a.38.38 0 0 0-.66-.38l-1.86 3.22a11.4 11.4 0 0 0-9.84 0L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" />
         </svg>
-        Application Android
+        <span id="androidApp">Application Android</span>
       </a>
       <a class="wa" href="https://wa.me/212602834831" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24">
@@ -1355,16 +1550,24 @@
       </div>
       <div class="opts">
         <button type="button" class="toggle" id="auto" title="Enchaîner les sourates" aria-pressed="true">
-          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-          <span>Enchaîner</span>
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+          </svg>
+          <span id="autoLabel">Enchaîner</span>
         </button>
         <button type="button" class="toggle" id="loop" title="Répéter la sourate" aria-pressed="false">
-          <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-          <span>Répéter</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+          </svg>
+          <span id="loopLabel">Répéter</span>
         </button>
-        <button type="button" class="toggle" id="hifdhToggle" title="Mode Hifdh : répétition verset par verset" aria-pressed="false">
-          <svg viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-          <span>Hifdh</span>
+        <button type="button" class="toggle" id="hifdhToggle" title="Mode Hifdh : répétition verset par verset"
+          aria-pressed="false">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+          </svg>
+          <span id="hifdhLabel">Hifdh</span>
         </button>
         <select id="rate" title="Vitesse">
           <option value="0.75">0.75×</option>
@@ -1374,14 +1577,26 @@
         </select>
       </div>
       <div class="hifdh-bar" id="hifdhBar" hidden>
+        <div class="hifdh-head">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+          </svg>
+          <div>
+            <b id="hifdhTitle">Mode Hifdh</b>
+            <small id="hifdhDesc">Répétez chaque verset pour le mémoriser, avec le texte surligné mot par mot.</small>
+          </div>
+        </div>
         <div class="hifdh-ayah" id="hifdhAyahText" lang="ar" hidden></div>
-        <label>Récitateur (verset par verset)
-          <select id="hifdhReciter" aria-label="Récitateur pour le mode Hifdh"></select>
-        </label>
-        <label>Répétitions par verset
-          <input type="number" id="hifdhReps" min="1" max="10" value="3" aria-label="Nombre de répétitions par verset">
-        </label>
-        <button type="button" class="btn" id="hifdhGo">Démarrer</button>
+        <div class="hifdh-controls">
+          <label><span id="hifdhReciterLabel">Récitateur</span>
+            <select id="hifdhReciter" aria-label="Récitateur pour le mode Hifdh"></select>
+          </label>
+          <label><span id="hifdhRepsLabel">Répétitions par verset</span>
+            <input type="number" id="hifdhReps" min="1" max="10" value="3"
+              aria-label="Nombre de répétitions par verset">
+          </label>
+          <button type="button" class="btn" id="hifdhGo">Démarrer</button>
+        </div>
         <span class="hifdh-status" id="hifdhStatus"></span>
       </div>
     </div>
@@ -1507,6 +1722,221 @@
     const $ = id => document.getElementById(id);
     const audio = $('audio'), grid = $('grid');
     const pad = n => String(n).padStart(3, '0');
+
+    /* ---------- Traduction de l'interface (FR / AR) ----------
+       Le contenu du Coran (texte, noms de sourates et de récitateurs en arabe) ne change pas :
+       seuls les textes de l'interface (boutons, messages, libellés) sont traduits ici. */
+    const T = {
+      fr: {
+        subtitle: 'Écouter les 114 sourates du Saint Coran',
+        recitationLabel: 'Récitation :',
+        online: 'En ligne', offline: 'Hors ligne',
+        installApp: "Installer l'app",
+        riwayaGroup: 'Lecture',
+        searchReciterPh: 'Chercher un récitateur…', searchReciterAria: 'Chercher un récitateur',
+        reciterPrev: 'Récitateurs précédents', reciterNext: 'Récitateurs suivants', reciterGroup: 'Récitateur',
+        noReciter: 'Aucun récitateur trouvé.',
+        searchSurahPh: 'Rechercher une sourate (nom, traduction ou numéro)…', searchSurahAria: 'Rechercher une sourate',
+        chipAll: 'Toutes', chipMeccan: 'Mecquoises', chipMedinan: 'Médinoises', chipDl: 'Téléchargées',
+        installTitle: "Installer l'application sur votre téléphone",
+        installHowDefault: "Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.",
+        installHowIOS: icon => `Dans Safari, touchez ${icon} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`,
+        installHowAndroid: 'Téléchargez l’application Android (4 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.',
+        installBtn: 'Installer', apkLink: 'Télécharger l’APK', close: 'Fermer',
+        hifdhPromoTitle: 'Mode Hifdh', hifdhPromoNew: 'Nouveau',
+        hifdhPromoDesc: 'Mémorisez le Coran verset par verset : répétitions au nombre de votre choix, texte affiché et surligné mot par mot pendant la lecture.',
+        tryBtn: 'Essayer',
+        offlineTitle: 'Écoute hors connexion',
+        offlineDescDefault: 'Téléchargez des sourates pour les écouter sans internet.',
+        autoSaveLabel: 'Garder automatiquement les sourates écoutées (et la suivante) pour les réécouter sans connexion',
+        cancelBtn: 'Annuler', removeAllBtn: 'Tout supprimer', confirmRemove: 'Confirmer la suppression ?',
+        surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
+        emptyMsg: 'Aucune sourate ne correspond.',
+        androidApp: 'Application Android',
+        prevTitle: 'Précédente', playTitle: 'Lecture / Pause (Espace)', nextTitle: 'Suivante',
+        seekAria: 'Position de lecture',
+        autoToggle: 'Enchaîner', autoTitle: 'Enchaîner les sourates',
+        loopToggle: 'Répéter', loopTitle: 'Répéter la sourate',
+        hifdhToggle: 'Hifdh', hifdhToggleTitle: 'Mode Hifdh : répétition verset par verset',
+        rateTitle: 'Vitesse',
+        hifdhTitle: 'Mode Hifdh', hifdhDesc: 'Répétez chaque verset pour le mémoriser, avec le texte surligné mot par mot.',
+        hifdhReciterLabel: 'Récitateur', hifdhReciterAria: 'Récitateur pour le mode Hifdh',
+        hifdhRepsLabel: 'Répétitions par verset', hifdhRepsAria: 'Nombre de répétitions par verset',
+        hifdhStart: 'Démarrer', hifdhStop: 'Arrêter',
+        type: n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise',
+        verses: v => `${v} verset${v > 1 ? 's' : ''}`,
+        cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
+        mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`,
+        notConnectedDl: 'Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.',
+        noOtherDownloaded: 'Aucune autre sourate téléchargée dans cette direction.',
+        hifdhDone: 'Mémorisation terminée : les 114 sourates ont été parcourues.',
+        hifdhAyahError: 'Impossible de lire ce verset. Essayez un autre récitateur pour le mode Hifdh.',
+        notAvailableOffline: 'Cette sourate n’est pas disponible hors ligne.',
+        playbackError: 'Impossible de lire cette sourate. Réessayez ou changez de récitateur.',
+        needConnectionDl: 'Connectez-vous à internet pour télécharger.',
+        quotaExceeded: 'Espace de stockage insuffisant sur cet appareil.',
+        downloadFailed: n => `Échec du téléchargement de la sourate ${n}.`,
+        reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'Warsh' : 'Hafs'}`,
+        appInstalled: 'Application installée ✓',
+        juzAmmaDownloading: 'Téléchargement du Juz ‘Amma (78 à 114) pour l’écoute hors connexion…',
+        offCount: (n, size) => `${n} / 114 sourates (${size})`,
+        dlAllRest: size => `Télécharger le reste (${size})`,
+        dlAllFull: size => `Tout télécharger (${size})`,
+        offBusy: n => `Téléchargement en cours… ${n} sourate(s) restante(s). Gardez la page ouverte.`,
+        offComplete: 'Toutes les sourates sont disponibles sans internet.',
+        offDefault: 'Téléchargez des sourates (bouton ↓ sur chaque carte) pour les écouter sans internet.',
+        hifdhVerseStatus: (ayah, total, rep, reps) => `Verset ${ayah}/${total} · répétition ${rep}/${reps}`,
+        hifdhBismillahStatus: 'Bismillah',
+        hifdhSurahVerseStatus: (surah, ayah, total, rep, reps) => `Sourate ${surah} · verset ${ayah}/${total} · répétition ${rep}/${reps}`,
+        hifdhSurahBismillahStatus: surah => `Sourate ${surah} · Bismillah`,
+        rLabel: (fr, warsh) => `${fr}${warsh ? ' (Warsh)' : ''}`,
+      },
+      ar: {
+        subtitle: 'استماع إلى سور القرآن الكريم الـ 114',
+        recitationLabel: 'القراءة:',
+        online: 'متصل', offline: 'غير متصل',
+        installApp: 'تثبيت التطبيق',
+        riwayaGroup: 'الرواية',
+        searchReciterPh: 'ابحث عن قارئ…', searchReciterAria: 'ابحث عن قارئ',
+        reciterPrev: 'القرّاء السابقون', reciterNext: 'القرّاء التالون', reciterGroup: 'قارئ',
+        noReciter: 'لم يُعثر على أي قارئ.',
+        searchSurahPh: 'ابحث عن سورة (الاسم أو الترجمة أو الرقم)…', searchSurahAria: 'ابحث عن سورة',
+        chipAll: 'الكل', chipMeccan: 'مكية', chipMedinan: 'مدنية', chipDl: 'تم تنزيلها',
+        installTitle: 'ثبّت التطبيق على هاتفك',
+        installHowDefault: 'وصول مباشر من الشاشة الرئيسية، وضع ملء الشاشة، واستماع بدون اتصال بالإنترنت.',
+        installHowIOS: icon => `في Safari، اضغط على ${icon} <b>مشاركة</b>، ثم <b>«إضافة إلى الشاشة الرئيسية»</b>.`,
+        installHowAndroid: 'نزّل تطبيق أندرويد (4 م.ب)، افتح الملف ثم اضغط <b>تثبيت</b>. اسمح بالتثبيت من المتصفح إذا طلب ذلك أندرويد.',
+        installBtn: 'تثبيت', apkLink: 'تنزيل APK', close: 'إغلاق',
+        hifdhPromoTitle: 'وضع الحفظ', hifdhPromoNew: 'جديد',
+        hifdhPromoDesc: 'احفظ القرآن آية آية: عدد التكرار الذي تختاره، مع عرض النص وتظليله كلمةً كلمة أثناء الاستماع.',
+        tryBtn: 'جرّب',
+        offlineTitle: 'الاستماع بدون اتصال',
+        offlineDescDefault: 'نزّل السور للاستماع إليها بدون إنترنت.',
+        autoSaveLabel: 'احتفظ تلقائيًا بالسور التي تستمع إليها (والتي تليها) لإعادة الاستماع بدون اتصال',
+        cancelBtn: 'إلغاء', removeAllBtn: 'حذف الكل', confirmRemove: 'تأكيد الحذف؟',
+        surahCount: n => `${n} سورة`,
+        emptyMsg: 'لا توجد سورة مطابقة.',
+        androidApp: 'تطبيق أندرويد',
+        prevTitle: 'السابقة', playTitle: 'تشغيل / إيقاف (مسافة)', nextTitle: 'التالية',
+        seekAria: 'موضع التشغيل',
+        autoToggle: 'تلقائي', autoTitle: 'الانتقال التلقائي بين السور',
+        loopToggle: 'تكرار', loopTitle: 'تكرار السورة',
+        hifdhToggle: 'الحفظ', hifdhToggleTitle: 'وضع الحفظ: تكرار الآيات واحدة تلو الأخرى',
+        rateTitle: 'السرعة',
+        hifdhTitle: 'وضع الحفظ', hifdhDesc: 'كرّر كل آية لحفظها، مع تظليل النص كلمةً كلمة.',
+        hifdhReciterLabel: 'القارئ', hifdhReciterAria: 'القارئ لوضع الحفظ',
+        hifdhRepsLabel: 'عدد التكرار لكل آية', hifdhRepsAria: 'عدد مرات تكرار كل آية',
+        hifdhStart: 'ابدأ', hifdhStop: 'إيقاف',
+        type: n => MEDINAN.has(n) ? 'مدنية' : 'مكية',
+        verses: v => `${v} آية`,
+        cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
+        mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1)} جيجا` : `${Math.max(1, Math.round(b / 1e6))} ميجا`,
+        notConnectedDl: 'لا يوجد اتصال: نزّل هذه السورة للاستماع إليها بدون إنترنت.',
+        noOtherDownloaded: 'لا توجد سورة أخرى منزّلة في هذا الاتجاه.',
+        hifdhDone: 'اكتمل الحفظ: تمت مراجعة السور الـ 114.',
+        hifdhAyahError: 'تعذّر تشغيل هذه الآية. جرّب قارئًا آخر لوضع الحفظ.',
+        notAvailableOffline: 'هذه السورة غير متوفرة بدون اتصال.',
+        playbackError: 'تعذّر تشغيل هذه السورة. أعد المحاولة أو غيّر القارئ.',
+        needConnectionDl: 'اتصل بالإنترنت للتنزيل.',
+        quotaExceeded: 'مساحة التخزين غير كافية على هذا الجهاز.',
+        downloadFailed: n => `فشل تنزيل السورة رقم ${n}.`,
+        reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'ورش' : 'حفص'}`,
+        appInstalled: 'تم تثبيت التطبيق ✓',
+        juzAmmaDownloading: 'جارٍ تنزيل جزء عمّ (78 إلى 114) للاستماع بدون اتصال…',
+        offCount: (n, size) => `${n} / 114 سورة (${size})`,
+        dlAllRest: size => `تنزيل الباقي (${size})`,
+        dlAllFull: size => `تنزيل الكل (${size})`,
+        offBusy: n => `جارٍ التنزيل… ${n} سورة متبقية. أبقِ الصفحة مفتوحة.`,
+        offComplete: 'جميع السور متوفرة بدون إنترنت.',
+        offDefault: 'نزّل السور (زر ↓ على كل بطاقة) للاستماع إليها بدون إنترنت.',
+        hifdhVerseStatus: (ayah, total, rep, reps) => `الآية ${ayah}/${total} · التكرار ${rep}/${reps}`,
+        hifdhBismillahStatus: 'البسملة',
+        hifdhSurahVerseStatus: (surah, ayah, total, rep, reps) => `السورة ${surah} · الآية ${ayah}/${total} · التكرار ${rep}/${reps}`,
+        hifdhSurahBismillahStatus: surah => `السورة ${surah} · البسملة`,
+        rLabel: (fr, warsh) => `${fr}${warsh ? ' (ورش)' : ''}`,
+      },
+    };
+    let lang = 'fr';
+    try { lang = localStorage.getItem('lang') === 'ar' ? 'ar' : 'fr'; } catch { }
+    const t = (key, ...args) => { const v = T[lang][key]; return typeof v === 'function' ? v(...args) : v; };
+
+    // Applique la langue courante : textes statiques puis rafraîchissement des zones dynamiques
+    // (elles ont déjà leur propre logique de rendu, on la relance simplement avec la nouvelle langue).
+    function applyI18n() {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+      $('recitationLabel').textContent = t('recitationLabel');
+      $('install').textContent = t('installApp');
+      $('subtitle').textContent = t('subtitle');
+      $('riwaya').setAttribute('aria-label', t('riwayaGroup'));
+      $('rSearch').placeholder = t('searchReciterPh');
+      $('rSearch').setAttribute('aria-label', t('searchReciterAria'));
+      $('rPrev').setAttribute('aria-label', t('reciterPrev'));
+      $('rlist').setAttribute('aria-label', t('reciterGroup'));
+      $('rEmpty').textContent = t('noReciter');
+      $('rNext').setAttribute('aria-label', t('reciterNext'));
+      $('q').placeholder = t('searchSurahPh');
+      $('q').setAttribute('aria-label', t('searchSurahAria'));
+      $('chipAll').textContent = t('chipAll');
+      $('chipMeccan').textContent = t('chipMeccan');
+      $('chipMedinan').textContent = t('chipMedinan');
+      $('chipDl').textContent = t('chipDl');
+      $('installTitle').textContent = t('installTitle');
+      $('installBtn').textContent = t('installBtn');
+      $('apkLink').textContent = t('apkLink');
+      $('installClose').setAttribute('aria-label', t('close'));
+      $('hifdhPromoTitle').textContent = t('hifdhPromoTitle');
+      $('hifdhPromoNew').textContent = t('hifdhPromoNew');
+      $('hifdhPromoDesc').textContent = t('hifdhPromoDesc');
+      $('hifdhPromoBtn').textContent = t('tryBtn');
+      $('hifdhPromoClose').setAttribute('aria-label', t('close'));
+      $('offlineTitle').textContent = t('offlineTitle');
+      $('autoSaveLabel').textContent = t('autoSaveLabel');
+      $('dlCancel').textContent = t('cancelBtn');
+      if (!confirmRm) $('rmAll').textContent = t('removeAllBtn');
+      $('empty').textContent = t('emptyMsg');
+      $('androidApp').textContent = t('androidApp');
+      $('prev').title = t('prevTitle');
+      $('play').title = t('playTitle');
+      $('next').title = t('nextTitle');
+      $('seek').setAttribute('aria-label', t('seekAria'));
+      $('auto').title = t('autoTitle'); $('autoLabel').textContent = t('autoToggle');
+      $('loop').title = t('loopTitle'); $('loopLabel').textContent = t('loopToggle');
+      $('hifdhToggle').title = t('hifdhToggleTitle'); $('hifdhLabel').textContent = t('hifdhToggle');
+      $('rate').title = t('rateTitle');
+      $('hifdhTitle').textContent = t('hifdhTitle');
+      $('hifdhDesc').textContent = t('hifdhDesc');
+      $('hifdhReciterLabel').textContent = t('hifdhReciterLabel');
+      $('hifdhReciter').setAttribute('aria-label', t('hifdhReciterAria'));
+      $('hifdhRepsLabel').textContent = t('hifdhRepsLabel');
+      $('hifdhReps').setAttribute('aria-label', t('hifdhRepsAria'));
+      $('hifdhGo').textContent = t(hifdh ? 'hifdhStop' : 'hifdhStart');
+      if (hifdh) {
+        // Rafraîchit le statut du mode Hifdh sans relancer l'audio en cours
+        const total = S[current - 1][3];
+        const reps = +$('hifdhReps').value;
+        const isBasmala = hifdh.ayah === 0;
+        $('pMeta').textContent = isBasmala ? t('hifdhBismillahStatus') : t('hifdhVerseStatus', hifdh.ayah, total, hifdh.rep, reps);
+        $('hifdhStatus').textContent = isBasmala ? t('hifdhSurahBismillahStatus', current) : t('hifdhSurahVerseStatus', current, hifdh.ayah, total, hifdh.rep, reps);
+      }
+
+      // Zones déjà pilotées par leur propre fonction de rendu : on la relance pour la nouvelle langue
+      for (const c of grid.children) {
+        const n = +c.dataset.n;
+        const [, , fr, v] = S[n - 1];
+        c.querySelector('.meta').innerHTML = cardMetaHTML(fr, v, n);
+        const dl = c.querySelector('.dl');
+        if (dl) dl.title = dl.classList.contains('done') ? t('dlTitleDone') : dl.classList.contains('loading') ? t('dlTitleLoading') : t('dlTitleGet');
+      }
+      renderInstallHow();
+      updateOnline();
+      applyFilter();
+      updatePanel();
+      showReciter();
+    }
+
+
     // En local : le dossier ali-jaber/. En ligne (GitHub Pages) : le CDN de mp3quran.net,
     // car GitHub refuse les fichiers de plus de 100 Mo.
     const APP = !!window.Capacitor; // application Android (Capacitor)
@@ -1517,11 +1947,11 @@
       : reciter.id.startsWith('https:') ? `${reciter.id}/` : `https://cdn.mp3quran.net/audio/${reciter.id}/`;
     const audioUrl = n => `${audioBase()}${pad(n)}.mp3`;
     const size = n => reciter.kb[n - 1] * 1024;
-    const rLabel = r => `${r.fr}${r.warsh ? ' (Warsh)' : ''}`;
+    const rLabel = r => t('rLabel', r.fr, r.warsh);
     const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f'’\-]/g, '').replace(/\s+/g, ' ');
-    const fmt = t => isFinite(t) ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}` : '0:00';
-    const mb = b => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`;
-    const type = n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise';
+    const fmt = sec => isFinite(sec) ? `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}` : '0:00';
+    const mb = b => t('mb', b);
+    const type = n => t('type', n);
     const canOffline = 'caches' in window && window.isSecureContext && (APP || 'serviceWorker' in navigator);
     const downloaded = new Set();
     let current = 1, filter = 'all';
@@ -1530,6 +1960,7 @@
     const ICON_GET = '<svg class="get" viewBox="0 0 24 24"><path d="M11 4h2v9.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6zM5 18h14v2H5z"/></svg>';
     const ICON_OK = '<svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
 
+    const cardMetaHTML = (fr, v, n) => `${t('cardMeta', fr, t('verses', v), type(n))} · <span class="sz">${mb(size(n))}</span>`;
     S.forEach(([tr, ar, fr, v], i) => {
       const n = i + 1;
       const c = document.createElement('div');
@@ -1540,12 +1971,12 @@
       c.dataset.t = MEDINAN.has(n) ? 'd' : 'm';
       c.dataset.search = norm(`${n} ${tr} ${tr.replace(/-/g, ' ')} ${fr} ${ar} سورة ${ar}`);
       c.innerHTML = `<div class="num"><b>${n}</b></div>
-    <div class="info"><div class="tr">${tr}</div><div class="meta">${fr}<br>${v} versets · ${type(n)} · <span class="sz">${mb(size(n))}</span></div></div>
+    <div class="info"><div class="tr">${tr}</div><div class="meta">${cardMetaHTML(fr, v, n)}</div></div>
     <div class="ar" lang="ar">${ar}<small>${MEDINAN.has(n) ? 'مدنية' : 'مكية'}</small></div>
-    ${canOffline ? `<button class="dl" title="Télécharger pour écouter hors ligne">${ICON_GET}${ICON_OK}</button>` : ''}`;
+    ${canOffline ? `<button class="dl" title="${t('dlTitleGet')}">${ICON_GET}${ICON_OK}</button>` : ''}`;
       c.onclick = e => {
         if (e.target.closest('.dl')) return;
-        if (!playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
+        if (!playable(n)) return toast(t('notConnectedDl'));
         (n === current && audio.src) ? toggle() : select(n, true);
       };
       c.onkeydown = e => { if (e.key === 'Enter') c.click(); };
@@ -1570,7 +2001,7 @@
 
     function select(n, autoplay, startAt = 0) {
       exitHifdh();
-      if (autoplay && !playable(n)) return toast('Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.');
+      if (autoplay && !playable(n)) return toast(t('notConnectedDl'));
       current = n;
       const [tr, ar, fr, v] = S[n - 1];
       const token = ++selectToken;
@@ -1586,7 +2017,7 @@
       $('pNum').textContent = n;
       $('pTr').textContent = tr;
       $('pAr').textContent = 'سورة ' + ar;
-      $('pMeta').textContent = `${fr} · ${v} versets · ${type(n)}`;
+      $('pMeta').textContent = t('playerMeta', fr, t('verses', v), type(n));
       document.title = `سورة ${ar} — ${tr}`;
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(n).classList.add('active');
@@ -1601,7 +2032,7 @@
     // Prochaine sourate jouable dans une direction (saute celles non téléchargées hors ligne)
     function step(dir) {
       for (let n = current + dir; n >= 1 && n <= 114; n += dir) if (playable(n)) return select(n, true);
-      if (!navigator.onLine) toast('Aucune autre sourate téléchargée dans cette direction.');
+      if (!navigator.onLine) toast(t('noOtherDownloaded'));
     }
     function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); }
     function save() { try { localStorage.setItem('lecteur', JSON.stringify({ n: current, t: audio.currentTime || 0 })); } catch { } }
@@ -1653,7 +2084,7 @@
       hifdh = null;
       hifdhWords = null;
       audio.loop = isOn($('loop'));
-      $('hifdhGo').textContent = 'Démarrer';
+      $('hifdhGo').textContent = t('hifdhStart');
       $('hifdhAyahText').hidden = true;
     }
 
@@ -1669,9 +2100,9 @@
     // (il est toujours accolé à l'écrit), pour que le nombre de mots corresponde aux horaires audio.
     function tokenizeWords(text) {
       const words = [];
-      for (const t of text.split(/\s+/).filter(Boolean)) {
-        if (/^[ۚۖۗۛۙۘ]+$/.test(t) && words.length) words[words.length - 1] += t;
-        else words.push(t);
+      for (const tok of text.split(/\s+/).filter(Boolean)) {
+        if (/^[ۚۖۗۛۙۘ]+$/.test(tok) && words.length) words[words.length - 1] += tok;
+        else words.push(tok);
       }
       return words;
     }
@@ -1774,8 +2205,8 @@
       $('pNum').textContent = current;
       $('pTr').textContent = tr;
       $('pAr').textContent = `سورة ${ar}`;
-      $('pMeta').textContent = isBasmala ? 'Bismillah' : `Verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
-      $('hifdhStatus').textContent = isBasmala ? `Sourate ${current} · Bismillah` : `Sourate ${current} · verset ${hifdh.ayah}/${total} · répétition ${hifdh.rep}/${reps}`;
+      $('pMeta').textContent = isBasmala ? t('hifdhBismillahStatus') : t('hifdhVerseStatus', hifdh.ayah, total, hifdh.rep, reps);
+      $('hifdhStatus').textContent = isBasmala ? t('hifdhSurahBismillahStatus', current) : t('hifdhSurahVerseStatus', current, hifdh.ayah, total, hifdh.rep, reps);
       document.title = `Hifdh ${current}:${isBasmala ? 'bismillah' : hifdh.ayah} — ${tr}`;
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(current)?.classList.add('active');
@@ -1789,7 +2220,7 @@
         localStorage.setItem('hifdhReciter', $('hifdhReciter').value);
         localStorage.setItem('hifdhReps', $('hifdhReps').value);
       } catch { }
-      $('hifdhGo').textContent = 'Arrêter';
+      $('hifdhGo').textContent = t('hifdhStop');
       playHifdhAyah();
     }
 
@@ -1802,9 +2233,13 @@
       if (current < 114) { current++; hifdh.ayah = firstAyah(current); hifdh.rep = 1; return playHifdhAyah(); }
       exitHifdh();
       $('hifdhStatus').textContent = '';
-      toast('Mémorisation terminée : les 114 sourates ont été parcourues.');
+      toast(t('hifdhDone'));
     }
 
+    function openHifdhPanel() {
+      $('hifdhBar').hidden = false;
+      setOn($('hifdhToggle'), true);
+    }
     $('hifdhToggle').onclick = () => {
       const show = $('hifdhBar').hidden;
       $('hifdhBar').hidden = !show;
@@ -1813,6 +2248,19 @@
     $('hifdhGo').onclick = () => {
       if (hifdh) { exitHifdh(); $('hifdhStatus').textContent = ''; select(current, false); }
       else hifdhStart();
+    };
+
+    // Bannière de mise en avant du mode Hifdh sur la page d'accueil
+    try { if (localStorage.getItem('hifdhPromoClosed') !== '1') $('hifdhPromo').hidden = false; } catch { $('hifdhPromo').hidden = false; }
+    $('hifdhPromoClose').onclick = () => {
+      $('hifdhPromo').hidden = true;
+      try { localStorage.setItem('hifdhPromoClosed', '1'); } catch { }
+    };
+    $('hifdhPromoBtn').onclick = () => {
+      $('hifdhPromo').hidden = true;
+      try { localStorage.setItem('hifdhPromoClosed', '1'); } catch { }
+      openHifdhPanel();
+      document.querySelector('.player').scrollIntoView({ block: 'end' });
     };
 
     if ('mediaSession' in navigator) {
@@ -1831,10 +2279,10 @@
       if (hifdh) {
         // Certains récitateurs n'ont pas de fichier Bismillah séparé : on passe directement au verset 1.
         if (hifdh.ayah === 0) { hifdh.ayah = 1; return playHifdhAyah(); }
-        toast('Impossible de lire ce verset. Essayez un autre récitateur pour le mode Hifdh.');
+        toast(t('hifdhAyahError'));
         return;
       }
-      toast(!navigator.onLine ? 'Cette sourate n’est pas disponible hors ligne.' : 'Impossible de lire cette sourate. Réessayez ou changez de récitateur.');
+      toast(!navigator.onLine ? t('notAvailableOffline') : t('playbackError'));
     });
     let lastSave = 0, seeking = false;
     audio.addEventListener('timeupdate', () => {
@@ -1857,9 +2305,9 @@
     $('seek').addEventListener('input', e => {
       seeking = true;
       if (audio.duration) {
-        const t = e.target.value / 1000 * audio.duration;
-        $('cur').textContent = fmt(t);
-        $('dur').textContent = fmtRemain(t, audio.duration);
+        const pos = e.target.value / 1000 * audio.duration;
+        $('cur').textContent = fmt(pos);
+        $('dur').textContent = fmtRemain(pos, audio.duration);
       }
     });
     $('seek').addEventListener('change', e => {
@@ -1878,7 +2326,7 @@
         c.hidden = !ok;
         if (ok) shown++;
       }
-      $('count').textContent = `${shown} sourate${shown > 1 ? 's' : ''}`;
+      $('count').textContent = t('surahCount', shown);
       $('empty').hidden = shown > 0;
     }
     $('q').addEventListener('input', applyFilter);
@@ -1906,7 +2354,7 @@
     /* ---------- Connexion ---------- */
     function updateOnline() {
       const on = navigator.onLine;
-      $('status').textContent = on ? 'En ligne' : 'Hors ligne';
+      $('status').textContent = on ? t('online') : t('offline');
       $('status').classList.toggle('off', !on);
       for (const c of grid.children) c.classList.toggle('unavailable', !playable(+c.dataset.n));
     }
@@ -1923,19 +2371,19 @@
       b.classList.toggle('loading', state === 'loading');
       b.style.setProperty('--p', Math.round(p * 100));
       b.dataset.p = state === 'loading' ? `${Math.round(p * 100)}%` : '';
-      b.title = state === 'done' ? 'Disponible hors ligne — cliquer pour supprimer'
-        : state === 'loading' ? 'Téléchargement… cliquer pour annuler' : 'Télécharger pour écouter hors ligne';
+      b.title = state === 'done' ? t('dlTitleDone')
+        : state === 'loading' ? t('dlTitleLoading') : t('dlTitleGet');
     }
 
     function updatePanel() {
       const bytes = [...downloaded].reduce((s, n) => s + size(n), 0);
       const total = reciter.kb.reduce((a, b) => a + b, 0) * 1024;
-      $('offCount').textContent = `${downloaded.size} / 114 sourates (${mb(bytes)})`;
+      $('offCount').textContent = t('offCount', downloaded.size, mb(bytes));
       $('offBar').style.width = `${bytes / total * 100}%`;
       const busy = running || queue.length;
       const left = total - bytes;
       $('dlAll').hidden = busy || downloaded.size === 114;
-      $('dlAll').textContent = downloaded.size ? `Télécharger le reste (${mb(left)})` : `Tout télécharger (${mb(total)})`;
+      $('dlAll').textContent = downloaded.size ? t('dlAllRest', mb(left)) : t('dlAllFull', mb(total));
       $('dlCancel').hidden = !busy;
       $('rmAll').hidden = busy || !downloaded.size;
       $('chipDl').hidden = !downloaded.size;
@@ -1944,9 +2392,9 @@
         document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.f === 'all'));
       }
       $('offInfo').textContent = busy
-        ? `Téléchargement en cours… ${queue.length + 1} sourate(s) restante(s). Gardez la page ouverte.`
-        : downloaded.size === 114 ? 'Toutes les sourates sont disponibles sans internet.'
-          : 'Téléchargez des sourates (bouton ↓ sur chaque carte) pour les écouter sans internet.';
+        ? t('offBusy', queue.length + 1)
+        : downloaded.size === 114 ? t('offComplete')
+          : t('offDefault');
       updateOnline();
     }
 
@@ -1961,7 +2409,7 @@
 
     // front = passer devant la file (sourate en cours d'écoute)
     function enqueue(list, silent = false, front = false) {
-      if (!navigator.onLine) return silent || toast('Connectez-vous à internet pour télécharger.');
+      if (!navigator.onLine) return silent || toast(t('needConnectionDl'));
       navigator.storage?.persist?.(); // demande au navigateur de ne pas effacer les fichiers
       const add = list.filter(n => !downloaded.has(n) && !isRunning(n));
       queue = front ? [...add, ...queue.filter(n => !add.includes(n))]
@@ -1988,7 +2436,7 @@
           setDlState(n, 'none');
           if (err.name !== 'AbortError') {
             const full = err.name === 'QuotaExceededError';
-            toast(full ? 'Espace de stockage insuffisant sur cet appareil.' : `Échec du téléchargement de la sourate ${n}.`);
+            toast(full ? t('quotaExceeded') : t('downloadFailed', n));
             if (full || !navigator.onLine) { queue.forEach(x => setDlState(x, 'none')); queue = []; }
           }
         }
@@ -2043,12 +2491,12 @@
     $('rmAll').onclick = async () => {
       if (!confirmRm) {
         confirmRm = true;
-        $('rmAll').textContent = 'Confirmer la suppression ?';
-        setTimeout(() => { confirmRm = false; $('rmAll').textContent = 'Tout supprimer'; }, 4000);
+        $('rmAll').textContent = t('confirmRemove');
+        setTimeout(() => { confirmRm = false; $('rmAll').textContent = t('removeAllBtn'); }, 4000);
         return;
       }
       confirmRm = false;
-      $('rmAll').textContent = 'Tout supprimer';
+      $('rmAll').textContent = t('removeAllBtn');
       // Supprime uniquement les sourates du récitateur affiché
       const cache = await caches.open(AUDIO_CACHE);
       for (const n of downloaded) await cache.delete(audioUrl(n));
@@ -2074,7 +2522,7 @@
     /* ---------- Choix du récitateur ---------- */
     // Médaillon de chaque récitateur : étoile à huit branches, couleur propre et initiale du nom
     const PALETTE = [['#f7631b', '#b8400a'], ['#1e9e63', '#0c5f3b'], ['#3b5bdb', '#1b2c8a'], ['#9c36b5', '#561a68'],
-      ['#e0a030', '#9a6110'], ['#0ca5b0', '#06636a'], ['#d6336c', '#8a1a43'], ['#5c7cfa', '#2f44a8']];
+    ['#e0a030', '#9a6110'], ['#0ca5b0', '#06636a'], ['#d6336c', '#8a1a43'], ['#5c7cfa', '#2f44a8']];
     function avatar(r, i) {
       const [c1, c2] = PALETTE[i % PALETTE.length];
       const letter = r.ar.split(' ').at(-1).replace(/^ال/, '')[0];
@@ -2155,7 +2603,7 @@
       showReciter(true);
       if (canOffline) await loadDownloaded();
       select(current, wasPlaying && playable(current));
-      toast(`${reciter.fr} · ${reciter.warsh ? 'Warsh' : 'Hafs'}`);
+      toast(t('reciterSwitch', reciter.fr, reciter.warsh));
     }
 
     /* ---------- Installation (PWA) ---------- */
@@ -2168,9 +2616,15 @@
     try { installDismissed = localStorage.getItem('installDismissed') === '1'; } catch { }
     const SHARE_ICON = '<svg class="share" viewBox="0 0 24 24"><path d="M12 2 7.5 6.5l1.4 1.4L11 5.8V15h2V5.8l2.1 2.1 1.4-1.4zM5 10v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h-4v2h2v8H7v-8h2v-2z"/></svg>';
 
-    function showInstallCard(how, withButton) {
+    let installHowKind = null; // 'ios' | 'android' | null (texte par défaut)
+    function renderInstallHow() {
+      $('installHow').innerHTML = installHowKind === 'ios' ? t('installHowIOS', SHARE_ICON)
+        : installHowKind === 'android' ? t('installHowAndroid') : t('installHowDefault');
+    }
+    function showInstallCard(kind, withButton) {
       if (installed || installDismissed) return;
-      if (how) $('installHow').innerHTML = how;
+      installHowKind = kind;
+      renderInstallHow();
       $('installBtn').hidden = !withButton;
       $('installCard').hidden = false;
     }
@@ -2195,11 +2649,11 @@
     });
     // iPhone / iPad : Safari n'a pas de bouton d'installation, on explique la marche à suivre
     if (isIOS) {
-      showInstallCard(`Dans Safari, touchez ${SHARE_ICON} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`, false);
+      showInstallCard('ios', false);
     } else if (isAndroid) {
       // Android : proposer l'application (APK) en téléchargement direct
       $('apkLink').hidden = false;
-      showInstallCard('Téléchargez l’application Android (4 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.', false);
+      showInstallCard('android', false);
     }
     if (APP) $('apkFoot').hidden = true; // déjà dans l'application
     $('install').onclick = doInstall;
@@ -2208,10 +2662,17 @@
       $('installCard').hidden = true;
       try { localStorage.setItem('installDismissed', '1'); } catch { }
     };
-    addEventListener('appinstalled', () => { hideInstall(); toast('Application installée ✓'); });
+    addEventListener('appinstalled', () => { hideInstall(); toast(t('appInstalled')); });
+
+    $('langBtn').onclick = () => {
+      lang = lang === 'fr' ? 'ar' : 'fr';
+      try { localStorage.setItem('lang', lang); } catch { }
+      applyI18n();
+    };
 
     /* ---------- Démarrage ---------- */
     (async () => {
+      applyI18n();
       if (canOffline) {
         if (!APP) navigator.serviceWorker.register('sw.js');
         $('offline').hidden = false;
@@ -2224,7 +2685,7 @@
           const juz = Array.from({ length: 37 }, (_, i) => 78 + i);
           const missing = juz.filter(n => !downloaded.has(n));
           if (missing.length) {
-            toast('Téléchargement du Juz ‘Amma (78 à 114) pour l’écoute hors connexion…');
+            toast(t('juzAmmaDownloading'));
             await enqueue(missing, true);
           }
           // Marque "fait" seulement si le Juz 'Amma est réellement complet (pas en cas d'échec,
