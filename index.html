@@ -1363,6 +1363,40 @@
       padding: 12px 16px;
     }
 
+    .tafsir-panel {
+      flex-basis: 100%;
+      max-height: 280px;
+      overflow-y: auto;
+      font-family: "Changa", -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 2;
+      text-align: right;
+      direction: rtl;
+      color: #fff;
+      opacity: .92;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-top: -4px;
+      margin-bottom: 4px;
+    }
+
+    .tafsir-panel .v {
+      margin-bottom: 12px;
+    }
+
+    .tafsir-panel .v b {
+      color: var(--orange);
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .tafsir-panel .status {
+      opacity: .8;
+      text-align: center;
+      direction: ltr;
+    }
+
     @media (max-width: 640px) {
       .banner h1 {
         font-size: 46px;
@@ -1638,6 +1672,13 @@
           </svg>
           <span id="hifdhLabel">Hifdh</span>
         </button>
+        <button type="button" class="toggle" id="tafsirToggle" title="Tafsir Al-Muyassar de la sourate"
+          aria-pressed="false">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm2-2.17c.3-.2.65-.33 1-.33h11V5H6v12.33z" />
+          </svg>
+          <span id="tafsirToggleLabel">Tafsir</span>
+        </button>
         <select id="rate" title="Vitesse">
           <option value="0.75">0.75×</option>
           <option value="1" selected>1×</option>
@@ -1645,6 +1686,7 @@
           <option value="1.5">1.5×</option>
         </select>
       </div>
+      <div class="tafsir-panel" id="tafsirPanel" lang="ar" hidden></div>
       <div class="hifdh-bar" id="hifdhBar" hidden>
         <div class="hifdh-head">
           <svg viewBox="0 0 24 24">
@@ -1838,6 +1880,8 @@
         hifdhRepsLabel: 'Répétitions par verset', hifdhRepsAria: 'Nombre de répétitions par verset',
         hifdhStart: 'Démarrer', hifdhStop: 'Arrêter',
         meaningBtn: 'Tafsir (explication en arabe)', meaningError: 'Tafsir indisponible pour ce verset.',
+        tafsirToggle: 'Tafsir', tafsirToggleTitle: 'Tafsir Al-Muyassar de la sourate',
+        tafsirLoading: 'Chargement du Tafsir Al-Muyassar…', tafsirError: 'Tafsir indisponible pour cette sourate.',
         type: n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise',
         verses: v => `${v} verset${v > 1 ? 's' : ''}`,
         cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
@@ -1906,6 +1950,8 @@
         hifdhRepsLabel: 'عدد التكرار لكل آية', hifdhRepsAria: 'عدد مرات تكرار كل آية',
         hifdhStart: 'ابدأ', hifdhStop: 'إيقاف',
         meaningBtn: 'التفسير الميسر', meaningError: 'التفسير غير متوفر لهذه الآية.',
+        tafsirToggle: 'التفسير', tafsirToggleTitle: 'التفسير الميسر للسورة',
+        tafsirLoading: 'جاري تحميل التفسير الميسر…', tafsirError: 'التفسير غير متوفر لهذه السورة.',
         type: n => MEDINAN.has(n) ? 'مدنية' : 'مكية',
         verses: v => `${v} آية`,
         cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
@@ -1987,6 +2033,8 @@
       $('auto').title = t('autoTitle'); $('autoLabel').textContent = t('autoToggle');
       $('loop').title = t('loopTitle'); $('loopLabel').textContent = t('loopToggle');
       $('hifdhToggle').title = t('hifdhToggleTitle'); $('hifdhLabel').textContent = t('hifdhToggle');
+      $('tafsirToggle').title = t('tafsirToggleTitle'); $('tafsirToggleLabel').textContent = t('tafsirToggle');
+      if (!$('tafsirPanel').hidden) renderNormalTafsir(current, true);
       $('rate').title = t('rateTitle');
       $('hifdhTitle').textContent = t('hifdhTitle');
       $('hifdhDesc').textContent = t('hifdhDesc');
@@ -2102,6 +2150,7 @@
       $('pTr').textContent = tr;
       $('pAr').textContent = 'سورة ' + ar;
       $('pMeta').textContent = t('playerMeta', fr, t('verses', v), type(n));
+      if (!$('tafsirPanel').hidden) renderNormalTafsir(n);
       document.title = `سورة ${ar} — ${tr}`;
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(n).classList.add('active');
@@ -2243,6 +2292,40 @@
       }
     }
     $('hifdhMeaningBtn').onclick = toggleHifdhMeaning;
+
+    // Tafsir Al-Muyassar en mode normal : pas de position par verset suivie (un seul fichier
+    // audio par sourate), donc on affiche le tafsir de toute la sourate, verset par verset,
+    // dans un panneau à consulter librement pendant l'écoute plutôt que synchronisé à l'audio.
+    const surahTafsirCache = new Map();
+    let tafsirLoadedFor = null, tafsirKey = '';
+    async function renderNormalTafsir(n, force) {
+      const panel = $('tafsirPanel');
+      if (!force && tafsirLoadedFor === n) return;
+      const key = 'surah:' + n;
+      tafsirKey = key;
+      if (surahTafsirCache.has(n)) {
+        panel.innerHTML = surahTafsirCache.get(n);
+        tafsirLoadedFor = n;
+        return;
+      }
+      panel.innerHTML = `<div class="status">${esc(t('tafsirLoading'))}</div>`;
+      try {
+        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/surah/${n}/ar.muyassar`);
+        const ayahs = json?.data?.ayahs;
+        if (!ayahs || !ayahs.length) throw new Error('empty');
+        const html = ayahs.map(a => `<div class="v"><b>${a.numberInSurah}.</b>${esc(a.text)}</div>`).join('');
+        surahTafsirCache.set(n, html);
+        if (tafsirKey === key) { panel.innerHTML = html; tafsirLoadedFor = n; }
+      } catch {
+        if (tafsirKey === key) panel.innerHTML = `<div class="status">${esc(t('tafsirError'))}</div>`;
+      }
+    }
+    $('tafsirToggle').onclick = () => {
+      const show = $('tafsirPanel').hidden;
+      $('tafsirPanel').hidden = !show;
+      setOn($('tafsirToggle'), show);
+      if (show) renderNormalTafsir(current);
+    };
 
     // Texte du verset affiché pendant la répétition (API alquran.cloud, texte uthmani officiel),
     // mis en cache pour ne le récupérer qu'une fois par verset même s'il est répété plusieurs fois.
