@@ -12,3 +12,4 @@ mobile/www/
 scripts/.venv/
 scripts/.cache/
 scripts/align_failures.log
+scripts/__pycache__/

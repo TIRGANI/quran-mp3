@@ -66,6 +66,23 @@ CHUNK_THRESHOLD_S = 420
 CHUNK_TARGET_S = 300
 CHUNK_PAD_S = 8
 
+# Sourates les plus écoutées/mémorisées en pratique, traitées en premier (dans cet ordre) avant
+# toutes les autres — plutôt que de suivre bêtement la longueur, pour que les plus demandées aient
+# leurs horaires exacts le plus vite possible. Les autres sourates suivent ensuite, des plus
+# courtes aux plus longues (comme avant) : cf. `surah_priority_key`.
+PRIORITY_SURAHS = [
+    1,                 # Al-Fatiha : récitée à chaque prière
+    112, 113, 114,     # Al-Ikhlas, Al-Falaq, An-Nas : les plus mémorisées
+    36,                # Yasin
+    67,                # Al-Mulk
+    18,                # Al-Kahf : lue chaque vendredi
+    55, 56,            # Ar-Rahman, Al-Waqi'ah
+    2,                 # Al-Baqara : Ayat al-Kursi, derniers versets — longue mais très demandée
+    3,                 # Al-i-Imran
+    32, 76,            # As-Sajda, Al-Insan : lues au Fajr du vendredi
+    17, 19,            # Al-Isra, Maryam
+]
+
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 log = logging.getLogger("align_quran")
 
@@ -309,6 +326,15 @@ def process_surah(aligner, reciter, n, ayah_texts, out_dir: Path, session, overw
     return "ok"
 
 
+_PRIORITY_RANK = {n: i for i, n in enumerate(PRIORITY_SURAHS)}
+
+
+def surah_priority_key(n: int, all_texts: dict):
+    if n in _PRIORITY_RANK:
+        return (0, _PRIORITY_RANK[n])
+    return (1, sum(len(t) for t in all_texts[str(n)]))
+
+
 def parse_surah_range(spec: str):
     out = set()
     for part in spec.split(","):
@@ -369,9 +395,9 @@ def main():
     print("Chargement du texte de référence (alquran.cloud, une fois pour toutes)...")
     all_texts = load_all_surah_texts(session)
 
-    # Sourates courtes d'abord : résultats utiles rapidement, les plus longues
-    # (Al-Baqara, Al-i-Imran...) qui dominent le temps total passent en dernier.
-    surahs.sort(key=lambda n: sum(len(t) for t in all_texts[str(n)]))
+    # Les plus demandées d'abord (PRIORITY_SURAHS), puis les autres des plus courtes aux plus
+    # longues : résultats utiles rapidement pour ce qui compte le plus.
+    surahs.sort(key=lambda n: surah_priority_key(n, all_texts))
 
     print("Chargement du modèle d'alignement (premier lancement : télécharge ~1.2 Go)...")
     import ctc_forced_aligner as cfa
