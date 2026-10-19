@@ -1352,8 +1352,10 @@
     }
 
     .hifdh-meaning {
-      font-size: 14px;
-      line-height: 1.8;
+      font-family: "Changa", -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 2;
+      text-align: right;
       color: #fff;
       opacity: .9;
       background: rgba(255, 255, 255, .06);
@@ -1654,9 +1656,8 @@
           </div>
         </div>
         <div class="hifdh-ayah" id="hifdhAyahText" lang="ar" hidden></div>
-        <button type="button" class="hifdh-meaning-btn" id="hifdhMeaningBtn" hidden aria-expanded="false">Signification
-          (FR)</button>
-        <div class="hifdh-meaning" id="hifdhMeaning" hidden></div>
+        <button type="button" class="hifdh-meaning-btn" id="hifdhMeaningBtn" hidden aria-expanded="false">Tafsir</button>
+        <div class="hifdh-meaning" id="hifdhMeaning" lang="ar" dir="rtl" hidden></div>
         <div class="hifdh-controls">
           <label><span id="hifdhReciterLabel">Récitateur</span>
             <select id="hifdhReciter" aria-label="Récitateur pour le mode Hifdh"></select>
@@ -1836,7 +1837,7 @@
         hifdhReciterLabel: 'Récitateur', hifdhReciterAria: 'Récitateur pour le mode Hifdh',
         hifdhRepsLabel: 'Répétitions par verset', hifdhRepsAria: 'Nombre de répétitions par verset',
         hifdhStart: 'Démarrer', hifdhStop: 'Arrêter',
-        meaningBtn: 'Signification (FR)', meaningError: 'Signification indisponible pour ce verset.',
+        meaningBtn: 'Tafsir (explication en arabe)', meaningError: 'Tafsir indisponible pour ce verset.',
         type: n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise',
         verses: v => `${v} verset${v > 1 ? 's' : ''}`,
         cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
@@ -1904,7 +1905,7 @@
         hifdhReciterLabel: 'القارئ', hifdhReciterAria: 'القارئ لوضع الحفظ',
         hifdhRepsLabel: 'عدد التكرار لكل آية', hifdhRepsAria: 'عدد مرات تكرار كل آية',
         hifdhStart: 'ابدأ', hifdhStop: 'إيقاف',
-        meaningBtn: 'المعنى (بالفرنسية)', meaningError: 'المعنى غير متوفر لهذه الآية.',
+        meaningBtn: 'التفسير الميسر', meaningError: 'التفسير غير متوفر لهذه الآية.',
         type: n => MEDINAN.has(n) ? 'مدنية' : 'مكية',
         verses: v => `${v} آية`,
         cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
@@ -2217,8 +2218,8 @@
       return { url, blob: false };
     }
 
-    // Signification (traduction française Hamidullah, api.alquran.cloud), affichée à la demande
-    // pour chaque verset : on ne la récupère que si l'utilisateur clique sur le bouton.
+    // Tafsir Al-Muyassar (explication arabe, Complexe du roi Fahd, api.alquran.cloud), affiché
+    // à la demande pour chaque verset : on ne le récupère que si l'utilisateur clique sur le bouton.
     const meaningCache = new Map();
     let hifdhMeaningKey = '';
     async function toggleHifdhMeaning() {
@@ -2232,7 +2233,7 @@
       if (meaningCache.has(key)) { box.textContent = meaningCache.get(key); return; }
       box.textContent = '…';
       try {
-        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/fr.hamidullah`);
+        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/ar.muyassar`);
         const text = json?.data?.text;
         if (!text) throw new Error('empty');
         meaningCache.set(key, text);
