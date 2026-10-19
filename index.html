@@ -1383,6 +1383,16 @@
 
     .tafsir-panel .v {
       margin-bottom: 18px;
+      border-radius: 10px;
+      padding: 6px 8px;
+      margin-left: -8px;
+      margin-right: -8px;
+      transition: background .25s;
+    }
+
+    .tafsir-panel .v.current {
+      background: rgba(247, 99, 27, .16);
+      box-shadow: inset 2px 0 0 var(--orange);
     }
 
     .tafsir-panel .v b {
@@ -2177,7 +2187,7 @@
       $('pTr').textContent = tr;
       $('pAr').textContent = 'سورة ' + ar;
       $('pMeta').textContent = t('playerMeta', fr, t('verses', v), type(n));
-      if (!$('tafsirPanel').hidden) renderNormalTafsir(n);
+      if (!$('tafsirPanel').hidden) { renderNormalTafsir(n); loadNormalAyahTimings(n); }
       document.title = `سورة ${ar} — ${tr}`;
       document.querySelectorAll('.card.active').forEach(c => c.classList.remove('active'));
       card(n).classList.add('active');
@@ -2320,12 +2330,15 @@
     }
     $('hifdhMeaningBtn').onclick = toggleHifdhMeaning;
 
-    // Texte du Coran + Tafsir Al-Muyassar en mode normal : pas de position par verset suivie
-    // (un seul fichier audio par sourate), donc on affiche toute la sourate, verset par verset,
-    // texte et tafsir, dans un panneau à consulter librement pendant l'écoute. Le surlignage
-    // mot par mot se fait au survol (il n'y a pas d'horodatage fiable pour l'audio de ce mode,
-    // contrairement au mode Hifdh qui lit un fichier par verset).
+    // Texte du Coran + Tafsir Al-Muyassar en mode normal : affiché sourate entière, verset par
+    // verset, dans un panneau à consulter pendant l'écoute. Le surlignage mot par mot se fait au
+    // survol ; le verset en cours de lecture est lui suivi automatiquement (surlignage + défilement) :
+    // avec les horaires exacts (api.quran.com) quand ils ont été vérifiés comme correspondant au
+    // fichier audio réellement joué (mp3quran.net), sinon avec une estimation proportionnelle à la
+    // longueur de chaque verset — en pratique les deux CDN ne servent presque jamais le même
+    // enregistrement (durées différentes), donc l'estimation est le mode normal, pas l'exception.
     const surahTafsirCache = new Map();
+    const normalAyahRatioCache = new Map(); // n -> [{ayah, from, to}] fractions 0..1 de la durée totale
     let tafsirLoadedFor = null, tafsirKey = '';
     async function renderNormalTafsir(n, force) {
       const panel = $('tafsirPanel');
@@ -2343,10 +2356,19 @@
         const [quranEd, tafsirEd] = json?.data || [];
         const ayahs = quranEd?.ayahs;
         if (!ayahs || !ayahs.length) throw new Error('empty');
+        if (!normalAyahRatioCache.has(n)) {
+          const lens = ayahs.map(a => a.text.replace(/\s+/g, '').length || 1);
+          const total = lens.reduce((s, l) => s + l, 0) || 1;
+          let acc = 0;
+          normalAyahRatioCache.set(n, ayahs.map((a, i) => {
+            const from = acc / total; acc += lens[i];
+            return { ayah: a.numberInSurah, from, to: acc / total };
+          }));
+        }
         const html = ayahs.map((a, i) => {
           const words = tokenizeWords(a.text).map(w => `<span class="nword">${esc(w)}</span>`).join(' ');
           const tafsirText = tafsirEd?.ayahs?.[i]?.text || '';
-          return `<div class="v"><b>${a.numberInSurah}.</b>`
+          return `<div class="v" data-ayah="${a.numberInSurah}"><b>${a.numberInSurah}.</b>`
             + `<div class="ntext">${words}</div>`
             + (tafsirText ? `<div class="ntafsir">${esc(tafsirText)}</div>` : '')
             + `</div>`;
@@ -2357,11 +2379,46 @@
         if (tafsirKey === key) panel.innerHTML = `<div class="status">${esc(t('tafsirError'))}</div>`;
       }
     }
+
+    // Récitateurs du mode normal pour lesquels on dispose d'horaires par verset vérifiés
+    // (mêmes identifiants que l'API quran.com utilisée pour le mot par mot du mode Hifdh).
+    const NORMAL_QDC_MAP = {
+      'mishary-alafasy/r1': 7, 'abdulbasit-abdulsamad/r3': 2, 'mahmoud-husary/r1': 6,
+      'muhammad-minshawi/r1': 9, 'abdulrahman-sudais/r1': 3, 'saud-shuraim/r1': 10,
+    };
+    let normalAyahPending = null, normalAyahTimings = null, normalAyahTimingsKey = '', normalFollowedAyah = -1;
+
+    // N'active le suivi que si la durée du fichier réellement joué (mp3quran.net) correspond à
+    // celle du fichier horodaté (quran.com) : ce sont deux CDN distincts, rien ne garantit qu'ils
+    // servent le même enregistrement pour un récitateur donné.
+    function tryValidateNormalAyahTimings() {
+      if (!normalAyahPending || !isFinite(audio.duration)) return;
+      const { key, map, durMs } = normalAyahPending;
+      normalAyahPending = null;
+      if (key !== normalAyahTimingsKey || !durMs) return;
+      if (Math.abs(audio.duration - durMs / 1000) <= 1.5) normalAyahTimings = map;
+    }
+    audio.addEventListener('loadedmetadata', tryValidateNormalAyahTimings);
+
+    async function loadNormalAyahTimings(n) {
+      normalAyahTimings = null;
+      normalAyahPending = null;
+      normalFollowedAyah = -1;
+      $('tafsirPanel').querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
+      const qdcId = NORMAL_QDC_MAP[reciter.id];
+      const key = qdcId ? `${qdcId}:${n}` : '';
+      normalAyahTimingsKey = key;
+      if (!qdcId) return;
+      const map = await loadWordTimings(qdcId, n);
+      if (normalAyahTimingsKey !== key || !map.size) return;
+      normalAyahPending = { key, map, durMs: wordTimingDurationCache.get(key) };
+      tryValidateNormalAyahTimings();
+    }
     $('tafsirToggle').onclick = () => {
       const show = $('tafsirPanel').hidden;
       $('tafsirPanel').hidden = !show;
       setOn($('tafsirToggle'), show);
-      if (show) renderNormalTafsir(current);
+      if (show) { renderNormalTafsir(current); loadNormalAyahTimings(current); }
     };
 
     // Texte du verset affiché pendant la répétition (API alquran.cloud, texte uthmani officiel),
@@ -2402,15 +2459,18 @@
 
     // Horaires mot par mot (api.quran.com), récupérés une fois par sourate + récitateur et mis en cache.
     const wordTimingCache = new Map();
+    const wordTimingDurationCache = new Map(); // durée (ms) du fichier audio quran.com correspondant
     async function loadWordTimings(qdcId, s) {
       const key = `${qdcId}:${s}`;
       if (wordTimingCache.has(key)) return wordTimingCache.get(key);
       const map = new Map();
       try {
         const json = await cachedJsonFetch(`https://api.quran.com/api/qdc/audio/reciters/${qdcId}/audio_files?chapter=${s}&segments=true`);
-        for (const v of json.audio_files[0].verse_timings) {
+        const af = json.audio_files[0];
+        wordTimingDurationCache.set(key, af.duration);
+        for (const v of af.verse_timings) {
           const ayahNum = +v.verse_key.split(':')[1];
-          map.set(ayahNum, { from: v.timestamp_from, segments: v.segments });
+          map.set(ayahNum, { from: v.timestamp_from, to: v.timestamp_to, segments: v.segments });
         }
       } catch { } // pas bloquant : le texte s'affichera sans surlignage mot par mot
       wordTimingCache.set(key, map);
@@ -2582,6 +2642,28 @@
         const ms = audio.currentTime * 1000;
         for (const el of hifdhWords.els) {
           el.classList.toggle('active', ms >= +el.dataset.from && ms < +el.dataset.to);
+        }
+      }
+      if (!hifdh && !$('tafsirPanel').hidden) {
+        let found = -1;
+        if (normalAyahTimings) { // horaires exacts vérifiés (rare) : horodatage réel en ms
+          const ms = audio.currentTime * 1000;
+          for (const [ayah, tm] of normalAyahTimings) {
+            if (ms >= tm.from && ms < tm.to) { found = ayah; break; }
+          }
+        } else if (audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
+          const ratios = normalAyahRatioCache.get(current);
+          const frac = audio.currentTime / audio.duration;
+          if (ratios) for (const r of ratios) {
+            if (frac >= r.from && frac < r.to) { found = r.ayah; break; }
+          }
+        }
+        if (found !== -1 && found !== normalFollowedAyah) {
+          normalFollowedAyah = found;
+          const panel = $('tafsirPanel');
+          panel.querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
+          const el = panel.querySelector(`.v[data-ayah="${found}"]`);
+          if (el) { el.classList.add('current'); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
         }
       }
     });
