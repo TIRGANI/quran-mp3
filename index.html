@@ -1753,7 +1753,7 @@
     </div>
   </div>
 
-  <audio id="audio" preload="metadata"></audio>
+  <audio id="audio" preload="metadata" crossorigin="anonymous"></audio>
 
   <script>
     // [translittération, arabe, français, versets]
@@ -2166,6 +2166,8 @@
         const res = await (await caches.open(AUDIO_CACHE)).match(audioUrl(n));
         if (res) return { url: URL.createObjectURL(await res.blob()), blob: true };
       }
+      const exact = await exactAudioUrl(n).catch(() => null);
+      if (exact) return { url: exact, blob: false };
       return { url: audioUrl(n), blob: false };
     }
 
@@ -2544,6 +2546,7 @@
     // Horaires mot par mot (api.quran.com), récupérés une fois par sourate + récitateur et mis en cache.
     const wordTimingCache = new Map();
     const wordTimingDurationCache = new Map(); // durée (ms) du fichier audio quran.com correspondant
+    const wordTimingAudioUrlCache = new Map(); // URL de ce même fichier (pour le jouer directement, synchro exacte)
     async function loadWordTimings(qdcId, s) {
       const key = `${qdcId}:${s}`;
       if (wordTimingCache.has(key)) return wordTimingCache.get(key);
@@ -2552,6 +2555,7 @@
         const json = await cachedJsonFetch(`https://api.quran.com/api/qdc/audio/reciters/${qdcId}/audio_files?chapter=${s}&segments=true`);
         const af = json.audio_files[0];
         wordTimingDurationCache.set(key, af.duration);
+        if (af.audio_url) wordTimingAudioUrlCache.set(key, af.audio_url);
         for (const v of af.verse_timings) {
           const ayahNum = +v.verse_key.split(':')[1];
           map.set(ayahNum, { from: v.timestamp_from, to: v.timestamp_to, segments: v.segments });
@@ -2559,6 +2563,20 @@
       } catch { } // pas bloquant : le texte s'affichera sans surlignage mot par mot
       wordTimingCache.set(key, map);
       return map;
+    }
+
+    // Pour les récitateurs avec horaires vérifiés, joue directement le fichier sur lequel ces
+    // horaires ont été mesurés (quran.com) plutôt que celui de mp3quran.net : ce sont deux
+    // enregistrements distincts, et même recalés (cf. plus haut) leur rythme peut varier tout au
+    // long de la sourate — seule la lecture du même fichier garantit une synchro mot par mot exacte.
+    // Jamais utilisé si la sourate est déjà téléchargée hors ligne, pour ne pas casser le mode hors
+    // connexion : dans ce cas on garde le fichier mp3quran.net déjà en cache.
+    async function exactAudioUrl(n) {
+      const qdcId = NORMAL_QDC_MAP[reciter.id];
+      if (!qdcId || downloaded.has(n)) return null;
+      const key = `${qdcId}:${n}`;
+      if (!wordTimingAudioUrlCache.has(key)) await loadWordTimings(qdcId, n);
+      return wordTimingAudioUrlCache.get(key) || null;
     }
 
     async function loadHifdhText(s, a, qdcId) {
