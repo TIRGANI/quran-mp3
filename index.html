@@ -2205,7 +2205,7 @@
       for (let n = current + dir; n >= 1 && n <= 114; n += dir) if (playable(n)) return select(n, true);
       if (!navigator.onLine) toast(t('noOtherDownloaded'));
     }
-    function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); }
+    function toggle() { audio.paused ? audio.play().catch(() => { }) : audio.pause(); ensureAudioAnalyser(); }
     function save() { try { localStorage.setItem('lecteur', JSON.stringify({ n: current, t: audio.currentTime || 0 })); } catch { } }
 
     // Boutons bascule (Enchaîner / Répéter) : état reflété par aria-pressed
@@ -2402,14 +2402,69 @@
       'muhammad-minshawi/r1': 9, 'abdulrahman-sudais/r1': 3, 'saud-shuraim/r1': 10,
     };
     let normalAyahPending = null, normalAyahTimings = null, normalAyahTimingsKey = '', normalFollowedAyah = -1;
-    let normalFollowedWord = -1, normalFollowedWordAyah = -1, normalAyahTimingsScale = 1;
+    let normalFollowedWord = -1, normalFollowedWordAyah = -1, normalAyahTimingsScale = 1, normalAyahTimingsDurMs = 0;
+
+    // Horloge d'analyse audio (Web Audio API), créée au premier clic lecture/pause de l'utilisateur
+    // (nécessite un geste utilisateur) : sert uniquement à repérer la fin du silence initial du
+    // fichier réellement joué (jingle, pause...), pour recaler le suivi mot par mot dessus.
+    let audioCtx = null, analyserNode = null, analyserData = null;
+    function ensureAudioAnalyser() {
+      if (analyserNode || audioCtx) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioCtx = new Ctx();
+        const src = audioCtx.createMediaElementSource(audio);
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 1024;
+        analyserData = new Uint8Array(analyserNode.fftSize);
+        src.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
+      } catch { analyserNode = null; }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+    }
 
     // Le fichier réellement joué (mp3quran.net) et celui dont on a les horaires (quran.com) sont
     // deux enregistrements distincts du même récitateur : leurs durées totales diffèrent presque
-    // toujours un peu (silences, pauses...), mais le rythme relatif entre versets reste très proche.
-    // On ne rejette donc plus les horaires sur un simple écart de durée : on les recale par un
-    // facteur d'échelle (durée réelle / durée horodatée), ce qui corrige l'essentiel du décalage.
-    // Rejeter seulement si l'écart est trop important pour être un simple effet de pauses.
+    // toujours un peu, en grande partie à cause d'un silence initial (jingle, pause) absent des
+    // horaires de quran.com, qui commencent eux pile au premier mot. On détecte ce silence par
+    // l'amplitude du son réellement joué (normalLeadSilenceMs) et on recale les horaires dessus :
+    // sans ça, le surlignage avance plus vite que la voix et finit "en avance" sur toute la sourate.
+    let normalLeadSilenceMs = 0, normalLeadSilenceSrc = '';
+    function recomputeNormalScale() {
+      if (!normalAyahTimingsDurMs || !isFinite(audio.duration)) return;
+      const speechS = Math.max(0.1, audio.duration - normalLeadSilenceMs / 1000);
+      normalAyahTimingsScale = speechS / (normalAyahTimingsDurMs / 1000);
+    }
+    function detectNormalLeadSilence(src) {
+      if (!analyserNode) { normalLeadSilenceSrc = src; return; }
+      const t0 = audio.currentTime;
+      let floor = null, floorN = 0;
+      function tick() {
+        if (normalLeadSilenceSrc === src || audio.src !== src || audio.paused || audio.ended) return;
+        analyserNode.getByteTimeDomainData(analyserData);
+        let sum = 0;
+        for (let i = 0; i < analyserData.length; i++) { const d = analyserData[i] - 128; sum += d * d; }
+        const rms = Math.sqrt(sum / analyserData.length);
+        if (floorN < 5) { floor = floor === null ? rms : (floor * floorN + rms) / (floorN + 1); floorN++; }
+        else if (rms > floor + 6) {
+          normalLeadSilenceMs = Math.max(0, (audio.currentTime - t0) * 1000 - 90);
+          normalLeadSilenceSrc = src;
+          recomputeNormalScale();
+          return;
+        }
+        if (audio.currentTime - t0 > 4) { normalLeadSilenceSrc = src; return; } // abandon : pas de silence net détecté
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+    audio.addEventListener('play', () => {
+      if (audio.currentTime < 1.5 && normalLeadSilenceSrc !== audio.src) detectNormalLeadSilence(audio.src);
+    });
+
+    // On ne rejette plus les horaires sur un simple écart de durée : on les recale par un facteur
+    // d'échelle (cf. recomputeNormalScale). Rejeter seulement si l'écart est trop important pour
+    // être un simple effet de silences/pauses — probablement alors un autre enregistrement.
     function tryValidateNormalAyahTimings() {
       if (!normalAyahPending || !isFinite(audio.duration)) return;
       const { key, map, durMs } = normalAyahPending;
@@ -2418,16 +2473,20 @@
       const scale = audio.duration / (durMs / 1000);
       if (scale < 0.5 || scale > 2) return; // trop différent : probablement un autre enregistrement
       normalAyahTimings = map;
-      normalAyahTimingsScale = scale;
+      normalAyahTimingsDurMs = durMs;
+      recomputeNormalScale();
     }
     audio.addEventListener('loadedmetadata', tryValidateNormalAyahTimings);
 
     async function loadNormalAyahTimings(n) {
       normalAyahTimings = null;
       normalAyahPending = null;
+      normalAyahTimingsDurMs = 0;
       normalFollowedAyah = -1;
       normalFollowedWord = -1;
       normalFollowedWordAyah = -1;
+      normalLeadSilenceMs = 0;
+      normalLeadSilenceSrc = '';
       $('tafsirPanel').querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
       $('tafsirPanel').querySelectorAll('.nword.active').forEach(el => el.classList.remove('active'));
       const qdcId = NORMAL_QDC_MAP[reciter.id];
@@ -2671,8 +2730,11 @@
       }
       if (!hifdh && !$('tafsirPanel').hidden) {
         let found = -1, localFrac = 0, ayahMs = 0, exactTm = null;
-        if (normalAyahTimings) { // horaires quran.com, recalés à l'échelle de l'audio réellement joué
-          const ms = audio.currentTime * 1000 / normalAyahTimingsScale;
+        // Rien à surligner tant qu'on est dans le silence initial détecté (jingle, pause) : les
+        // horaires (exacts ou estimés) ne couvrent que la récitation elle-même.
+        const effectiveMs = audio.currentTime * 1000 - normalLeadSilenceMs;
+        if (effectiveMs >= 0 && normalAyahTimings) { // horaires quran.com, recalés à l'échelle de l'audio réellement joué
+          const ms = effectiveMs / normalAyahTimingsScale;
           for (const [ayah, tm] of normalAyahTimings) {
             if (ms >= tm.from && ms < tm.to) {
               found = ayah; exactTm = tm; ayahMs = ms - tm.from;
@@ -2680,9 +2742,10 @@
               break;
             }
           }
-        } else if (audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
+        } else if (effectiveMs >= 0 && audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
           const ratios = normalAyahRatioCache.get(current);
-          const frac = audio.currentTime / audio.duration;
+          const speechMs = audio.duration * 1000 - normalLeadSilenceMs;
+          const frac = speechMs > 0 ? effectiveMs / speechMs : 0;
           if (ratios) for (const r of ratios) {
             if (frac >= r.from && frac < r.to) { found = r.ayah; localFrac = (frac - r.from) / (r.to - r.from); break; }
           }

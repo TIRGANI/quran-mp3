@@ -1,5 +1,5 @@
 // Service worker : met l'application en cache et sert les sourates téléchargées hors ligne.
-const SHELL = 'shell-v7';
+const SHELL = 'shell-v8';
 const AUDIO = 'audio-v1'; // même nom que dans index.html
 
 self.addEventListener('install', event => {
@@ -33,9 +33,21 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (url.origin !== location.origin) return;
-  // Application : cache d'abord, mise à jour en arrière-plan
+  // Page et script principal : réseau d'abord (pour voir les mises à jour dès ce chargement,
+  // pas seulement au suivant), cache seulement si hors ligne. Le reste de l'app (polices,
+  // icônes...) change rarement : cache d'abord, mise à jour en arrière-plan.
+  const isAppShell = req.mode === 'navigate' || url.pathname.endsWith('index.html') || url.pathname === '/';
   event.respondWith((async () => {
     const cache = await caches.open(SHELL);
+    if (isAppShell) {
+      try {
+        const res = await fetch(req);
+        if (res.ok) cache.put(req, res.clone());
+        return res;
+      } catch {
+        return (await cache.match(req, { ignoreSearch: true })) || cache.match('index.html');
+      }
+    }
     const cached = await cache.match(req, { ignoreSearch: true });
     const network = fetch(req).then(res => {
       if (res.ok) cache.put(req, res.clone());
