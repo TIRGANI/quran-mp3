@@ -2166,11 +2166,55 @@
       if (!hifdh) return;
       hifdh = null;
       hifdhWords = null;
+      hifdhPlayToken++; // invalide toute résolution audio encore en attente (APP hors ligne)
+      if (hifdhBlobUrl) { URL.revokeObjectURL(hifdhBlobUrl); hifdhBlobUrl = null; }
       audio.loop = isOn($('loop'));
       $('hifdhGo').textContent = t('hifdhStart');
       $('hifdhAyahText').hidden = true;
       $('hifdhMeaningBtn').hidden = true;
       $('hifdhMeaning').hidden = true;
+    }
+
+    // Cache générique pour le texte, la traduction et les horaires du mode Hifdh (JSON) :
+    // cache d'abord si déjà vu hors connexion, sinon réseau (et mise en cache pour la prochaine fois).
+    const HIFDH_DATA_CACHE = 'hifdh-data-v1';
+    async function cachedJsonFetch(url) {
+      if (canOffline) {
+        try {
+          const cache = await caches.open(HIFDH_DATA_CACHE);
+          const cached = await cache.match(url);
+          if (cached) return cached.json();
+          const res = await fetch(url);
+          if (res.ok) cache.put(url, res.clone());
+          return res.json();
+        } catch { }
+      }
+      return (await fetch(url)).json();
+    }
+
+    // Garde automatiquement l'audio du mode Hifdh pour l'écoute hors connexion, sur le même
+    // principe que l'autoSave des sourates normales : jamais bloquant, échoue silencieusement.
+    async function cacheHifdhAudio(url) {
+      if (!canOffline || !navigator.onLine || !$('autoSave').checked) return;
+      try {
+        const cache = await caches.open(AUDIO_CACHE);
+        if (await cache.match(url)) return;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) await cache.put(url, res.clone());
+      } catch { }
+    }
+
+    // Dans l'application Android (pas de service worker), l'audio mis en cache est lu via une
+    // URL blob, comme pour les sourates normales ; sur le site, le service worker s'en charge.
+    let hifdhBlobUrl = null, hifdhPlayToken = 0;
+    async function hifdhAudioSrc(url) {
+      if (APP && canOffline) {
+        try {
+          const res = await (await caches.open(AUDIO_CACHE)).match(url);
+          if (res) return { url: URL.createObjectURL(await res.blob()), blob: true };
+        } catch { }
+      }
+      return { url, blob: false };
     }
 
     // Signification (traduction française Hamidullah, api.alquran.cloud), affichée à la demande
@@ -2188,8 +2232,7 @@
       if (meaningCache.has(key)) { box.textContent = meaningCache.get(key); return; }
       box.textContent = '…';
       try {
-        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/fr.hamidullah`);
-        const json = await res.json();
+        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/fr.hamidullah`);
         const text = json?.data?.text;
         if (!text) throw new Error('empty');
         meaningCache.set(key, text);
@@ -2243,8 +2286,7 @@
       if (wordTimingCache.has(key)) return wordTimingCache.get(key);
       const map = new Map();
       try {
-        const res = await fetch(`https://api.quran.com/api/qdc/audio/reciters/${qdcId}/audio_files?chapter=${s}&segments=true`);
-        const json = await res.json();
+        const json = await cachedJsonFetch(`https://api.quran.com/api/qdc/audio/reciters/${qdcId}/audio_files?chapter=${s}&segments=true`);
         for (const v of json.audio_files[0].verse_timings) {
           const ayahNum = +v.verse_key.split(':')[1];
           map.set(ayahNum, { from: v.timestamp_from, segments: v.segments });
@@ -2262,8 +2304,7 @@
       if (!text) {
         box.hidden = true;
         try {
-          const res = await fetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/quran-uthmani`);
-          const json = await res.json();
+          const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/ayah/${s}:${a}/quran-uthmani`);
           text = json?.data?.text;
           if (!text) throw new Error('empty');
           ayahTextCache.set(key, text);
@@ -2299,14 +2340,22 @@
       box.hidden = false;
     }
 
-    function playHifdhAyah() {
+    async function playHifdhAyah() {
+      if (!hifdh) return;
+      const token = ++hifdhPlayToken;
       const total = S[current - 1][3];
       const [tr, ar] = S[current - 1];
       const reps = +$('hifdhReps').value;
       const isBasmala = hifdh.ayah === 0;
       const reciterRow = HIFDH_RECITERS.find(r => r[0] === $('hifdhReciter').value);
-      audio.src = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${isBasmala ? '000' : pad(hifdh.ayah)}.mp3`;
+      const rawUrl = `https://everyayah.com/data/${$('hifdhReciter').value}/${pad(current)}${isBasmala ? '000' : pad(hifdh.ayah)}.mp3`;
+      const { url: src, blob } = await hifdhAudioSrc(rawUrl);
+      if (token !== hifdhPlayToken) { if (blob) URL.revokeObjectURL(src); return; } // état changé entre-temps
+      if (hifdhBlobUrl) URL.revokeObjectURL(hifdhBlobUrl);
+      hifdhBlobUrl = blob ? src : null;
+      audio.src = src;
       audio.play().catch(() => { });
+      cacheHifdhAudio(rawUrl); // garde pour l'écoute hors connexion, en arrière-plan
       hifdhWords = null;
       hifdhMeaningKey = '';
       $('hifdhMeaning').hidden = true;
