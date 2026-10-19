@@ -1382,13 +1382,40 @@
     }
 
     .tafsir-panel .v {
-      margin-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     .tafsir-panel .v b {
       color: var(--orange);
       font-weight: 700;
       margin-left: 6px;
+    }
+
+    .tafsir-panel .ntext {
+      font-family: var(--ar);
+      font-size: 22px;
+      line-height: 2.1;
+      color: #ffd2bb;
+      margin: 4px 0 8px;
+    }
+
+    .tafsir-panel .nword {
+      display: inline-block;
+      margin: 0 1px;
+      border-radius: 5px;
+      padding: 0 3px;
+      cursor: default;
+      transition: background .1s, color .1s;
+    }
+
+    .tafsir-panel .nword:hover {
+      background: var(--orange);
+      color: #04091e;
+    }
+
+    .tafsir-panel .ntafsir {
+      font-size: 14px;
+      opacity: .85;
     }
 
     .tafsir-panel .status {
@@ -2293,9 +2320,11 @@
     }
     $('hifdhMeaningBtn').onclick = toggleHifdhMeaning;
 
-    // Tafsir Al-Muyassar en mode normal : pas de position par verset suivie (un seul fichier
-    // audio par sourate), donc on affiche le tafsir de toute la sourate, verset par verset,
-    // dans un panneau à consulter librement pendant l'écoute plutôt que synchronisé à l'audio.
+    // Texte du Coran + Tafsir Al-Muyassar en mode normal : pas de position par verset suivie
+    // (un seul fichier audio par sourate), donc on affiche toute la sourate, verset par verset,
+    // texte et tafsir, dans un panneau à consulter librement pendant l'écoute. Le surlignage
+    // mot par mot se fait au survol (il n'y a pas d'horodatage fiable pour l'audio de ce mode,
+    // contrairement au mode Hifdh qui lit un fichier par verset).
     const surahTafsirCache = new Map();
     let tafsirLoadedFor = null, tafsirKey = '';
     async function renderNormalTafsir(n, force) {
@@ -2310,10 +2339,18 @@
       }
       panel.innerHTML = `<div class="status">${esc(t('tafsirLoading'))}</div>`;
       try {
-        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/surah/${n}/ar.muyassar`);
-        const ayahs = json?.data?.ayahs;
+        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,ar.muyassar`);
+        const [quranEd, tafsirEd] = json?.data || [];
+        const ayahs = quranEd?.ayahs;
         if (!ayahs || !ayahs.length) throw new Error('empty');
-        const html = ayahs.map(a => `<div class="v"><b>${a.numberInSurah}.</b>${esc(a.text)}</div>`).join('');
+        const html = ayahs.map((a, i) => {
+          const words = tokenizeWords(a.text).map(w => `<span class="nword">${esc(w)}</span>`).join(' ');
+          const tafsirText = tafsirEd?.ayahs?.[i]?.text || '';
+          return `<div class="v"><b>${a.numberInSurah}.</b>`
+            + `<div class="ntext">${words}</div>`
+            + (tafsirText ? `<div class="ntafsir">${esc(tafsirText)}</div>` : '')
+            + `</div>`;
+        }).join('');
         surahTafsirCache.set(n, html);
         if (tafsirKey === key) { panel.innerHTML = html; tafsirLoadedFor = n; }
       } catch {
