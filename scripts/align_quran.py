@@ -330,6 +330,9 @@ def main():
     p.add_argument("--overwrite", action="store_true", help="Regénère même si le JSON existe déjà")
     p.add_argument("--keep-audio", action="store_true", help="Garde aussi le mp3 téléchargé (gros volume)")
     p.add_argument("--list-reciters", action="store_true", help="Liste les IDs disponibles et quitte")
+    p.add_argument("--time-budget-min", type=float, default=0,
+                   help="S'arrête proprement (entre deux sourates) après N minutes, pour tenir dans la limite "
+                        "d'un job CI (ex: GitHub Actions, 6h max) ; 0 = pas de limite (défaut)")
     p.add_argument("-v", "--verbose", action="store_true")
     args = p.parse_args()
 
@@ -374,38 +377,46 @@ def main():
     import ctc_forced_aligner as cfa
     aligner = cfa.AlignmentSingleton()
 
-    total = len(chosen) * len(surahs)
+    # Sourates en boucle externe (plutôt que récitateur) : après un run limité en temps, tous les
+    # récitateurs ont progressé un peu, au lieu que le premier seul soit fini pendant que les autres
+    # attendent. Chaque item reste indépendant et resumable (skip si déjà présent).
+    work = [(reciter, n) for n in surahs for reciter in chosen]
+    total = len(work)
     done = ok = skipped = failed = 0
     t_start = time.time()
-    for reciter in chosen:
-        for n in surahs:
-            done += 1
-            elapsed = time.time() - t_start
-            rate = done / elapsed if elapsed > 0 else 0
-            eta_min = (total - done) / rate / 60 if rate > 0 else 0
-            print(
-                f"\r[{done}/{total}] {reciter['id']} sourate {n:3d}  "
-                f"(ok={ok} skip={skipped} fail={failed}, ETA {eta_min:.0f} min)      ",
-                end="",
-                flush=True,
+    stopped_early = False
+    for reciter, n in work:
+        if args.time_budget_min and (time.time() - t_start) / 60 >= args.time_budget_min:
+            stopped_early = True
+            break
+        done += 1
+        elapsed = time.time() - t_start
+        rate = done / elapsed if elapsed > 0 else 0
+        eta_min = (total - done) / rate / 60 if rate > 0 else 0
+        print(
+            f"\r[{done}/{total}] {reciter['id']} sourate {n:3d}  "
+            f"(ok={ok} skip={skipped} fail={failed}, ETA {eta_min:.0f} min)      ",
+            end="",
+            flush=True,
+        )
+        try:
+            status = process_surah(
+                aligner, reciter, n, all_texts[str(n)], out_dir, session, args.overwrite, args.keep_audio
             )
-            try:
-                status = process_surah(
-                    aligner, reciter, n, all_texts[str(n)], out_dir, session, args.overwrite, args.keep_audio
-                )
-                if status == "ok":
-                    ok += 1
-                else:
-                    skipped += 1
-            except Exception as e:
-                failed += 1
-                with open(FAIL_LOG, "a", encoding="utf-8") as f:
-                    f.write(f"{reciter['id']}\t{n}\t{e}\n")
-                    f.write(traceback.format_exc() + "\n")
-                log.info(f"échec {reciter['id']} sourate {n}: {e}")
+            if status == "ok":
+                ok += 1
+            else:
+                skipped += 1
+        except Exception as e:
+            failed += 1
+            with open(FAIL_LOG, "a", encoding="utf-8") as f:
+                f.write(f"{reciter['id']}\t{n}\t{e}\n")
+                f.write(traceback.format_exc() + "\n")
+            log.info(f"échec {reciter['id']} sourate {n}: {e}")
 
     print()
-    print(f"Terminé : {ok} générés, {skipped} déjà présents, {failed} échecs.")
+    suffix = " (arrêt sur budget de temps, reprendra au prochain lancement)" if stopped_early else ""
+    print(f"Terminé{suffix} : {ok} générés, {skipped} déjà présents, {failed} échecs.")
     if failed:
         print(f"Détails des échecs : {FAIL_LOG}")
 

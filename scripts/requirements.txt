@@ -1,6 +1,5 @@
 requests
 tqdm
 numpy
-torch
 ctc-forced-aligner
 unidecode
