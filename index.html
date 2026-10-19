@@ -1418,7 +1418,8 @@
       transition: background .1s, color .1s;
     }
 
-    .tafsir-panel .nword:hover {
+    .tafsir-panel .nword:hover,
+    .tafsir-panel .nword.active {
       background: var(--orange);
       color: #04091e;
     }
@@ -2339,6 +2340,7 @@
     // enregistrement (durées différentes), donc l'estimation est le mode normal, pas l'exception.
     const surahTafsirCache = new Map();
     const normalAyahRatioCache = new Map(); // n -> [{ayah, from, to}] fractions 0..1 de la durée totale
+    const normalWordRatioCache = new Map(); // n -> Map(ayah -> [{from, to}]) fractions 0..1 dans le verset
     let tafsirLoadedFor = null, tafsirKey = '';
     async function renderNormalTafsir(n, force) {
       const panel = $('tafsirPanel');
@@ -2365,8 +2367,21 @@
             return { ayah: a.numberInSurah, from, to: acc / total };
           }));
         }
+        const wordRatioMap = normalWordRatioCache.has(n) ? normalWordRatioCache.get(n) : (() => {
+          const m = new Map(); normalWordRatioCache.set(n, m); return m;
+        })();
         const html = ayahs.map((a, i) => {
-          const words = tokenizeWords(a.text).map(w => `<span class="nword">${esc(w)}</span>`).join(' ');
+          const tokens = tokenizeWords(a.text);
+          if (!wordRatioMap.has(a.numberInSurah)) {
+            const wLens = tokens.map(w => w.replace(/[ۚۖۗۛۙۘ]/g, '').length || 1);
+            const wTotal = wLens.reduce((s, l) => s + l, 0) || 1;
+            let wAcc = 0;
+            wordRatioMap.set(a.numberInSurah, tokens.map((w, wi) => {
+              const from = wAcc / wTotal; wAcc += wLens[wi];
+              return { from, to: wAcc / wTotal };
+            }));
+          }
+          const words = tokens.map((w, wi) => `<span class="nword" data-wi="${wi}">${esc(w)}</span>`).join(' ');
           const tafsirText = tafsirEd?.ayahs?.[i]?.text || '';
           return `<div class="v" data-ayah="${a.numberInSurah}"><b>${a.numberInSurah}.</b>`
             + `<div class="ntext">${words}</div>`
@@ -2387,16 +2402,23 @@
       'muhammad-minshawi/r1': 9, 'abdulrahman-sudais/r1': 3, 'saud-shuraim/r1': 10,
     };
     let normalAyahPending = null, normalAyahTimings = null, normalAyahTimingsKey = '', normalFollowedAyah = -1;
+    let normalFollowedWord = -1, normalFollowedWordAyah = -1, normalAyahTimingsScale = 1;
 
-    // N'active le suivi que si la durée du fichier réellement joué (mp3quran.net) correspond à
-    // celle du fichier horodaté (quran.com) : ce sont deux CDN distincts, rien ne garantit qu'ils
-    // servent le même enregistrement pour un récitateur donné.
+    // Le fichier réellement joué (mp3quran.net) et celui dont on a les horaires (quran.com) sont
+    // deux enregistrements distincts du même récitateur : leurs durées totales diffèrent presque
+    // toujours un peu (silences, pauses...), mais le rythme relatif entre versets reste très proche.
+    // On ne rejette donc plus les horaires sur un simple écart de durée : on les recale par un
+    // facteur d'échelle (durée réelle / durée horodatée), ce qui corrige l'essentiel du décalage.
+    // Rejeter seulement si l'écart est trop important pour être un simple effet de pauses.
     function tryValidateNormalAyahTimings() {
       if (!normalAyahPending || !isFinite(audio.duration)) return;
       const { key, map, durMs } = normalAyahPending;
       normalAyahPending = null;
       if (key !== normalAyahTimingsKey || !durMs) return;
-      if (Math.abs(audio.duration - durMs / 1000) <= 1.5) normalAyahTimings = map;
+      const scale = audio.duration / (durMs / 1000);
+      if (scale < 0.5 || scale > 2) return; // trop différent : probablement un autre enregistrement
+      normalAyahTimings = map;
+      normalAyahTimingsScale = scale;
     }
     audio.addEventListener('loadedmetadata', tryValidateNormalAyahTimings);
 
@@ -2404,7 +2426,10 @@
       normalAyahTimings = null;
       normalAyahPending = null;
       normalFollowedAyah = -1;
+      normalFollowedWord = -1;
+      normalFollowedWordAyah = -1;
       $('tafsirPanel').querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
+      $('tafsirPanel').querySelectorAll('.nword.active').forEach(el => el.classList.remove('active'));
       const qdcId = NORMAL_QDC_MAP[reciter.id];
       const key = qdcId ? `${qdcId}:${n}` : '';
       normalAyahTimingsKey = key;
@@ -2645,25 +2670,55 @@
         }
       }
       if (!hifdh && !$('tafsirPanel').hidden) {
-        let found = -1;
-        if (normalAyahTimings) { // horaires exacts vérifiés (rare) : horodatage réel en ms
-          const ms = audio.currentTime * 1000;
+        let found = -1, localFrac = 0, ayahMs = 0, exactTm = null;
+        if (normalAyahTimings) { // horaires quran.com, recalés à l'échelle de l'audio réellement joué
+          const ms = audio.currentTime * 1000 / normalAyahTimingsScale;
           for (const [ayah, tm] of normalAyahTimings) {
-            if (ms >= tm.from && ms < tm.to) { found = ayah; break; }
+            if (ms >= tm.from && ms < tm.to) {
+              found = ayah; exactTm = tm; ayahMs = ms - tm.from;
+              localFrac = ayahMs / (tm.to - tm.from);
+              break;
+            }
           }
         } else if (audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
           const ratios = normalAyahRatioCache.get(current);
           const frac = audio.currentTime / audio.duration;
           if (ratios) for (const r of ratios) {
-            if (frac >= r.from && frac < r.to) { found = r.ayah; break; }
+            if (frac >= r.from && frac < r.to) { found = r.ayah; localFrac = (frac - r.from) / (r.to - r.from); break; }
           }
         }
+        const panel = $('tafsirPanel');
         if (found !== -1 && found !== normalFollowedAyah) {
           normalFollowedAyah = found;
-          const panel = $('tafsirPanel');
           panel.querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
           const el = panel.querySelector(`.v[data-ayah="${found}"]`);
           if (el) { el.classList.add('current'); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        }
+        // Mot en cours, à l'intérieur du verset en cours : avec les horaires réels par mot
+        // (quran.com) quand leur nombre correspond exactement au nombre de mots affichés, sinon
+        // estimé proportionnellement à sa longueur. Mis à jour à chaque tick, contrairement au
+        // verset (changement rare).
+        let wi = -1;
+        if (found !== -1) {
+          const wordRatios = normalWordRatioCache.get(current)?.get(found);
+          if (exactTm?.segments && wordRatios && exactTm.segments.length === wordRatios.length) {
+            for (let k = 0; k < exactTm.segments.length; k++) {
+              const seg = exactTm.segments[k];
+              if (seg.length >= 3 && ayahMs >= seg[1] - exactTm.from && ayahMs < seg[2] - exactTm.from) { wi = k; break; }
+            }
+          } else if (wordRatios) {
+            for (let k = 0; k < wordRatios.length; k++) {
+              if (localFrac >= wordRatios[k].from && localFrac < wordRatios[k].to) { wi = k; break; }
+            }
+          }
+        }
+        if (wi !== normalFollowedWord || found !== normalFollowedWordAyah) {
+          normalFollowedWord = wi; normalFollowedWordAyah = found;
+          panel.querySelectorAll('.nword.active').forEach(el => el.classList.remove('active'));
+          if (wi !== -1) {
+            const el = panel.querySelector(`.v[data-ayah="${found}"] .nword[data-wi="${wi}"]`);
+            if (el) el.classList.add('active');
+          }
         }
       }
     });
