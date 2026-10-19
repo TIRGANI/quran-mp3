@@ -2166,8 +2166,13 @@
         const res = await (await caches.open(AUDIO_CACHE)).match(audioUrl(n));
         if (res) return { url: URL.createObjectURL(await res.blob()), blob: true };
       }
-      const exact = await exactAudioUrl(n).catch(() => null);
-      if (exact) return { url: exact, blob: false };
+      // Si on a des horaires exacts pré-générés pour CE fichier mp3quran.net (scripts/align_quran.py),
+      // pas besoin de jouer un autre enregistrement : on garde mp3quran.net (cohérent avec le hors ligne).
+      const local = await loadLocalTiming(reciter.id, n).catch(() => null);
+      if (!local) {
+        const exact = await exactAudioUrl(n).catch(() => null);
+        if (exact) return { url: exact, blob: false };
+      }
       return { url: audioUrl(n), blob: false };
     }
 
@@ -2406,6 +2411,25 @@
     let normalAyahPending = null, normalAyahTimings = null, normalAyahTimingsKey = '', normalFollowedAyah = -1;
     let normalFollowedWord = -1, normalFollowedWordAyah = -1, normalAyahTimingsScale = 1, normalAyahTimingsDurMs = 0;
 
+    // Horaires mot par mot générés par scripts/align_quran.py : alignement forcé directement sur
+    // le fichier mp3quran.net réellement joué (pas un autre enregistrement), donc exacts sans aucun
+    // recalage. Prioritaires sur tout le reste quand disponibles ; sinon on retombe sur les horaires
+    // quran.com (recalés) ou l'estimation proportionnelle, comme avant.
+    let normalLocalAyahs = null; // Map(ayah -> [{w,from,to}]) ou null si indisponible pour cette sourate
+    const localTimingCache = new Map(); // `${reciterId}:${n}` -> données | null
+    const reciterDirName = id => id.replace(/[^a-zA-Z0-9_.-]+/g, '_');
+    async function loadLocalTiming(reciterId, n) {
+      const key = `${reciterId}:${n}`;
+      if (localTimingCache.has(key)) return localTimingCache.get(key);
+      let data = null;
+      try {
+        const res = await fetch(`scripts/timings/${reciterDirName(reciterId)}/${n}.json`);
+        if (res.ok) data = await res.json();
+      } catch { }
+      localTimingCache.set(key, data);
+      return data;
+    }
+
     // Horloge d'analyse audio (Web Audio API), créée au premier clic lecture/pause de l'utilisateur
     // (nécessite un geste utilisateur) : sert uniquement à repérer la fin du silence initial du
     // fichier réellement joué (jingle, pause...), pour recaler le suivi mot par mot dessus.
@@ -2484,6 +2508,7 @@
       normalAyahTimings = null;
       normalAyahPending = null;
       normalAyahTimingsDurMs = 0;
+      normalLocalAyahs = null;
       normalFollowedAyah = -1;
       normalFollowedWord = -1;
       normalFollowedWordAyah = -1;
@@ -2491,6 +2516,13 @@
       normalLeadSilenceSrc = '';
       $('tafsirPanel').querySelectorAll('.v.current').forEach(el => el.classList.remove('current'));
       $('tafsirPanel').querySelectorAll('.nword.active').forEach(el => el.classList.remove('active'));
+      const reciterAtStart = reciter.id;
+      const local = await loadLocalTiming(reciterAtStart, n).catch(() => null);
+      if (reciterAtStart !== reciter.id || current !== n) return; // changé entretemps
+      if (local && local.ayahs) {
+        normalLocalAyahs = new Map(Object.entries(local.ayahs).map(([a, words]) => [+a, words]));
+        return;
+      }
       const qdcId = NORMAL_QDC_MAP[reciter.id];
       const key = qdcId ? `${qdcId}:${n}` : '';
       normalAyahTimingsKey = key;
@@ -2747,25 +2779,40 @@
         }
       }
       if (!hifdh && !$('tafsirPanel').hidden) {
-        let found = -1, localFrac = 0, ayahMs = 0, exactTm = null;
-        // Rien à surligner tant qu'on est dans le silence initial détecté (jingle, pause) : les
-        // horaires (exacts ou estimés) ne couvrent que la récitation elle-même.
-        const effectiveMs = audio.currentTime * 1000 - normalLeadSilenceMs;
-        if (effectiveMs >= 0 && normalAyahTimings) { // horaires quran.com, recalés à l'échelle de l'audio réellement joué
-          const ms = effectiveMs / normalAyahTimingsScale;
-          for (const [ayah, tm] of normalAyahTimings) {
-            if (ms >= tm.from && ms < tm.to) {
-              found = ayah; exactTm = tm; ayahMs = ms - tm.from;
-              localFrac = ayahMs / (tm.to - tm.from);
-              break;
+        let found = -1, localFrac = 0, ayahMs = 0, exactTm = null, wi = -1, wiFromLocal = false;
+        if (normalLocalAyahs) {
+          // Horaires pré-générés sur le fichier réellement joué : correspondance directe, sans
+          // aucun recalage (même référentiel temporel que audio.currentTime).
+          wiFromLocal = true;
+          const ms = audio.currentTime * 1000;
+          for (const [ayah, words] of normalLocalAyahs) {
+            if (!words.length || ms < words[0].from || ms >= words[words.length - 1].to) continue;
+            found = ayah;
+            for (let k = 0; k < words.length; k++) {
+              if (ms >= words[k].from && ms < words[k].to) { wi = k; break; }
             }
+            break;
           }
-        } else if (effectiveMs >= 0 && audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
-          const ratios = normalAyahRatioCache.get(current);
-          const speechMs = audio.duration * 1000 - normalLeadSilenceMs;
-          const frac = speechMs > 0 ? effectiveMs / speechMs : 0;
-          if (ratios) for (const r of ratios) {
-            if (frac >= r.from && frac < r.to) { found = r.ayah; localFrac = (frac - r.from) / (r.to - r.from); break; }
+        } else {
+          // Rien à surligner tant qu'on est dans le silence initial détecté (jingle, pause) : les
+          // horaires (exacts ou estimés) ne couvrent que la récitation elle-même.
+          const effectiveMs = audio.currentTime * 1000 - normalLeadSilenceMs;
+          if (effectiveMs >= 0 && normalAyahTimings) { // horaires quran.com, recalés à l'échelle de l'audio réellement joué
+            const ms = effectiveMs / normalAyahTimingsScale;
+            for (const [ayah, tm] of normalAyahTimings) {
+              if (ms >= tm.from && ms < tm.to) {
+                found = ayah; exactTm = tm; ayahMs = ms - tm.from;
+                localFrac = ayahMs / (tm.to - tm.from);
+                break;
+              }
+            }
+          } else if (effectiveMs >= 0 && audio.duration) { // sinon, estimation proportionnelle à la longueur des versets
+            const ratios = normalAyahRatioCache.get(current);
+            const speechMs = audio.duration * 1000 - normalLeadSilenceMs;
+            const frac = speechMs > 0 ? effectiveMs / speechMs : 0;
+            if (ratios) for (const r of ratios) {
+              if (frac >= r.from && frac < r.to) { found = r.ayah; localFrac = (frac - r.from) / (r.to - r.from); break; }
+            }
           }
         }
         const panel = $('tafsirPanel');
@@ -2775,12 +2822,11 @@
           const el = panel.querySelector(`.v[data-ayah="${found}"]`);
           if (el) { el.classList.add('current'); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
         }
-        // Mot en cours, à l'intérieur du verset en cours : avec les horaires réels par mot
-        // (quran.com) quand leur nombre correspond exactement au nombre de mots affichés, sinon
-        // estimé proportionnellement à sa longueur. Mis à jour à chaque tick, contrairement au
-        // verset (changement rare).
-        let wi = -1;
-        if (found !== -1) {
+        // Mot en cours, à l'intérieur du verset en cours : avec les horaires locaux exacts quand ils
+        // existent, sinon ceux de quran.com (recalés) si leur nombre correspond exactement au nombre
+        // de mots affichés, sinon estimé proportionnellement à sa longueur. Mis à jour à chaque tick,
+        // contrairement au verset (changement rare).
+        if (!wiFromLocal && found !== -1) {
           const wordRatios = normalWordRatioCache.get(current)?.get(found);
           if (exactTm?.segments && wordRatios && exactTm.segments.length === wordRatios.length) {
             for (let k = 0; k < exactTm.segments.length; k++) {

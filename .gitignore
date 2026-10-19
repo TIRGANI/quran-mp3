@@ -6,3 +6,9 @@ Lancer Coran.command
 # Application Android : dépendances et fichiers générés
 mobile/node_modules/
 mobile/www/
+
+# Outil d'alignement audio/texte (scripts/align_quran.py) : environnement et caches locaux,
+# pas scripts/timings/ (les horaires générés sont commités, servis par GitHub Pages)
+scripts/.venv/
+scripts/.cache/
+scripts/align_failures.log
