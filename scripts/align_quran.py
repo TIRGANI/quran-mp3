@@ -65,6 +65,7 @@ WAQF_RE = re.compile(f"^[{WAQF_MARKS}]+$")
 CHUNK_THRESHOLD_S = 420
 CHUNK_TARGET_S = 300
 CHUNK_PAD_S = 8
+CHUNK_CONTEXT_AYAHS = 2
 
 # Sourates les plus écoutées/mémorisées en pratique, traitées en premier (dans cet ordre) avant
 # toutes les autres — plutôt que de suivre bêtement la longueur, pour que les plus demandées aient
@@ -229,9 +230,15 @@ def estimate_ayah_time_ranges(ayah_word_lists, duration_s: float):
 
 
 def build_chunks(ayah_word_lists, duration_s: float):
-    """Regroupe les versets consécutifs en morceaux d'environ CHUNK_TARGET_S, avec un
-    padding de chaque côté pour ne jamais couper un mot. Renvoie une liste de
-    {ayah_start, ayah_end (exclu), slice_start_s, slice_end_s}."""
+    """Regroupe les versets consécutifs en morceaux d'environ CHUNK_TARGET_S. Chaque morceau a :
+    - une plage audio tranchée (slice_start_s/slice_end_s), avec un padding de chaque côté pour ne
+      jamais couper un mot en plein milieu ;
+    - une plage de texte « de contexte » (ctx_ayah_start/ctx_ayah_end) plus large que la plage utile
+      (ayah_start/ayah_end, exclu) : les quelques versets voisins inclus dans le padding audio sont
+      aussi donnés à l'aligneur, sinon il doit faire correspondre de la vraie parole (le bout du
+      verset précédent, bien réel dans le padding) à du silence qu'il n'a pas — ce qui décale
+      systématiquement le début du morceau suivant. Les mots de contexte sont retirés après coup,
+      seuls ceux de la plage utile sont gardés."""
     ranges = estimate_ayah_time_ranges(ayah_word_lists, duration_s)
     chunks = []
     i, n = 0, len(ranges)
@@ -241,10 +248,15 @@ def build_chunks(ayah_word_lists, duration_s: float):
         while j < n and (ranges[j][1] - chunk_start) < CHUNK_TARGET_S:
             j += 1
         j = max(j, i + 1)  # au moins un verset par morceau, même si trop long à lui seul
-        chunk_end = ranges[j - 1][1]
-        slice_start = max(0.0, chunk_start - CHUNK_PAD_S)
-        slice_end = min(duration_s, chunk_end + CHUNK_PAD_S)
-        chunks.append({"ayah_start": i, "ayah_end": j, "slice_start_s": slice_start, "slice_end_s": slice_end})
+        ctx_i = max(0, i - CHUNK_CONTEXT_AYAHS)
+        ctx_j = min(n, j + CHUNK_CONTEXT_AYAHS)
+        slice_start = max(0.0, ranges[ctx_i][0] - CHUNK_PAD_S)
+        slice_end = min(duration_s, ranges[ctx_j - 1][1] + CHUNK_PAD_S)
+        chunks.append({
+            "ayah_start": i, "ayah_end": j,
+            "ctx_ayah_start": ctx_i, "ctx_ayah_end": ctx_j,
+            "slice_start_s": slice_start, "slice_end_s": slice_end,
+        })
         i = j
     return chunks
 
@@ -263,17 +275,22 @@ def align_file(aligner, audio_path: Path, ayah_word_lists):
     all_words = []
     with tempfile.TemporaryDirectory() as tmp:
         for ci, chunk in enumerate(chunks):
-            chunk_words_text = [w for lst in ayah_word_lists[chunk["ayah_start"]: chunk["ayah_end"]] for w in lst]
-            if not chunk_words_text:
+            ctx_words_text = [w for lst in ayah_word_lists[chunk["ctx_ayah_start"]: chunk["ctx_ayah_end"]] for w in lst]
+            if not ctx_words_text:
                 continue
             slice_path = Path(tmp) / f"chunk_{ci}.wav"
             ffmpeg_slice(audio_path, slice_path, chunk["slice_start_s"], chunk["slice_end_s"])
-            words = align_words(aligner, slice_path, chunk_words_text)
+            ctx_words = align_words(aligner, slice_path, ctx_words_text)
+            slice_path.unlink(missing_ok=True)
+
+            # Ne garde que les mots de la plage utile (pas le contexte de part et d'autre).
+            before = sum(len(w) for w in ayah_word_lists[chunk["ctx_ayah_start"]: chunk["ayah_start"]])
+            core_n = sum(len(w) for w in ayah_word_lists[chunk["ayah_start"]: chunk["ayah_end"]])
+            words = ctx_words[before: before + core_n]
             for w in words:
                 w["start"] += chunk["slice_start_s"]
                 w["end"] += chunk["slice_start_s"]
             all_words.extend(words)
-            slice_path.unlink(missing_ok=True)
 
     if len(all_words) != len(full_words_text):
         raise RuntimeError(f"{len(all_words)} mots alignés != {len(full_words_text)} attendus (découpage)")
