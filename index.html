@@ -633,6 +633,170 @@
       color: #fff;
     }
 
+    #smodeFilters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Recherche vocale */
+    .mic {
+      flex: none;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .mic svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .mic:hover {
+      color: var(--orange);
+    }
+
+    .mic.listening {
+      background: var(--orange);
+      color: #fff;
+      animation: micPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(247, 99, 27, .4); }
+      50% { box-shadow: 0 0 0 8px rgba(247, 99, 27, 0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mic.listening {
+        animation: none;
+      }
+    }
+
+    /* Bascule Sourates / Texte du Coran (mode de recherche) */
+    .smode {
+      display: inline-flex;
+      gap: 2px;
+      background: var(--bg);
+      border-radius: 33px;
+      padding: 3px;
+      flex: none;
+    }
+
+    .smode button {
+      border: 0;
+      background: none;
+      color: var(--muted);
+      border-radius: 33px;
+      padding: 7px 14px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .smode button.on {
+      background: var(--white);
+      color: var(--orange);
+      box-shadow: 0 2px 6px rgba(4, 9, 30, .1);
+    }
+
+    /* Résultats de recherche dans le texte du Coran */
+    .tresults {
+      max-width: 820px;
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .tresult {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .tresult:last-child {
+      border-bottom: 0;
+    }
+
+    .tresult:hover {
+      background: var(--bg);
+    }
+
+    .tresult .tloc {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .tresult .tbody {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tresult .tplay {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--orange-soft);
+      color: var(--orange);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      transition: background .15s, transform .15s;
+    }
+
+    .tresult .tplay svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      margin-left: 2px;
+    }
+
+    .tresult:hover .tplay {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .tresult .tar {
+      flex: 1;
+      font-family: var(--ar);
+      font-size: 19px;
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .tresult .tar mark {
+      background: var(--orange-soft);
+      color: var(--orange);
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+
+    .tmore {
+      text-align: center;
+      padding: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     /* Panneau hors ligne */
     .offline {
       max-width: 860px;
@@ -1570,12 +1734,24 @@
 
   <div class="container">
     <div class="tools">
+      <div class="smode" id="smode" role="group" aria-label="Mode de recherche">
+        <button type="button" class="on" id="smSurah" data-m="surah">Sourates</button>
+        <button type="button" id="smText" data-m="text">Texte du Coran</button>
+      </div>
       <input type="search" id="q" placeholder="Rechercher une sourate (nom, traduction ou numéro)…"
         aria-label="Rechercher une sourate">
-      <button class="chip on" id="chipAll" data-f="all">Toutes</button>
-      <button class="chip" id="chipMeccan" data-f="m">Mecquoises</button>
-      <button class="chip" id="chipMedinan" data-f="d">Médinoises</button>
-      <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
+      <button type="button" class="mic" id="micBtn" title="Recherche vocale" aria-label="Recherche vocale" hidden>
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z" />
+        </svg>
+      </button>
+      <div id="smodeFilters">
+        <button class="chip on" id="chipAll" data-f="all">Toutes</button>
+        <button class="chip" id="chipMeccan" data-f="m">Mecquoises</button>
+        <button class="chip" id="chipMedinan" data-f="d">Médinoises</button>
+        <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
+      </div>
     </div>
 
     <div class="installcard" id="installCard" hidden>
@@ -1623,6 +1799,10 @@
 
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty" hidden>Aucune sourate ne correspond.</div>
+
+    <div class="tresults" id="tresults" hidden></div>
+    <div class="empty" id="tempty" hidden>Tapez un mot ou un bout de verset (avec ou sans voyelles) pour
+      rechercher dans le texte du Coran.</div>
   </div>
 
   <footer class="footer">
@@ -1888,7 +2068,20 @@
         reciterPrev: 'Récitateurs précédents', reciterNext: 'Récitateurs suivants', reciterGroup: 'Récitateur',
         noReciter: 'Aucun récitateur trouvé.',
         searchSurahPh: 'Rechercher une sourate (nom, traduction ou numéro)…', searchSurahAria: 'Rechercher une sourate',
+        searchTextPh: 'Rechercher un mot ou un verset dans le Coran…', searchTextAria: 'Rechercher dans le texte du Coran',
+        micTitle: 'Recherche vocale', micListening: 'Parlez maintenant…',
+        micNotSupported: 'La recherche vocale n’est pas disponible sur ce navigateur.',
+        micDenied: 'Microphone refusé : autorisez-le dans les réglages du navigateur.',
+        micError: 'La recherche vocale n’a pas fonctionné, réessayez.',
+        smSurah: 'Sourates', smText: 'Texte du Coran',
         chipAll: 'Toutes', chipMeccan: 'Mecquoises', chipMedinan: 'Médinoises', chipDl: 'Téléchargées',
+        tsearchHint: 'Tapez un mot ou un bout de verset (avec ou sans voyelles) pour rechercher dans le texte du Coran.',
+        tsearchEmpty: 'Aucun verset ne correspond.',
+        tsearchLoading: 'Chargement du texte du Coran…',
+        tsearchLoc: (n, tr, ayah) => `Sourate ${n}. ${tr} — verset ${ayah}`,
+        tsearchMore: extra => `… et ${extra} autre${extra > 1 ? 's' : ''} verset${extra > 1 ? 's' : ''}.`,
+        tsearchPlayAria: (n, tr, ayah) => `Écouter la sourate ${n}, ${tr}, verset ${ayah}`,
+        tsearchPlayTitle: 'Écouter ce verset',
         installTitle: "Installer l'application sur votre téléphone",
         installHowDefault: "Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.",
         installHowIOS: icon => `Dans Safari, touchez ${icon} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`,
@@ -1958,7 +2151,20 @@
         reciterPrev: 'القرّاء السابقون', reciterNext: 'القرّاء التالون', reciterGroup: 'قارئ',
         noReciter: 'لم يُعثر على أي قارئ.',
         searchSurahPh: 'ابحث عن سورة (الاسم أو الترجمة أو الرقم)…', searchSurahAria: 'ابحث عن سورة',
+        searchTextPh: 'ابحث عن كلمة أو جزء من آية في القرآن…', searchTextAria: 'ابحث في نص القرآن',
+        micTitle: 'البحث الصوتي', micListening: 'تحدّث الآن…',
+        micNotSupported: 'البحث الصوتي غير متوفر على هذا المتصفح.',
+        micDenied: 'تم رفض الميكروفون: فعّله من إعدادات المتصفح.',
+        micError: 'تعذّر البحث الصوتي، أعد المحاولة.',
+        smSurah: 'السور', smText: 'نص القرآن',
         chipAll: 'الكل', chipMeccan: 'مكية', chipMedinan: 'مدنية', chipDl: 'تم تنزيلها',
+        tsearchHint: 'اكتب كلمة أو جزءًا من آية (بتشكيل أو بدونه) للبحث في نص القرآن.',
+        tsearchEmpty: 'لا توجد آية مطابقة.',
+        tsearchLoading: 'جارٍ تحميل نص القرآن…',
+        tsearchLoc: (n, tr, ayah) => `سورة ${n}. ${tr} — الآية ${ayah}`,
+        tsearchMore: extra => `… و ${extra} آية أخرى.`,
+        tsearchPlayAria: (n, tr, ayah) => `استمع إلى سورة ${n}، ${tr}، الآية ${ayah}`,
+        tsearchPlayTitle: 'استمع إلى هذه الآية',
         installTitle: 'ثبّت التطبيق على هاتفك',
         installHowDefault: 'وصول مباشر من الشاشة الرئيسية، وضع ملء الشاشة، واستماع بدون اتصال بالإنترنت.',
         installHowIOS: icon => `في Safari، اضغط على ${icon} <b>مشاركة</b>، ثم <b>«إضافة إلى الشاشة الرئيسية»</b>.`,
@@ -2039,8 +2245,13 @@
       $('rlist').setAttribute('aria-label', t('reciterGroup'));
       $('rEmpty').textContent = t('noReciter');
       $('rNext').setAttribute('aria-label', t('reciterNext'));
-      $('q').placeholder = t('searchSurahPh');
-      $('q').setAttribute('aria-label', t('searchSurahAria'));
+      $('q').placeholder = t(searchMode === 'text' ? 'searchTextPh' : 'searchSurahPh');
+      $('q').setAttribute('aria-label', t(searchMode === 'text' ? 'searchTextAria' : 'searchSurahAria'));
+      $('micBtn').title = t('micTitle');
+      $('micBtn').setAttribute('aria-label', t('micTitle'));
+      $('smSurah').textContent = t('smSurah');
+      $('smText').textContent = t('smText');
+      $('tempty').textContent = t('tsearchHint');
       $('chipAll').textContent = t('chipAll');
       $('chipMeccan').textContent = t('chipMeccan');
       $('chipMedinan').textContent = t('chipMedinan');
@@ -2125,6 +2336,7 @@
     const canOffline = 'caches' in window && window.isSecureContext && (APP || 'serviceWorker' in navigator);
     const downloaded = new Set();
     let current = 1, filter = 'all';
+    let searchMode = 'surah';
     let hifdh = null; // { ayah, rep } quand le mode Hifdh (répétition par verset) est actif
 
     const ICON_GET = '<svg class="get" viewBox="0 0 24 24"><path d="M11 4h2v9.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6zM5 18h14v2H5z"/></svg>';
@@ -2869,6 +3081,7 @@
 
     /* ---------- Recherche et filtres ---------- */
     function applyFilter() {
+      if (searchMode !== 'surah') return; // la recherche plein texte gère son propre affichage
       const q = norm($('q').value.trim());
       let shown = 0;
       for (const c of grid.children) {
@@ -2881,12 +3094,181 @@
       $('count').textContent = t('surahCount', shown);
       $('empty').hidden = shown > 0;
     }
-    $('q').addEventListener('input', applyFilter);
-    document.querySelectorAll('.chip').forEach(ch => ch.onclick = () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === ch));
+    document.querySelectorAll('#smodeFilters .chip').forEach(ch => ch.onclick = () => {
+      document.querySelectorAll('#smodeFilters .chip').forEach(c => c.classList.toggle('on', c === ch));
       filter = ch.dataset.f;
       applyFilter();
     });
+
+    /* ---------- Recherche dans le texte du Coran (mode « Texte du Coran ») ----------
+       Le texte complet (version Uthmani, un tableau de 114 sourates × versets) est chargé à la
+       demande depuis quran-text.json plutôt qu'au démarrage, pour ne pas alourdir le chargement
+       initial de l'application. */
+    let quranTextFlat = null, quranTextPromise = null;
+    function loadQuranText() {
+      if (!quranTextPromise) {
+        quranTextPromise = fetch('quran-text.json').then(r => r.json()).then(data => {
+          const flat = [];
+          data.forEach((ayat, i) => ayat.forEach((text, j) => flat.push({ n: i + 1, ayah: j + 1, text })));
+          quranTextFlat = flat;
+          return flat;
+        }).catch(e => { quranTextPromise = null; throw e; });
+      }
+      return quranTextPromise;
+    }
+
+    // Les voyelles (tashkeel) sont ignorées, et les variantes d'alif/hamza, de yâ' final et de tâ'
+    // marbûta sont considérées équivalentes, pour que la recherche fonctionne qu'on les tape ou non.
+    const AR_DIACRITICS = '[\\u0610-\\u061A\\u064B-\\u065F\\u0670\\u06D6-\\u06ED\\u0640]*';
+    const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    function buildTextSearchRegex(raw) {
+      const chars = [...raw.trim()];
+      if (!chars.length) return null;
+      const parts = chars.map(ch => {
+        if ('اأإآٱ'.includes(ch)) return '[اأإآٱ]';
+        if (ch === 'ى') return '[ىي]';
+        if (ch === 'ة') return '[ةه]';
+        if (/\s/.test(ch)) return '\\s+';
+        return escapeRegExp(ch);
+      });
+      try { return new RegExp(parts.join(AR_DIACRITICS), 'i'); } catch { return null; }
+    }
+    function highlightArabic(text, regex) {
+      const m = new RegExp(regex.source, 'i').exec(text);
+      if (!m) return esc(text);
+      return `${esc(text.slice(0, m.index))}<mark>${esc(m[0])}</mark>${esc(text.slice(m.index + m[0].length))}`;
+    }
+
+    const TSEARCH_LIMIT = 80;
+    function renderTextResults(matches, regex) {
+      const box = $('tresults');
+      if (!matches.length) {
+        box.hidden = true; box.innerHTML = '';
+        $('tempty').hidden = false;
+        $('tempty').textContent = t('tsearchEmpty');
+        return;
+      }
+      $('tempty').hidden = true;
+      const shown = matches.slice(0, TSEARCH_LIMIT);
+      box.innerHTML = shown.map(({ n, ayah, text }) => {
+        const tr = S[n - 1][0];
+        return `<div class="tresult" tabindex="0" role="button" data-n="${n}" data-ayah="${ayah}"
+            aria-label="${esc(t('tsearchPlayAria', n, tr, ayah))}">
+          <span class="tloc">${esc(t('tsearchLoc', n, tr, ayah))}</span>
+          <span class="tbody">
+            <button type="button" class="tplay" tabindex="-1" aria-hidden="true" title="${esc(t('tsearchPlayTitle'))}">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            </button>
+            <span class="tar" lang="ar">${highlightArabic(text, regex)}</span>
+          </span>
+        </div>`;
+      }).join('') + (matches.length > TSEARCH_LIMIT ? `<div class="tmore">${esc(t('tsearchMore', matches.length - TSEARCH_LIMIT))}</div>` : '');
+      box.hidden = false;
+      box.querySelectorAll('.tresult').forEach(el => {
+        el.onclick = () => goToAyah(+el.dataset.n, +el.dataset.ayah);
+        el.onkeydown = e => { if (e.key === 'Enter') el.click(); };
+      });
+    }
+
+    let tSearchTimer, tSearchToken = 0;
+    function scheduleTextSearch() { clearTimeout(tSearchTimer); tSearchTimer = setTimeout(runTextSearch, 150); }
+    async function runTextSearch() {
+      const raw = $('q').value;
+      const regex = buildTextSearchRegex(raw);
+      if (!regex) {
+        $('tresults').hidden = true; $('tresults').innerHTML = '';
+        $('tempty').hidden = false;
+        $('tempty').textContent = t('tsearchHint');
+        return;
+      }
+      $('tresults').hidden = true;
+      $('tempty').hidden = false;
+      $('tempty').textContent = t('tsearchLoading');
+      const token = ++tSearchToken;
+      let flat;
+      try { flat = quranTextFlat || await loadQuranText(); } catch { $('tempty').textContent = t('playbackError'); return; }
+      if (token !== tSearchToken) return; // une recherche plus récente a été lancée
+      const matches = flat.filter(row => regex.test(row.text));
+      renderTextResults(matches, regex);
+    }
+
+    // Lance la lecture d'un verset précis trouvé par la recherche, via le mode Hifdh (audio par
+    // verset) : plus simple et plus fiable qu'un positionnement en secondes dans le fichier complet.
+    function goToAyah(n, ayah) {
+      selectToken++; // invalide un éventuel select() de sourate entière encore en attente
+      current = n;
+      audio.loop = false;
+      hifdh = { ayah, rep: 1 };
+      try {
+        localStorage.setItem('hifdhReciter', $('hifdhReciter').value);
+        localStorage.setItem('hifdhReps', $('hifdhReps').value);
+      } catch { }
+      openHifdhPanel();
+      $('hifdhGo').textContent = t('hifdhStop');
+      playHifdhAyah();
+      document.querySelector('.player').scrollIntoView({ block: 'end' });
+    }
+
+    function setSearchMode(mode) {
+      searchMode = mode;
+      $('smSurah').classList.toggle('on', mode === 'surah');
+      $('smText').classList.toggle('on', mode === 'text');
+      $('smodeFilters').hidden = mode === 'text';
+      grid.hidden = mode === 'text';
+      $('q').value = '';
+      if (mode === 'text') {
+        $('empty').hidden = true;
+        $('tresults').hidden = true; $('tresults').innerHTML = '';
+        $('tempty').hidden = false;
+        $('tempty').textContent = t('tsearchHint');
+      } else {
+        $('tresults').hidden = true; $('tresults').innerHTML = '';
+        $('tempty').hidden = true;
+        applyFilter();
+      }
+      $('q').placeholder = t(mode === 'text' ? 'searchTextPh' : 'searchSurahPh');
+      $('q').setAttribute('aria-label', t(mode === 'text' ? 'searchTextAria' : 'searchSurahAria'));
+      $('micBtn').hidden = mode !== 'text' || !SpeechRecognitionCtor;
+      $('q').focus();
+    }
+    $('smSurah').onclick = () => setSearchMode('surah');
+    $('smText').onclick = () => setSearchMode('text');
+    $('q').addEventListener('input', () => searchMode === 'text' ? scheduleTextSearch() : applyFilter());
+
+    /* ---------- Recherche vocale (Web Speech API) ----------
+       Uniquement pour la recherche dans le texte du Coran (en arabe) : le bouton n'apparaît qu'en
+       mode « Texte du Coran » et dicte toujours en arabe (ar-SA), quelle que soit la langue de
+       l'interface. Non supporté par Firefox ni par la plupart des navigateurs hors Chrome/Safari :
+       le bouton reste masqué dans ce cas. */
+    const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognitionCtor) {
+      let recog = null, listening = false;
+      $('micBtn').onclick = () => {
+        if (listening) { recog?.stop(); return; }
+        recog = new SpeechRecognitionCtor();
+        recog.lang = 'ar-SA';
+        recog.interimResults = false;
+        recog.maxAlternatives = 1;
+        listening = true;
+        $('micBtn').classList.add('listening');
+        toast(t('micListening'));
+        recog.onresult = e => {
+          const text = e.results[0]?.[0]?.transcript?.trim();
+          if (!text) return;
+          $('q').value = text;
+          $('q').dispatchEvent(new Event('input'));
+        };
+        recog.onerror = e => {
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(t('micDenied'));
+          else if (e.error !== 'no-speech' && e.error !== 'aborted') toast(t('micError'));
+        };
+        recog.onend = () => {
+          listening = false;
+          $('micBtn').classList.remove('listening');
+        };
+        try { recog.start(); } catch { listening = false; $('micBtn').classList.remove('listening'); }
+      };
+    }
 
     document.addEventListener('keydown', e => {
       if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
