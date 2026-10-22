@@ -1322,6 +1322,45 @@
       font-size: 13px;
     }
 
+    /* Options repliées par défaut (Enchaîner, Répéter, Hifdh, Tafsir, vitesse, panneaux) :
+       la barre se déplie automatiquement dès qu'on en a besoin (survol, clic, ouverture d'un
+       panneau) et se replie toute seule ensuite, pour rester simple le reste du temps. */
+    .more {
+      flex: none;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      transition: background .15s;
+    }
+
+    .more:hover {
+      background: rgba(255, 255, 255, .2);
+    }
+
+    .more svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      transition: transform .2s;
+    }
+
+    .player.expanded .more svg {
+      transform: rotate(180deg);
+    }
+
+    .player:not(.expanded) .opts,
+    .player:not(.expanded) .tafsir-panel,
+    .player:not(.expanded) .hifdh-bar {
+      display: none !important;
+    }
+
     .opts .toggle {
       display: flex;
       align-items: center;
@@ -1617,6 +1656,11 @@
         flex-basis: 100%;
       }
 
+      .more {
+        order: 3;
+        margin: 0 auto;
+      }
+
       .opts {
         order: 4;
       }
@@ -1838,7 +1882,7 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <div class="player">
+  <div class="player" id="player">
     <div class="container">
       <div class="now">
         <div class="num"><b id="pNum">1</b></div>
@@ -1869,6 +1913,12 @@
         <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Position de lecture">
         <span id="dur">0:00</span>
       </div>
+      <button type="button" class="more" id="playerMore" title="Plus d'options" aria-label="Plus d'options"
+        aria-expanded="false">
+        <svg viewBox="0 0 24 24">
+          <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z" />
+        </svg>
+      </button>
       <div class="opts">
         <button type="button" class="toggle" id="auto" title="Enchaîner les sourates" aria-pressed="true">
           <svg viewBox="0 0 24 24">
@@ -2069,6 +2119,7 @@
         noReciter: 'Aucun récitateur trouvé.',
         searchSurahPh: 'Rechercher une sourate (nom, traduction ou numéro)…', searchSurahAria: 'Rechercher une sourate',
         searchTextPh: 'Rechercher un mot ou un verset dans le Coran…', searchTextAria: 'Rechercher dans le texte du Coran',
+        playerMoreTitle: 'Plus d’options',
         micTitle: 'Recherche vocale', micListening: 'Parlez maintenant…',
         micNotSupported: 'La recherche vocale n’est pas disponible sur ce navigateur.',
         micDenied: 'Microphone refusé : autorisez-le dans les réglages du navigateur.',
@@ -2152,6 +2203,7 @@
         noReciter: 'لم يُعثر على أي قارئ.',
         searchSurahPh: 'ابحث عن سورة (الاسم أو الترجمة أو الرقم)…', searchSurahAria: 'ابحث عن سورة',
         searchTextPh: 'ابحث عن كلمة أو جزء من آية في القرآن…', searchTextAria: 'ابحث في نص القرآن',
+        playerMoreTitle: 'خيارات إضافية',
         micTitle: 'البحث الصوتي', micListening: 'تحدّث الآن…',
         micNotSupported: 'البحث الصوتي غير متوفر على هذا المتصفح.',
         micDenied: 'تم رفض الميكروفون: فعّله من إعدادات المتصفح.',
@@ -2247,6 +2299,8 @@
       $('rNext').setAttribute('aria-label', t('reciterNext'));
       $('q').placeholder = t(searchMode === 'text' ? 'searchTextPh' : 'searchSurahPh');
       $('q').setAttribute('aria-label', t(searchMode === 'text' ? 'searchTextAria' : 'searchSurahAria'));
+      $('playerMore').title = t('playerMoreTitle');
+      $('playerMore').setAttribute('aria-label', t('playerMoreTitle'));
       $('micBtn').title = t('micTitle');
       $('micBtn').setAttribute('aria-label', t('micTitle'));
       $('smSurah').textContent = t('smSurah');
@@ -2446,6 +2500,31 @@
       audio.loop = on;
       try { localStorage.setItem('loop', on ? '1' : '0'); } catch { }
     };
+
+    /* ---------- Barre du lecteur : options repliées par défaut ----------
+       Pour garder une barre simple la plupart du temps, les boutons secondaires (Enchaîner,
+       Répéter, Hifdh, Tafsir, vitesse) et les panneaux Tafsir/Hifdh restent repliés par défaut.
+       La barre se déplie automatiquement au survol, au clic sur le chevron, ou dès qu'un panneau
+       Hifdh/Tafsir s'ouvre ; elle se replie toute seule après un court délai d'inactivité, sauf si
+       un de ces panneaux est resté ouvert. */
+    let playerCollapseTimer;
+    function setPlayerExpanded(on) {
+      $('player').classList.toggle('expanded', on);
+      $('playerMore').setAttribute('aria-expanded', on ? 'true' : 'false');
+    }
+    function scheduleAutoCollapse(delay) {
+      clearTimeout(playerCollapseTimer);
+      playerCollapseTimer = setTimeout(() => {
+        if ($('hifdhBar').hidden && $('tafsirPanel').hidden) setPlayerExpanded(false);
+      }, delay);
+    }
+    $('playerMore').onclick = () => {
+      const expand = !$('player').classList.contains('expanded');
+      setPlayerExpanded(expand);
+      if (expand) scheduleAutoCollapse(4000); else clearTimeout(playerCollapseTimer);
+    };
+    $('player').addEventListener('mouseenter', () => { clearTimeout(playerCollapseTimer); setPlayerExpanded(true); });
+    $('player').addEventListener('mouseleave', () => scheduleAutoCollapse(1200));
 
     /* ---------- Mode Hifdh : répétition verset par verset, nombre de répétitions au choix ----------
        Audio par verset (hors ligne non disponible dans ce mode) fourni par everyayah.com, fichiers
@@ -2933,6 +3012,8 @@
     function openHifdhPanel() {
       $('hifdhBar').hidden = false;
       setOn($('hifdhToggle'), true);
+      setPlayerExpanded(true);
+      clearTimeout(playerCollapseTimer);
     }
     $('hifdhToggle').onclick = () => {
       const show = $('hifdhBar').hidden;
@@ -3488,6 +3569,7 @@
     $('rPrev').onclick = () => rList.scrollBy({ left: -rList.clientWidth * .8, behavior: 'smooth' });
     $('rNext').onclick = () => rList.scrollBy({ left: rList.clientWidth * .8, behavior: 'smooth' });
     audio.addEventListener('play', () => document.body.classList.add('playing'));
+    audio.addEventListener('play', () => scheduleAutoCollapse(4000));
     audio.addEventListener('pause', () => document.body.classList.remove('playing'));
     let rq = '';
     $('rSearch').addEventListener('input', e => {
