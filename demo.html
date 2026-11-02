@@ -133,9 +133,14 @@
     padding: 13px 32px;
     border-radius: 33px;
     box-shadow: 0 10px 24px rgba(143, 108, 40, .35);
+    transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s ease, background .2s ease;
   }
 
-  .hero-cta:hover { background: #a67f34; }
+  .hero-cta:hover {
+    background: #a67f34;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(143, 108, 40, .45);
+  }
 
   .hero .shot {
     position: relative;
@@ -201,9 +206,15 @@
   .feature-shot {
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 16px 40px rgba(4, 9, 30, .14);
+    box-shadow: 0 16px 40px rgba(18, 63, 53, .14);
     border: 1px solid var(--line);
     direction: ltr;
+    transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s ease;
+  }
+
+  .feature-shot:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 48px rgba(18, 63, 53, .2);
   }
 
   .feature-text h3 {
@@ -301,6 +312,13 @@
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 22px;
+    transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s ease, border-color .2s ease;
+  }
+
+  .minicard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(18, 63, 53, .14);
+    border-color: var(--emerald);
   }
 
   .minicard .ic {
