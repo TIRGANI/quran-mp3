@@ -1,13 +1,13 @@
 {
-  "name": "القرآن الكريم — Coran MP3",
-  "short_name": "Coran MP3",
-  "description": "Écouter les 114 sourates du Saint Coran, au choix parmi 64 récitateurs (Hafs et Warsh), même hors ligne.",
+  "name": "القرآن الكريم — Wirdan",
+  "short_name": "Wirdan",
+  "description": "Écouter les 114 sourates du Saint Coran, au choix parmi 68 récitateurs (Hafs et Warsh), même hors ligne.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#04091e",
-  "theme_color": "#04091e",
+  "background_color": "#04140d",
+  "theme_color": "#04140d",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },

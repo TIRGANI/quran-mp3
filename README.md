@@ -1,6 +1,6 @@
-# القرآن الكريم — Coran MP3
+# القرآن الكريم — Wirdan
 
-Application web pour écouter les 114 sourates du Saint Coran, au choix parmi **64 récitateurs** (lectures Hafs et Warsh), même sans connexion.
+Application web pour écouter les 114 sourates du Saint Coran, au choix parmi **68 récitateurs** (lectures Hafs et Warsh), même sans connexion.
 
 - Choix du récitateur (carrousel illustré, recherche, lecture Hafs/Warsh)
 - Recherche (nom, traduction, numéro) et filtres Mecquoises / Médinoises

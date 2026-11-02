@@ -1,8 +1,8 @@
 {
   "appId": "com.tirgani.coranmp3",
-  "appName": "Coran MP3",
+  "appName": "Wirdan",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#04091e"
+    "backgroundColor": "#04140d"
   }
 }
