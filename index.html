@@ -37,6 +37,9 @@
       --color-accent-hover: #d4b374;
       --color-accent-soft: #f3e7cf;
       --color-accent-tint-dark: #ddc48c;
+      /* Or plus foncé réservé aux fonds pleins des boutons (lecture, Installer, Essayer...) */
+      --color-accent-btn: #8f6c28;
+      --color-accent-btn-hover: #a67f34;
       --color-secondary: #829B8A;
       --color-secondary-text: #5f7268;
       --color-background: #F7F4EA;
@@ -104,14 +107,14 @@
     }
 
     .logo {
-      font-weight: 700;
-      font-size: 20px;
-      padding-left: 10px;
-      border-left: 4px solid var(--color-primary);
+      display: flex;
+      align-items: center;
     }
 
-    .logo span {
-      color: var(--color-primary);
+    .logo img {
+      height: 40px;
+      width: 40px;
+      display: block;
     }
 
     .topbar .right {
@@ -224,12 +227,12 @@
     }
 
     .wa.apkfoot {
-      background: var(--orange);
+      background: var(--color-accent-btn);
       margin-right: 8px;
     }
 
     .wa.apkfoot:hover {
-      background: var(--color-accent-hover);
+      background: var(--color-accent-btn-hover);
     }
 
     .wa.demolink {
@@ -396,7 +399,7 @@
     }
 
     .riwaya button.on {
-      background: var(--orange);
+      background: var(--color-accent-btn);
     }
 
     .rwrap {
@@ -878,13 +881,18 @@
     }
 
     .btn {
-      border: 1px solid var(--orange);
-      background: var(--orange);
-      color: var(--color-text);
+      border: 1px solid var(--color-accent-btn);
+      background: var(--color-accent-btn);
+      color: #fff;
       border-radius: 33px;
       padding: 8px 16px;
       font-weight: 600;
       cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--color-accent-btn-hover);
+      border-color: var(--color-accent-btn-hover);
     }
 
     .btn.ghost {
@@ -1314,11 +1322,11 @@
     .ib.main {
       width: 52px;
       height: 52px;
-      background: var(--orange);
+      background: var(--color-accent-btn);
     }
 
     .ib.main:hover {
-      background: var(--color-accent-hover);
+      background: var(--color-accent-btn-hover);
     }
 
     .ib svg {
@@ -1423,9 +1431,9 @@
     }
 
     .opts .toggle[aria-pressed="true"] {
-      background: var(--orange);
+      background: var(--color-accent-btn);
       opacity: 1;
-      box-shadow: 0 2px 10px rgba(198, 164, 92, .4);
+      box-shadow: 0 2px 10px rgba(143, 108, 40, .4);
     }
 
     .opts .toggle:focus-visible {
@@ -1710,13 +1718,6 @@
     /* Interface en arabe (RTL) : la plupart des lignes flexibles se retournent
        automatiquement grâce à dir="rtl" sur <html> ; seules les propriétés physiques
        (left/right/margin-left/margin-right) ci-dessous doivent être inversées à la main. */
-    html[dir="rtl"] .logo {
-      padding-left: 0;
-      padding-right: 10px;
-      border-left: 0;
-      border-right: 4px solid var(--color-primary);
-    }
-
     html[dir="rtl"] .wa.apkfoot,
     html[dir="rtl"] .wa.demolink {
       margin-right: 0;
@@ -1772,7 +1773,7 @@
 
   <div class="topbar">
     <div class="container">
-      <div class="logo">Wird<span>an</span></div>
+      <div class="logo"><img src="icon-192.png" alt="Wirdan"></div>
       <div class="right">
         <span><span id="recitationLabel">Récitation :</span> <b id="rName">Ali Jaber</b></span>
         <span class="status" id="status">En ligne</span>
