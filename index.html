@@ -2375,8 +2375,8 @@
         rLabel: (fr, warsh) => `${fr}${warsh ? ' (ورش)' : ''}`,
       },
     };
-    let lang = 'fr';
-    try { lang = localStorage.getItem('lang') === 'ar' ? 'ar' : 'fr'; } catch { }
+    let lang = 'ar';
+    try { lang = localStorage.getItem('lang') === 'fr' ? 'fr' : 'ar'; } catch { }
     const t = (key, ...args) => { const v = T[lang][key]; return typeof v === 'function' ? v(...args) : v; };
 
     // Applique la langue courante : textes statiques puis rafraîchissement des zones dynamiques
