@@ -1860,15 +1860,71 @@
       fill: currentColor;
     }
 
+    /* Avancement de lecture sur chaque carte de sourate */
+    .card .rprog {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 3px;
+      background: var(--color-accent);
+      border-radius: 0 3px 3px 0;
+      pointer-events: none;
+    }
+
+    .card .rprog.full {
+      background: var(--color-success);
+    }
+
+    html[dir="rtl"] .card .rprog {
+      left: auto;
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+
     .reader {
+      --rd-bg: var(--bg);
+      --rd-page: #fffdf6;
+      --rd-ink: var(--ink);
+      --rd-line: var(--line);
+      --rd-head: var(--orange-soft);
+      --rd-title: var(--color-primary);
+      --rd-muted: var(--muted);
+      --rd-num: var(--color-accent-btn);
+      --rd-sel: rgba(198, 164, 92, .28);
+      --rd-cur: rgba(61, 122, 92, .16);
       position: fixed;
       inset: 0;
       z-index: 9;
       /* sous le lecteur audio (z-index 10), qui reste utilisable pendant la lecture */
       display: flex;
       flex-direction: column;
-      background: var(--bg);
-      color: var(--ink);
+      background: var(--rd-bg);
+      color: var(--rd-ink);
+    }
+
+    .reader[data-theme="sepia"] {
+      --rd-bg: #eadfc4;
+      --rd-page: #f6ecd2;
+      --rd-ink: #3b2f1e;
+      --rd-line: #dccaa0;
+      --rd-head: #ecd9ad;
+      --rd-title: #5b4318;
+      --rd-muted: #7a6a4f;
+      --rd-num: #8a6420;
+    }
+
+    .reader[data-theme="night"] {
+      --rd-bg: #06110c;
+      --rd-page: #0e1d16;
+      --rd-ink: #e9e3d1;
+      --rd-line: #22382d;
+      --rd-head: #142a20;
+      --rd-title: #ddc48c;
+      --rd-muted: #9fb3a7;
+      --rd-num: #ddc48c;
+      --rd-sel: rgba(198, 164, 92, .24);
+      --rd-cur: rgba(130, 175, 145, .2);
+      color-scheme: dark;
     }
 
     .rd-bar {
@@ -1876,11 +1932,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
       padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
       background: var(--navy);
       color: #fff;
       box-shadow: 0 4px 18px rgba(0, 0, 0, .18);
+      position: relative;
+      z-index: 2;
     }
 
     .rd-ic {
@@ -1901,8 +1958,18 @@
       transition: background .15s;
     }
 
-    .rd-ic:hover {
-      background: rgba(255, 255, 255, .18);
+    .rd-ic:hover,
+    .rd-ic.on {
+      background: rgba(255, 255, 255, .2);
+    }
+
+    .rd-ic.on {
+      box-shadow: inset 0 0 0 1.5px var(--color-accent);
+    }
+
+    .rd-ic:disabled {
+      opacity: .35;
+      cursor: default;
     }
 
     .rd-ic svg {
@@ -1930,7 +1997,7 @@
     }
 
     #rdSel option {
-      color: var(--ink);
+      color: #252B28;
       background: #fff;
     }
 
@@ -1965,6 +2032,67 @@
       fill: currentColor;
     }
 
+    /* Barre d'avancement dans la sourate affichée */
+    .rd-pbar {
+      flex: none;
+      height: 3px;
+      background: var(--rd-line);
+    }
+
+    .rd-pbar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--color-accent);
+    }
+
+    html[dir="rtl"] .rd-pbar i {
+      margin-left: auto;
+    }
+
+    /* Actions sur le verset touché */
+    .rd-act {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 8px 16px;
+      background: var(--rd-page);
+      border-bottom: 1px solid var(--rd-line);
+      font-size: 13px;
+    }
+
+    .rd-act b {
+      font-weight: 600;
+      margin-inline-end: auto;
+      color: var(--rd-title);
+    }
+
+    .rd-act button,
+    .sbtn {
+      border: 1px solid var(--rd-line);
+      background: transparent;
+      color: var(--rd-ink);
+      border-radius: 33px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .rd-act button:hover,
+    .sbtn:hover {
+      border-color: var(--color-accent);
+    }
+
+    .rd-act button.on {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
     .rd-scroll {
       flex: 1;
       overflow-y: auto;
@@ -1975,8 +2103,8 @@
     .rd-page {
       max-width: 820px;
       margin: 0 auto;
-      background: #fffdf6;
-      border: 1px solid var(--line);
+      background: var(--rd-page);
+      border: 1px solid var(--rd-line);
       border-radius: 18px;
       box-shadow: 0 16px 40px rgba(18, 63, 53, .07);
       padding: 26px clamp(16px, 5vw, 48px) 32px;
@@ -1989,7 +2117,7 @@
       border-radius: 14px;
       padding: 10px 16px;
       margin-bottom: 18px;
-      background: var(--orange-soft);
+      background: var(--rd-head);
     }
 
     .rd-head h2 {
@@ -1997,12 +2125,12 @@
       font-family: var(--ar);
       font-size: 30px;
       line-height: 1.5;
-      color: var(--color-primary);
+      color: var(--rd-title);
     }
 
     .rd-head small {
       font-family: "Changa", sans-serif;
-      color: var(--muted);
+      color: var(--rd-muted);
       font-size: 13px;
     }
 
@@ -2011,7 +2139,7 @@
       font-family: var(--ar);
       font-size: 1.1em;
       margin: 0 0 12px;
-      color: var(--color-primary);
+      color: var(--rd-title);
     }
 
     .rd-text {
@@ -2023,17 +2151,61 @@
       word-spacing: .05em;
     }
 
-    .rd-text .ay {
+    .rd-page.airy .rd-text {
+      line-height: 2.9;
+    }
+
+    .rd-verses {
+      font-family: var(--ar);
+      line-height: 2.1;
+    }
+
+    .rd-page.airy .rd-verses {
+      line-height: 2.6;
+    }
+
+    .rd-verses .vb {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rd-line);
+    }
+
+    .rd-verses .vb:last-child {
+      border-bottom: 0;
+    }
+
+    .rd-verses .ex {
+      font-family: "Changa", -apple-system, "Segoe UI", sans-serif;
+      font-size: max(14px, .52em);
+      line-height: 1.8;
+      color: var(--rd-muted);
+      margin-top: 4px;
+    }
+
+    .rd-verses .ex:empty {
+      display: none;
+    }
+
+    .rd-verses .ex[dir="ltr"] {
+      text-align: left;
+    }
+
+    .ay {
       border-radius: 8px;
       transition: background .25s;
       cursor: pointer;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
     }
 
-    .rd-text .ay.sel {
-      background: rgba(198, 164, 92, .25);
+    .ay.cur {
+      background: var(--rd-cur);
     }
 
-    .rd-text .am {
+    .ay.sel {
+      background: var(--rd-sel);
+    }
+
+    .ay .am {
       display: inline-grid;
       place-items: center;
       min-width: 1.45em;
@@ -2044,13 +2216,20 @@
       border-radius: 50%;
       font-size: .62em;
       line-height: 1;
-      color: var(--color-accent-btn);
+      color: var(--rd-num);
       vertical-align: .2em;
+    }
+
+    /* Verset marqué d'un marque-page : numéro plein */
+    .ay.bm .am {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
     }
 
     .rd-status {
       text-align: center;
-      color: var(--muted);
+      color: var(--rd-muted);
       font-family: "Changa", sans-serif;
       font-size: 15px;
       padding: 30px 0;
@@ -2063,9 +2242,9 @@
     }
 
     .rd-foot button {
-      border: 1px solid var(--line);
-      background: var(--white);
-      color: var(--color-primary);
+      border: 1px solid var(--rd-line);
+      background: transparent;
+      color: var(--rd-title);
       border-radius: 33px;
       padding: 9px 20px;
       font: inherit;
@@ -2074,7 +2253,247 @@
     }
 
     .rd-foot button:hover {
-      border-color: var(--color-primary);
+      border-color: var(--color-accent);
+    }
+
+    /* Panneaux Options / Progression */
+    .rd-sheet {
+      position: absolute;
+      top: calc(64px + env(safe-area-inset-top, 0px));
+      right: 12px;
+      z-index: 3;
+      width: min(400px, calc(100% - 24px));
+      max-height: calc(100% - 64px - 150px - env(safe-area-inset-top, 0px));
+      overflow-y: auto;
+      background: var(--rd-page);
+      color: var(--rd-ink);
+      border: 1px solid var(--rd-line);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+      padding: 6px 18px 16px;
+      font-size: 14px;
+    }
+
+    html[dir="rtl"] .rd-sheet {
+      right: auto;
+      left: 12px;
+    }
+
+    .rd-sheet h3 {
+      margin: 14px 0 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--rd-num);
+    }
+
+    .srow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--rd-line);
+    }
+
+    .srow > span {
+      font-weight: 600;
+    }
+
+    .seg {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2px;
+      background: rgba(127, 127, 127, .12);
+      border-radius: 33px;
+      padding: 3px;
+    }
+
+    .seg button {
+      border: 0;
+      background: none;
+      color: inherit;
+      border-radius: 33px;
+      padding: 5px 11px;
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: .75;
+    }
+
+    .seg button.on {
+      background: var(--color-accent-btn);
+      color: #fff;
+      opacity: 1;
+    }
+
+    .seg button:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
+    .segv {
+      min-width: 28px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+
+    .snote {
+      color: var(--rd-muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+      margin: 8px 0 0;
+    }
+
+    .sbtns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .sbtn.danger {
+      color: #c0392b;
+      border-color: rgba(192, 57, 43, .4);
+    }
+
+    .sbtn.danger.armed {
+      background: #c0392b;
+      color: #fff;
+    }
+
+    .pbig {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pbig b {
+      font-size: 26px;
+      color: var(--rd-title);
+    }
+
+    .pbig span {
+      color: var(--rd-muted);
+      font-size: 12.5px;
+    }
+
+    .pline {
+      height: 7px;
+      border-radius: 7px;
+      background: rgba(127, 127, 127, .15);
+      overflow: hidden;
+      margin: 6px 0 4px;
+    }
+
+    .pline i {
+      display: block;
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 7px;
+    }
+
+    .bml {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .bml li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--rd-line);
+    }
+
+    .bml .bmgo {
+      flex: 1;
+      text-align: start;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      padding: 9px 0;
+      cursor: pointer;
+    }
+
+    .bml .bmgo:hover {
+      color: var(--rd-num);
+    }
+
+    .bml .bmgo span[lang="ar"] {
+      font-family: var(--ar);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .bml .bmx {
+      border: 0;
+      background: none;
+      color: var(--rd-muted);
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    /* Défilement automatique : commande flottante */
+    .rd-auto {
+      position: absolute;
+      right: 16px;
+      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 33px;
+      padding: 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+    }
+
+    html[dir="rtl"] .rd-auto {
+      right: auto;
+      left: 16px;
+    }
+
+    .rd-auto button {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: #fff;
+      font: inherit;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .rd-auto button:hover {
+      background: rgba(255, 255, 255, .15);
+    }
+
+    .rd-auto svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .rd-auto span {
+      min-width: 16px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
     }
 
     @media (max-width: 560px) {
@@ -2084,16 +2503,25 @@
         gap: 4px;
       }
 
+      .rd-ic {
+        width: 34px;
+        height: 34px;
+      }
+
       .rd-play span {
         display: none;
       }
 
       .rd-play {
-        padding: 0 11px;
+        padding: 0 10px;
       }
 
       .rd-sp {
         display: none;
+      }
+
+      .rd-act {
+        padding: 8px 10px;
       }
     }
   </style>
@@ -2269,8 +2697,12 @@
         </svg>
       </button>
       <span class="rd-sp"></span>
-      <button type="button" class="rd-ic" id="rdSmaller" aria-label="Réduire le texte" title="Réduire le texte">A−</button>
-      <button type="button" class="rd-ic" id="rdBigger" aria-label="Agrandir le texte" title="Agrandir le texte">A+</button>
+      <button type="button" class="rd-ic" id="rdProgBtn" aria-label="Progression" title="Progression">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2zm0 15-5-2.18L7 18V5h10v13z" />
+        </svg>
+      </button>
+      <button type="button" class="rd-ic" id="rdSetBtn" aria-label="Options de lecture" title="Options de lecture">Aa</button>
       <button type="button" class="rd-play" id="rdPlay">
         <svg id="rdIcPlay" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z" />
@@ -2281,8 +2713,32 @@
         <span id="rdPlayLabel">Écouter</span>
       </button>
     </div>
+    <div class="rd-pbar"><i id="rdPbar"></i></div>
+    <div class="rd-act" id="rdAct" hidden>
+      <b id="rdActLabel"></b>
+      <button type="button" data-va="bm" id="rdActBm"></button>
+      <button type="button" data-va="upto" id="rdActUpto"></button>
+      <button type="button" data-va="play" id="rdActPlay" hidden></button>
+      <button type="button" data-va="copy" id="rdActCopy"></button>
+      <button type="button" data-va="close" id="rdActClose" aria-label="Fermer">×</button>
+    </div>
+    <div class="rd-sheet" id="rdSheet" hidden></div>
     <div class="rd-scroll" id="rdScroll">
       <article class="rd-page" id="rdPage" lang="ar"></article>
+    </div>
+    <div class="rd-auto" id="rdAuto" hidden>
+      <button type="button" id="rdAutoToggle">
+        <svg id="rdAutoIcPause" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+        </svg>
+        <svg id="rdAutoIcPlay" viewBox="0 0 24 24" hidden>
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </button>
+      <button type="button" id="rdAutoSlower">−</button>
+      <span id="rdAutoSpeed">2</span>
+      <button type="button" id="rdAutoFaster">+</button>
+      <button type="button" id="rdAutoOff">×</button>
     </div>
   </div>
 
@@ -2580,8 +3036,35 @@
         rdPrev: 'Sourate précédente', rdNext: 'Sourate suivante', rdSurah: 'Sourate',
         rdSmaller: 'Réduire le texte', rdBigger: 'Agrandir le texte',
         rdListen: 'Écouter', rdPause: 'Pause',
-        rdLoading: 'Chargement du texte du Coran…', rdError: 'Impossible de charger le texte du Coran. Vérifiez votre connexion.',
+        rdLoading: 'Chargement…', rdError: 'Impossible de charger le texte du Coran. Vérifiez votre connexion.',
         rdNextSurah: name => `Sourate suivante : ${name}`,
+        rdProgress: 'Progression et marque-pages', rdSettings: 'Options de lecture',
+        rdSize: 'Taille du texte', rdTheme: 'Thème', rdThemeLight: 'Clair', rdThemeSepia: 'Sépia', rdThemeNight: 'Nuit',
+        rdLayout: 'Affichage', rdLayoutFlow: 'Continu', rdLayoutVerse: 'Verset par verset',
+        rdExtra: 'Sous chaque verset', rdExtraNone: 'Rien', rdExtraFr: 'Traduction', rdExtraTafsir: 'Tafsir',
+        rdExtraError: 'Traduction / tafsir indisponible : une connexion internet est nécessaire la première fois.',
+        rdTashkeel: 'Voyelles (tachkil)', rdShow: 'Afficher', rdHide: 'Masquer',
+        rdSpacing: 'Interligne', rdSpacingNormal: 'Normal', rdSpacingAiry: 'Aéré',
+        rdFollow: 'Suivre la récitation', rdOn: 'Oui', rdOff: 'Non',
+        rdWake: 'Garder l’écran allumé', rdAutoScroll: 'Défilement automatique',
+        rdFullscreen: 'Plein écran', rdExitFullscreen: 'Quitter le plein écran',
+        rdFollowNote: 'Pendant l’écoute, le verset récité est surligné et suivi à l’écran : de façon exacte pour certains récitateurs (Al-Afasy, Al-Husary, Al-Minshawi, Abdul Basit, As-Sudais, Ash-Shuraim), approximative pour les autres.',
+        rdKhatma: 'Khatma (lecture complète)',
+        rdKhatmaStat: (tot, done, k) => `${tot} / 6236 versets lus · ${done} / 114 sourates terminées${k ? ` · ${k} khatma${k > 1 ? 's' : ''} terminée${k > 1 ? 's' : ''}` : ''}`,
+        rdToday: 'Aujourd’hui',
+        rdTodayStat: (td, goal, s) => `verset${td > 1 ? 's' : ''} lu${td > 1 ? 's' : ''} · objectif ${goal}${s ? ` · ${s} jour${s > 1 ? 's' : ''} d’affilée` : ''}`,
+        rdGoal: 'Objectif quotidien', rdJuz: '1 juz’',
+        rdThisSurah: (tr, ar) => `Sourate ${tr}`,
+        rdSurahStat: (r, v) => `${r} / ${v} versets lus`,
+        rdMarkRead: 'Marquer comme lue', rdMarkUnread: 'Marquer comme non lue',
+        rdBookmarks: 'Marque-pages', rdNoBookmarks: 'Aucun marque-page. Touchez un verset pour en ajouter un.',
+        rdVerseN: a => `verset ${a}`, rdRemoveBm: 'Supprimer le marque-page',
+        rdReset: 'Recommencer la khatma', rdResetConfirm: 'Confirmer : effacer toute la progression ?', rdNewKhatma: 'Commencer une nouvelle khatma',
+        rdKhatmaDone: 'Félicitations, khatma terminée ! Qu’Allah l’accepte de vous.',
+        rdSavedNote: 'La progression est enregistrée automatiquement sur cet appareil : versets dépassés en lisant, sourates lues jusqu’au bout, marque-pages et dernière position.',
+        rdActBm: 'Marque-page', rdActBmOn: 'Retirer le marque-page', rdActUpto: 'Lu jusqu’ici', rdActPlay: 'Écouter d’ici', rdActCopy: 'Copier',
+        rdBmAdded: 'Marque-page ajouté.', rdProgressSaved: 'Progression mise à jour.', rdCopied: 'Verset copié.', rdCopyError: 'Copie impossible.',
+        rdSlower: 'Plus lent', rdFaster: 'Plus rapide', rdAutoStop: 'Arrêter le défilement', rdAutoPause: 'Pause du défilement', rdAutoResume: 'Reprendre le défilement',
         cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
         mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`,
         notConnectedDl: 'Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.',
@@ -2670,8 +3153,35 @@
         rdPrev: 'السورة السابقة', rdNext: 'السورة التالية', rdSurah: 'السورة',
         rdSmaller: 'تصغير الخط', rdBigger: 'تكبير الخط',
         rdListen: 'استماع', rdPause: 'إيقاف',
-        rdLoading: 'جاري تحميل نص القرآن…', rdError: 'تعذّر تحميل نص القرآن. تحقّق من الاتصال.',
+        rdLoading: 'جاري التحميل…', rdError: 'تعذّر تحميل نص القرآن. تحقّق من الاتصال.',
         rdNextSurah: name => `السورة التالية: ${name}`,
+        rdProgress: 'التقدم والعلامات', rdSettings: 'خيارات القراءة',
+        rdSize: 'حجم الخط', rdTheme: 'المظهر', rdThemeLight: 'فاتح', rdThemeSepia: 'ورقي', rdThemeNight: 'ليلي',
+        rdLayout: 'العرض', rdLayoutFlow: 'متصل', rdLayoutVerse: 'آية آية',
+        rdExtra: 'أسفل كل آية', rdExtraNone: 'لا شيء', rdExtraFr: 'ترجمة فرنسية', rdExtraTafsir: 'التفسير الميسر',
+        rdExtraError: 'الترجمة / التفسير غير متوفر: يلزم الاتصال بالإنترنت في المرة الأولى.',
+        rdTashkeel: 'التشكيل', rdShow: 'إظهار', rdHide: 'إخفاء',
+        rdSpacing: 'تباعد الأسطر', rdSpacingNormal: 'عادي', rdSpacingAiry: 'واسع',
+        rdFollow: 'تتبع التلاوة', rdOn: 'نعم', rdOff: 'لا',
+        rdWake: 'إبقاء الشاشة مضاءة', rdAutoScroll: 'التمرير التلقائي',
+        rdFullscreen: 'ملء الشاشة', rdExitFullscreen: 'الخروج من ملء الشاشة',
+        rdFollowNote: 'أثناء الاستماع تُظلَّل الآية المتلوة وتُتابَع على الشاشة: بدقة مع بعض القراء (العفاسي، الحصري، المنشاوي، عبد الباسط، السديس، الشريم)، وبشكل تقريبي مع الباقين.',
+        rdKhatma: 'الختمة',
+        rdKhatmaStat: (tot, done, k) => `${tot} من 6236 آية · ${done} من 114 سورة مكتملة${k ? ` · ختمات مكتملة: ${k}` : ''}`,
+        rdToday: 'اليوم',
+        rdTodayStat: (td, goal, s) => `آية مقروءة · الهدف ${goal}${s ? ` · ${s} يوم متتالٍ` : ''}`,
+        rdGoal: 'الورد اليومي', rdJuz: 'جزء',
+        rdThisSurah: (tr, ar) => `سورة ${ar}`,
+        rdSurahStat: (r, v) => `${r} من ${v} آية مقروءة`,
+        rdMarkRead: 'تعليم كمقروءة', rdMarkUnread: 'تعليم كغير مقروءة',
+        rdBookmarks: 'العلامات', rdNoBookmarks: 'لا توجد علامات. المس آية لإضافة علامة.',
+        rdVerseN: a => `الآية ${a}`, rdRemoveBm: 'حذف العلامة',
+        rdReset: 'بدء الختمة من جديد', rdResetConfirm: 'تأكيد: مسح كل التقدم؟', rdNewKhatma: 'بدء ختمة جديدة',
+        rdKhatmaDone: 'مبارك! أتممت الختمة، تقبّل الله منك.',
+        rdSavedNote: 'يُحفظ التقدم تلقائيًا على هذا الجهاز: الآيات التي تتجاوزها أثناء القراءة، والسور المقروءة حتى نهايتها، والعلامات وآخر موضع.',
+        rdActBm: 'علامة', rdActBmOn: 'إزالة العلامة', rdActUpto: 'قرأت إلى هنا', rdActPlay: 'استمع من هنا', rdActCopy: 'نسخ',
+        rdBmAdded: 'تمت إضافة العلامة.', rdProgressSaved: 'تم تحديث التقدم.', rdCopied: 'تم نسخ الآية.', rdCopyError: 'تعذّر النسخ.',
+        rdSlower: 'أبطأ', rdFaster: 'أسرع', rdAutoStop: 'إيقاف التمرير', rdAutoPause: 'إيقاف مؤقت للتمرير', rdAutoResume: 'استئناف التمرير',
         cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
         mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1)} جيجا` : `${Math.max(1, Math.round(b / 1e6))} ميجا`,
         notConnectedDl: 'لا يوجد اتصال: نزّل هذه السورة للاستماع إليها بدون إنترنت.',
@@ -3747,20 +4257,94 @@
 
     /* ---------- Mode lecture (Mushaf) ----------
        Texte Uthmani de quran-text.json (déjà utilisé par la recherche, donc aussi disponible hors
-       ligne une fois chargé), affiché sourate par sourate en texte continu avec le numéro de chaque
-       verset. La dernière position lue et la taille du texte sont mémorisées. Le lecteur audio reste
-       visible en bas pour écouter la sourate pendant la lecture. Fonctions déclarées avec `var` /
-       `function` car applyReaderLang() peut être appelée par le changement de langue au démarrage. */
-    var readerN = 1, readerSaveTimer = 0, readerReady = false;
+       ligne une fois chargé), affiché sourate par sourate. Tout est enregistré sur l'appareil
+       (localStorage) :
+       - readerPrefs : options d'affichage (taille, thème, mise en page, traduction, voyelles…) ;
+       - readerProgress : versets lus (une chaîne de 0/1 par sourate), marque-pages, nombre de
+         versets lus par jour (objectif quotidien, série de jours), khatmas terminées ;
+       - readerPos : dernière position, pour reprendre la lecture.
+       Un verset compte comme lu quand on le dépasse en faisant défiler le texte (soi-même, en
+       défilement automatique ou en suivant la récitation), ou quand on reste un moment sur la fin
+       de la sourate ; on peut aussi marquer à la main (« Lu jusqu'ici », « Marquer comme lue »).
+       Variables déclarées avec `var` / fonctions hissées : applyReaderLang() peut être appelée par
+       le changement de langue au démarrage, avant ce bloc (readerReady la neutralise alors). */
+    var readerN = 1, readerReady = false;
     const arNum = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
     const READER_SIZES = [20, 23, 26, 29, 32, 36, 40, 46];
-    let readerSizeIdx = 3;
-    try { const v = +localStorage.getItem('readerSize'); if (READER_SIZES[v]) readerSizeIdx = v; } catch { }
+    const SCROLL_SPEEDS = [0, 10, 17, 26, 38, 55]; // px/s pour une taille de texte de 29px
+    const GOALS = [5, 10, 20, 50, 100, 208]; // 208 ≈ un juz' (6236 / 30)
+    const TOTAL_AYAT = 6236;
+    const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+    const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } };
+
+    const rp = Object.assign({
+      size: 3, theme: 'light', layout: 'flow', extra: 'none', tashkeel: true,
+      spacing: 'normal', follow: true, wake: false, speed: 0,
+    }, lsGet('readerPrefs', {}));
+    if (!lsGet('readerPrefs', null)) { const old = lsGet('readerSize', null); if (old !== null) rp.size = +old; }
+    if (!READER_SIZES[rp.size]) rp.size = 3;
+    if (!SCROLL_SPEEDS[rp.speed]) rp.speed = 0;
+    const savePrefs = () => lsSet('readerPrefs', rp);
+
+    const prog = Object.assign({ read: {}, bm: [], days: {}, goal: 20, khatmas: 0 }, lsGet('readerProgress', {}));
+    const saveProg = () => lsSet('readerProgress', prog);
+    const dayKey = d => d.toLocaleDateString('en-CA'); // AAAA-MM-JJ, heure locale
+    const today = () => dayKey(new Date());
+
+    const bitsOf = n => (prog.read[n] || '').padEnd(S[n - 1][3], '0').slice(0, S[n - 1][3]);
+    const readCount = n => { const s = prog.read[n]; return s ? s.split('1').length - 1 : 0; };
+    const totalRead = () => { let c = 0; for (let n = 1; n <= 114; n++) c += readCount(n); return c; };
+
+    // Marque (value '1') ou démarque ('0') les versets from..to de la sourate n.
+    function markRange(n, from, to, value = '1') {
+      const v = S[n - 1][3];
+      from = Math.max(1, from); to = Math.min(v, to);
+      if (to < from) return 0;
+      const before = bitsOf(n), b = before.split('');
+      let added = 0;
+      for (let a = from; a <= to; a++) {
+        if (b[a - 1] !== value) { if (value === '1') added++; b[a - 1] = value; }
+      }
+      const s = b.join('');
+      if (s === before) return 0;
+      if (s.includes('1')) prog.read[n] = s; else delete prog.read[n];
+      if (added) {
+        const d = today();
+        prog.days[d] = (prog.days[d] || 0) + added;
+        const keys = Object.keys(prog.days).sort();
+        for (const k of keys.slice(0, Math.max(0, keys.length - 400))) delete prog.days[k];
+      }
+      saveProg();
+      updateCardProgress(n);
+      if (sheetMode === 'prog') renderSheet();
+      if (added && totalRead() === TOTAL_AYAT) toast(t('rdKhatmaDone'));
+      return added;
+    }
+
+    function streak() {
+      const d = new Date();
+      if (!prog.days[today()]) d.setDate(d.getDate() - 1); // la série n'est pas perdue avant la fin de la journée
+      let s = 0;
+      while (prog.days[dayKey(d)]) { s++; d.setDate(d.getDate() - 1); }
+      return s;
+    }
+
+    function updateCardProgress(n) {
+      const c = card(n);
+      if (!c) return;
+      const pct = readCount(n) / S[n - 1][3];
+      let bar = c.querySelector('.rprog');
+      if (!pct) { bar?.remove(); return; }
+      if (!bar) { bar = document.createElement('span'); bar.className = 'rprog'; c.appendChild(bar); }
+      bar.style.width = (pct * 100).toFixed(1) + '%';
+      bar.classList.toggle('full', pct >= 1);
+    }
 
     S.forEach(([tr, ar], i) => {
       const o = document.createElement('option');
       o.value = i + 1; o.textContent = `${i + 1}. ${tr} — ${ar}`;
       $('rdSel').appendChild(o);
+      updateCardProgress(i + 1);
     });
 
     function applyReaderLang() {
@@ -3768,100 +4352,186 @@
       $('readBtnLabel').textContent = t('readBtn');
       $('readBtn').title = t('readBtnTitle');
       $('reader').setAttribute('aria-label', t('readBtnTitle'));
-      for (const [id, key] of [['rdClose', 'close'], ['rdPrev', 'rdPrev'], ['rdNext', 'rdNext'], ['rdSmaller', 'rdSmaller'], ['rdBigger', 'rdBigger']]) {
+      for (const [id, key] of [['rdClose', 'close'], ['rdPrev', 'rdPrev'], ['rdNext', 'rdNext'], ['rdProgBtn', 'rdProgress'],
+        ['rdSetBtn', 'rdSettings'], ['rdActClose', 'close'], ['rdAutoSlower', 'rdSlower'], ['rdAutoFaster', 'rdFaster'],
+        ['rdAutoOff', 'rdAutoStop'], ['rdAutoToggle', 'rdAutoPause']]) {
         $(id).title = t(key); $(id).setAttribute('aria-label', t(key));
       }
       $('rdSel').setAttribute('aria-label', t('rdSurah'));
+      $('rdActUpto').textContent = t('rdActUpto');
+      $('rdActPlay').textContent = t('rdActPlay');
+      $('rdActCopy').textContent = t('rdActCopy');
+      updateVerseBar();
       updateReaderPlay();
+      renderSheet();
       const nx = $('rdPage').querySelector('.rd-foot button');
       if (nx) nx.textContent = t('rdNextSurah', S[readerN][0]);
     }
 
     function updateReaderPlay() {
       const playing = readerN === current && !!audio.src && !audio.paused && !hifdh;
-      $('rdIcPlay').hidden = playing;
-      $('rdIcPause').hidden = !playing;
+      // Éléments SVG : pas de propriété .hidden, seulement l'attribut
+      $('rdIcPlay').toggleAttribute('hidden', playing);
+      $('rdIcPause').toggleAttribute('hidden', !playing);
       $('rdPlayLabel').textContent = t(playing ? 'rdPause' : 'rdListen');
     }
 
     function applyReaderSize() {
-      $('rdPage').style.fontSize = READER_SIZES[readerSizeIdx] + 'px';
-      $('rdSmaller').disabled = readerSizeIdx === 0;
-      $('rdBigger').disabled = readerSizeIdx === READER_SIZES.length - 1;
+      $('rdPage').style.fontSize = READER_SIZES[rp.size] + 'px';
     }
 
-    async function renderReader(n, ayah) {
+    const stripTashkeel = s => s.replace(/[ً-ٰٟۖ-ۭ]/g, '').replace(/ٱ/g, 'ا');
+    const bareAr = s => s.replace(/[ً-ٰۖ-ۭ]/g, '');
+    let readerAyat = [];           // texte (avec voyelles) des versets affichés, sans la Basmala
+    let readerSessionFrom = 1;     // premier verset affiché à l'ouverture : on ne compte comme lus que ceux d'après
+    let readerUserScrolledAt = 0, readerSaveTimer = 0, readerEndTimer = 0, readerFollowAyah = -1, readerRenderToken = 0;
+
+    // opt.keep : ré-affichage (changement d'option) sans changer la session ni surligner le verset.
+    async function renderReader(n, ayah, opt = {}) {
+      const token = ++readerRenderToken;
+      clearTimeout(readerEndTimer);
       readerN = n;
+      readerFollowAyah = -1;
+      closeVerseBar();
       $('rdSel').value = n;
       $('rdPrev').disabled = n === 1;
       $('rdNext').disabled = n === 114;
       updateReaderPlay();
+      if (sheetMode === 'prog') renderSheet();
       const page = $('rdPage');
+      page.className = 'rd-page' + (rp.spacing === 'airy' ? ' airy' : '');
       const [tr, ar, , v] = S[n - 1];
       const head = `<header class="rd-head"><h2>سورة ${esc(ar)}</h2>`
         + `<small>${esc(tr)} · ${MEDINAN.has(n) ? 'مدنية' : 'مكية'} · ${arNum(v)} آية</small></header>`;
       if (!quranTextData) {
         page.innerHTML = head + `<div class="rd-status">${esc(t('rdLoading'))}</div>`;
         try { await loadQuranText(); } catch {
-          if (readerN === n) page.innerHTML = head + `<div class="rd-status">${esc(t('rdError'))}</div>`;
+          if (token === readerRenderToken) page.innerHTML = head + `<div class="rd-status">${esc(t('rdError'))}</div>`;
           return;
         }
-        if (readerN !== n) return; // une autre sourate a été choisie entre-temps
+        if (token !== readerRenderToken) return; // une autre sourate a été choisie entre-temps
       }
       const ayat = quranTextData[n - 1].slice();
       // Le texte source inclut la Basmala au début du premier verset (sauf Al-Fatiha, où elle est le
-      // verset 1, et At-Tawba, qui n'en a pas) : on l'affiche à part, comme dans le Mushaf.
+      // verset 1, et At-Tawba, qui n'en a pas) : on l'affiche à part, comme dans le Mushaf. Elle varie
+      // parfois d'un signe diacritique (ex. 95, 97) : on compare les 4 premiers mots sans voyelles.
+      const show = rp.tashkeel ? s => s : stripTashkeel;
       let basmala = '';
       if (n !== 1 && n !== 9) {
-        // Basmala prise dans le fichier lui-même (verset 1 d'Al-Fatiha). Le début des autres sourates
-        // varie parfois d'un signe diacritique (ex. 95, 97) : on compare donc les 4 premiers mots
-        // sans voyelles ni signes.
-        basmala = `<p class="rd-basmala">${esc(quranTextData[0][0])}</p>`;
-        const bare = s => s.replace(/[ً-ٰۖ-ۭ]/g, '');
+        basmala = `<p class="rd-basmala">${esc(show(quranTextData[0][0]))}</p>`;
         const words = ayat[0].split(' ');
-        if (bare(words.slice(0, 4).join(' ')) === bare(quranTextData[0][0])) ayat[0] = words.slice(4).join(' ');
+        if (bareAr(words.slice(0, 4).join(' ')) === bareAr(quranTextData[0][0])) ayat[0] = words.slice(4).join(' ');
       }
-      const text = ayat.map((a, i) => `<span class="ay" data-a="${i + 1}">${esc(a)}<span class="am">${arNum(i + 1)}</span></span>`).join(' ');
-      page.innerHTML = head + basmala + `<p class="rd-text">${text}</p>`
+      readerAyat = ayat;
+      const bms = new Set(prog.bm.filter(b => b.n === n).map(b => b.a));
+      const verse = (a, i) => `<span class="ay${bms.has(i + 1) ? ' bm' : ''}" data-a="${i + 1}">${esc(show(a))}<span class="am">${arNum(i + 1)}</span></span>`;
+      const verseMode = rp.layout === 'verse' || rp.extra !== 'none';
+      const body = verseMode
+        ? `<div class="rd-verses">${ayat.map((a, i) => `<div class="vb">${verse(a, i)}<div class="ex"></div></div>`).join('')}</div>`
+        : `<p class="rd-text">${ayat.map(verse).join(' ')}</p>`;
+      page.innerHTML = head + basmala + body
         + (n < 114 ? `<div class="rd-foot"><button type="button">${esc(t('rdNextSurah', S[n][0]))}</button></div>` : '');
-      page.querySelector('.rd-foot button')?.addEventListener('click', () => renderReader(n + 1));
+      page.querySelector('.rd-foot button')?.addEventListener('click', () => goSurah(n + 1));
+      if (rp.extra !== 'none') loadReaderExtra(n, token);
       const target = ayah > 1 && page.querySelector(`.ay[data-a="${ayah}"]`);
       if (target) {
-        target.classList.add('sel');
-        target.scrollIntoView({ block: 'center' });
+        if (!opt.keep) target.classList.add('sel');
+        target.scrollIntoView({ block: opt.keep ? 'start' : 'center' });
       } else $('rdScroll').scrollTop = 0;
+      if (!opt.keep) readerSessionFrom = target ? ayah : 1;
+      updatePbar();
       saveReaderPos();
+      checkEnd();
+    }
+
+    // Traduction française (Hamidullah) ou Tafsir Al-Muyassar sous chaque verset (en ligne, mis en cache)
+    async function loadReaderExtra(n, token) {
+      const fr = rp.extra === 'fr';
+      const ed = fr ? 'fr.hamidullah' : 'ar.muyassar';
+      const boxes = $('rdPage').querySelectorAll('.ex');
+      if (boxes[0]) boxes[0].textContent = t('rdLoading');
+      try {
+        const json = await cachedJsonFetch(`https://api.alquran.cloud/v1/surah/${n}/${ed}`);
+        if (token !== readerRenderToken) return;
+        const ay = json?.data?.ayahs;
+        if (!ay?.length) throw new Error('empty');
+        boxes.forEach((b, i) => {
+          b.textContent = ay[i]?.text || '';
+          b.lang = fr ? 'fr' : 'ar';
+          b.dir = fr ? 'ltr' : 'rtl';
+        });
+      } catch {
+        if (token === readerRenderToken && boxes[0]) boxes[0].textContent = t('rdExtraError');
+      }
+    }
+
+    function firstVisibleAyah() {
+      const top = $('rdScroll').getBoundingClientRect().top;
+      for (const el of $('rdPage').querySelectorAll('.ay')) {
+        if (el.getBoundingClientRect().bottom > top + 8) return +el.dataset.a;
+      }
+      return 1;
     }
 
     function saveReaderPos() {
-      // Premier verset visible en haut de la zone de lecture
-      const box = $('rdScroll').getBoundingClientRect();
-      let ayah = 1;
-      for (const el of $('rdPage').querySelectorAll('.ay')) {
-        if (el.getBoundingClientRect().bottom > box.top + 8) { ayah = +el.dataset.a; break; }
-      }
-      try { localStorage.setItem('readerPos', JSON.stringify({ n: readerN, a: ayah })); } catch { }
+      if (!quranTextData) return;
+      lsSet('readerPos', { n: readerN, a: firstVisibleAyah() });
+    }
+
+    function updatePbar() {
+      const s = $('rdScroll'), max = s.scrollHeight - s.clientHeight;
+      $('rdPbar').style.width = (max > 0 ? Math.min(100, s.scrollTop / max * 100) : 100) + '%';
+    }
+
+    const atEnd = () => { const s = $('rdScroll'); return s.scrollTop + s.clientHeight >= s.scrollHeight - 260; };
+    // Fin de sourate visible : on la compte comme lue après un temps de lecture raisonnable
+    // (pour ne pas marquer comme lue une courte sourate simplement ouverte puis quittée).
+    function checkEnd() {
+      clearTimeout(readerEndTimer);
+      if ($('reader').hidden || !quranTextData || !atEnd()) return;
+      const n = readerN, v = S[n - 1][3];
+      const visible = v - Math.max(readerSessionFrom, firstVisibleAyah()) + 1;
+      readerEndTimer = setTimeout(() => {
+        if (readerN === n && !$('reader').hidden && atEnd()) markRange(n, readerSessionFrom, v);
+      }, Math.min(60, 3 + 1.5 * visible) * 1000);
+    }
+
+    function goSurah(n) {
+      if (n < 1 || n > 114) return;
+      // Passer à la sourate suivante depuis la fin de celle-ci = elle a été lue
+      if (n === readerN + 1 && quranTextData && atEnd()) markRange(readerN, readerSessionFrom, S[readerN - 1][3]);
+      renderReader(n);
     }
 
     function openReader(n, ayah) {
       if (!n) {
-        try { const p = JSON.parse(localStorage.getItem('readerPos')); if (p?.n >= 1 && p.n <= 114) { n = p.n; ayah = p.a; } } catch { }
+        const p = lsGet('readerPos', null);
+        if (p?.n >= 1 && p.n <= 114) { n = p.n; ayah = p.a; }
       }
       const wasOpen = !$('reader').hidden;
       $('reader').hidden = false;
+      $('reader').dataset.theme = rp.theme;
       document.body.style.overflow = 'hidden';
       // Bouton « retour » (Android, navigateur) : ferme la lecture au lieu de quitter l'app
       if (!wasOpen) try { history.pushState({ reader: 1 }, ''); } catch { }
       applyReaderSize();
       renderReader(n || 1, ayah);
-      $('rdClose').focus({ preventScroll: true });
+      autoPaused = false;
+      updateAutoScroll();
+      updateWakeLock();
+      if (!wasOpen) $('rdClose').focus({ preventScroll: true });
     }
 
     function hideReader() {
       if ($('reader').hidden) return;
       saveReaderPos();
+      clearTimeout(readerEndTimer);
+      openSheet(null);
       $('reader').hidden = true;
       document.body.style.overflow = '';
+      updateAutoScroll();
+      updateWakeLock();
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
       card(readerN)?.focus({ preventScroll: true });
     }
     function closeReader() {
@@ -3870,27 +4540,329 @@
     }
     window.addEventListener('popstate', hideReader);
 
+    /* --- Verset touché : marque-page, « lu jusqu'ici », écouter à partir de là, copier --- */
+    let selAyah = 0, selTimingOk = false;
+    function closeVerseBar() {
+      selAyah = 0;
+      $('rdAct').hidden = true;
+      $('rdPage').querySelectorAll('.ay.sel').forEach(el => el.classList.remove('sel'));
+    }
+    function updateVerseBar() {
+      if (!selAyah) return;
+      const on = prog.bm.some(b => b.n === readerN && b.a === selAyah);
+      $('rdActLabel').textContent = `${lang === 'ar' ? S[readerN - 1][1] : S[readerN - 1][0]} · ${t('rdVerseN', selAyah)}`;
+      $('rdActBm').textContent = t(on ? 'rdActBmOn' : 'rdActBm');
+      $('rdActBm').classList.toggle('on', on);
+      $('rdActPlay').hidden = !selTimingOk;
+    }
+    async function selectVerse(a) {
+      $('rdPage').querySelectorAll('.ay.sel').forEach(el => el.classList.remove('sel'));
+      if (selAyah === a) return closeVerseBar();
+      selAyah = a;
+      $('rdPage').querySelector(`.ay[data-a="${a}"]`)?.classList.add('sel');
+      $('rdAct').hidden = false;
+      selTimingOk = false;
+      updateVerseBar();
+      // « Écouter d'ici » seulement quand on connaît le début exact du verset pour ce récitateur
+      const n = readerN;
+      const tm = await loadLocalTiming(reciter.id, n).catch(() => null);
+      if (readerN === n && selAyah === a) { selTimingOk = !!tm?.ayahs?.[a]?.length; updateVerseBar(); }
+    }
+    $('rdAct').addEventListener('click', async e => {
+      const act = e.target.closest('button')?.dataset.va;
+      const n = readerN, a = selAyah;
+      if (!act || !a) return;
+      if (act === 'close') return closeVerseBar();
+      if (act === 'bm') {
+        const i = prog.bm.findIndex(b => b.n === n && b.a === a);
+        if (i >= 0) prog.bm.splice(i, 1); else { prog.bm.push({ n, a, ts: Date.now() }); toast(t('rdBmAdded')); }
+        saveProg();
+        $('rdPage').querySelector(`.ay[data-a="${a}"]`)?.classList.toggle('bm', i < 0);
+        updateVerseBar();
+        renderSheet();
+      } else if (act === 'upto') {
+        markRange(n, 1, a);
+        toast(t('rdProgressSaved'));
+        closeVerseBar();
+      } else if (act === 'play') {
+        const tm = await loadLocalTiming(reciter.id, n).catch(() => null);
+        const w = tm?.ayahs?.[a];
+        if (!w?.length) return;
+        const at = w[0].from / 1000;
+        if (current === n && audio.src && !hifdh) { audio.currentTime = at; audio.play().catch(() => { }); }
+        else select(n, true, at);
+        closeVerseBar();
+      } else if (act === 'copy') {
+        const text = `${readerAyat[a - 1]} ﴿${arNum(a)}﴾ [${S[n - 1][1]} ${n}:${a}]`;
+        try { await navigator.clipboard.writeText(text); toast(t('rdCopied')); } catch { toast(t('rdCopyError')); }
+        closeVerseBar();
+      }
+    });
+
+    /* --- Panneaux Options / Progression --- */
+    let sheetMode = null, resetArmed = false;
+    function openSheet(mode) {
+      sheetMode = mode;
+      resetArmed = false;
+      $('rdSheet').hidden = !mode;
+      $('rdSetBtn').classList.toggle('on', mode === 'set');
+      $('rdProgBtn').classList.toggle('on', mode === 'prog');
+      renderSheet();
+    }
+    const segBtns = (key, opts, cur) => `<div class="seg">${opts.map(([v, label]) =>
+      `<button type="button" data-set="${key}" data-v="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${esc(String(label))}</button>`).join('')}</div>`;
+    const seg = (key, opts) => segBtns(key, opts, rp[key]);
+    const row = (label, ctrl) => `<div class="srow"><span>${esc(label)}</span>${ctrl}</div>`;
+
+    function settingsHTML() {
+      const yesNo = [['true', t('rdOn')], ['false', t('rdOff')]];
+      return `<h3>${esc(t('rdSettings'))}</h3>`
+        + row(t('rdSize'), `<div class="seg"><button type="button" data-act="smaller" ${rp.size === 0 ? 'disabled' : ''} aria-label="${esc(t('rdSmaller'))}">A−</button>`
+          + `<span class="segv">${READER_SIZES[rp.size]}</span><button type="button" data-act="bigger" ${rp.size === READER_SIZES.length - 1 ? 'disabled' : ''} aria-label="${esc(t('rdBigger'))}">A+</button></div>`)
+        + row(t('rdTheme'), seg('theme', [['light', t('rdThemeLight')], ['sepia', t('rdThemeSepia')], ['night', t('rdThemeNight')]]))
+        + row(t('rdLayout'), seg('layout', [['flow', t('rdLayoutFlow')], ['verse', t('rdLayoutVerse')]]))
+        + row(t('rdExtra'), seg('extra', [['none', t('rdExtraNone')], ['fr', t('rdExtraFr')], ['tafsir', t('rdExtraTafsir')]]))
+        + row(t('rdTashkeel'), seg('tashkeel', [['true', t('rdShow')], ['false', t('rdHide')]]))
+        + row(t('rdSpacing'), seg('spacing', [['normal', t('rdSpacingNormal')], ['airy', t('rdSpacingAiry')]]))
+        + row(t('rdFollow'), seg('follow', yesNo))
+        + ('wakeLock' in navigator ? row(t('rdWake'), seg('wake', yesNo)) : '')
+        + row(t('rdAutoScroll'), seg('speed', [[0, t('rdOff')], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]]))
+        + (document.fullscreenEnabled ? `<div class="sbtns"><button type="button" class="sbtn" data-act="fullscreen">${esc(t(document.fullscreenElement ? 'rdExitFullscreen' : 'rdFullscreen'))}</button></div>` : '')
+        + `<p class="snote">${esc(t('rdFollowNote'))}</p>`;
+    }
+
+    function progressHTML() {
+      const tot = totalRead(), pct = tot / TOTAL_AYAT * 100;
+      let done = 0;
+      for (let n = 1; n <= 114; n++) if (readCount(n) === S[n - 1][3]) done++;
+      const td = prog.days[today()] || 0, goal = prog.goal;
+      const v = S[readerN - 1][3], rc = readCount(readerN);
+      const bms = prog.bm.slice().sort((x, y) => x.n - y.n || x.a - y.a);
+      const pctTxt = pct > 0 && pct < 10 ? pct.toFixed(1) : Math.floor(pct);
+      const complete = tot === TOTAL_AYAT;
+      return `<h3>${esc(t('rdKhatma'))}</h3>`
+        + `<div class="pbig"><b>${pctTxt}%</b><span>${esc(t('rdKhatmaStat', tot, done, prog.khatmas))}</span></div>`
+        + `<div class="pline"><i style="width:${pct}%"></i></div>`
+        + `<h3>${esc(t('rdToday'))}</h3>`
+        + `<div class="pbig"><b>${td}</b><span>${esc(t('rdTodayStat', td, goal, streak()))}</span></div>`
+        + `<div class="pline"><i style="width:${Math.min(100, td / goal * 100)}%"></i></div>`
+        + row(t('rdGoal'), segBtns('goal', GOALS.map(g => [g, g === 208 ? t('rdJuz') : g]), goal))
+        + `<h3>${esc(t('rdThisSurah', S[readerN - 1][0], S[readerN - 1][1]))}</h3>`
+        + `<div class="pline"><i style="width:${rc / v * 100}%"></i></div>`
+        + `<p class="snote">${esc(t('rdSurahStat', rc, v))}</p>`
+        + `<div class="sbtns"><button type="button" class="sbtn" data-act="markSurah">${esc(t('rdMarkRead'))}</button>`
+        + `<button type="button" class="sbtn" data-act="unmarkSurah">${esc(t('rdMarkUnread'))}</button></div>`
+        + `<h3>${esc(t('rdBookmarks'))}</h3>`
+        + (bms.length ? `<ul class="bml">${bms.map(b => `<li><button type="button" class="bmgo" data-act="goBm" data-n="${b.n}" data-a="${b.a}">`
+          + `<span lang="ar">${esc(S[b.n - 1][1])}</span> · ${esc(S[b.n - 1][0])} — ${esc(t('rdVerseN', b.a))}</button>`
+          + `<button type="button" class="bmx" data-act="delBm" data-n="${b.n}" data-a="${b.a}" aria-label="${esc(t('rdRemoveBm'))}" title="${esc(t('rdRemoveBm'))}">×</button></li>`).join('')}</ul>`
+          : `<p class="snote">${esc(t('rdNoBookmarks'))}</p>`)
+        + `<div class="sbtns"><button type="button" class="sbtn danger${resetArmed ? ' armed' : ''}" data-act="reset">`
+        + `${esc(t(resetArmed ? 'rdResetConfirm' : complete ? 'rdNewKhatma' : 'rdReset'))}</button></div>`
+        + `<p class="snote">${esc(t('rdSavedNote'))}</p>`;
+    }
+
+    function renderSheet() {
+      if (!sheetMode) return;
+      const st = $('rdSheet').scrollTop;
+      $('rdSheet').innerHTML = sheetMode === 'set' ? settingsHTML() : progressHTML();
+      $('rdSheet').scrollTop = st;
+    }
+
+    function applyPref(k) {
+      savePrefs();
+      if (k === 'theme') $('reader').dataset.theme = rp.theme;
+      if (k === 'size') { const a = firstVisibleAyah(); applyReaderSize(); $('rdPage').querySelector(`.ay[data-a="${a}"]`)?.scrollIntoView({ block: 'start' }); }
+      if (['layout', 'extra', 'tashkeel', 'spacing'].includes(k)) renderReader(readerN, firstVisibleAyah(), { keep: true });
+      if (k === 'follow' && !rp.follow) $('rdPage').querySelectorAll('.ay.cur').forEach(el => el.classList.remove('cur'));
+      if (k === 'wake') updateWakeLock();
+      if (k === 'speed') { autoPaused = false; updateAutoScroll(); }
+    }
+
+    $('rdSheet').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.set === 'goal') {
+        prog.goal = +b.dataset.v; saveProg(); renderSheet(); return;
+      }
+      if (b.dataset.set) {
+        const k = b.dataset.set;
+        let v = b.dataset.v;
+        if (v === 'true' || v === 'false') v = v === 'true';
+        else if (k === 'speed') v = +v;
+        rp[k] = v;
+        applyPref(k);
+        renderSheet();
+        return;
+      }
+      const act = b.dataset.act;
+      if (act !== 'reset') resetArmed = false;
+      if (act === 'smaller' || act === 'bigger') {
+        rp.size = Math.max(0, Math.min(READER_SIZES.length - 1, rp.size + (act === 'bigger' ? 1 : -1)));
+        applyPref('size');
+      } else if (act === 'fullscreen') {
+        (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen())
+          .catch(() => { }).finally(renderSheet);
+        return;
+      } else if (act === 'markSurah') {
+        markRange(readerN, 1, S[readerN - 1][3]);
+      } else if (act === 'unmarkSurah') {
+        markRange(readerN, 1, S[readerN - 1][3], '0');
+      } else if (act === 'goBm') {
+        openSheet(null);
+        renderReader(+b.dataset.n, +b.dataset.a);
+        return;
+      } else if (act === 'delBm') {
+        const n = +b.dataset.n, a = +b.dataset.a;
+        prog.bm = prog.bm.filter(x => !(x.n === n && x.a === a));
+        saveProg();
+        if (n === readerN) $('rdPage').querySelector(`.ay[data-a="${a}"]`)?.classList.remove('bm');
+        updateVerseBar();
+      } else if (act === 'reset') {
+        if (!resetArmed) { resetArmed = true; renderSheet(); return; }
+        if (totalRead() === TOTAL_AYAT) prog.khatmas++;
+        prog.read = {};
+        saveProg();
+        for (let n = 1; n <= 114; n++) updateCardProgress(n);
+        resetArmed = false;
+      }
+      renderSheet();
+    });
+
+    /* --- Suivi de la récitation : verset en cours surligné et gardé à l'écran --- */
+    let readerTimingKey = '', readerTiming = null;
+    async function ensureReaderTiming(n) {
+      const key = `${reciter.id}:${n}`;
+      if (readerTimingKey === key) return;
+      readerTimingKey = key;
+      readerTiming = null;
+      const d = await loadLocalTiming(reciter.id, n).catch(() => null);
+      if (readerTimingKey !== key || !d?.ayahs) return;
+      readerTiming = Object.entries(d.ayahs).filter(([, w]) => w.length)
+        .map(([a, w]) => ({ a: +a, from: w[0].from })).sort((x, y) => x.a - y.a);
+    }
+    const readerRatioCache = new Map();
+    function readerRatios(n) {
+      if (!readerRatioCache.has(n)) {
+        const lens = quranTextData[n - 1].map(a => a.replace(/\s+/g, '').length || 1);
+        const total = lens.reduce((s, l) => s + l, 0);
+        let acc = 0;
+        readerRatioCache.set(n, lens.map((l, i) => { const from = acc / total; acc += l; return { a: i + 1, from }; }));
+      }
+      return readerRatioCache.get(n);
+    }
+    audio.addEventListener('timeupdate', () => {
+      if ($('reader').hidden || !rp.follow || hifdh || readerN !== current || !quranTextData || audio.paused) return;
+      ensureReaderTiming(current);
+      let a = -1;
+      if (readerTiming) {
+        // Horaires exacts pré-générés pour ce fichier (scripts/align_quran.py)
+        const ms = audio.currentTime * 1000;
+        for (const x of readerTiming) { if (ms >= x.from) a = x.a; else break; }
+      } else if (audio.duration) {
+        // Sinon, estimation proportionnelle à la longueur des versets
+        const speech = audio.duration * 1000 - normalLeadSilenceMs;
+        const frac = speech > 0 ? (audio.currentTime * 1000 - normalLeadSilenceMs) / speech : 0;
+        for (const r of readerRatios(current)) { if (frac >= r.from) a = r.a; else break; }
+      }
+      if (a < 1 || a === readerFollowAyah) return;
+      readerFollowAyah = a;
+      $('rdPage').querySelectorAll('.ay.cur').forEach(el => el.classList.remove('cur'));
+      const el = $('rdPage').querySelector(`.ay[data-a="${a}"]`);
+      if (!el) return;
+      el.classList.add('cur');
+      // On ne reprend pas la main si l'utilisateur vient de faire défiler le texte lui-même
+      if (Date.now() - readerManualAt > 4000) {
+        readerUserScrolledAt = Date.now();
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    /* --- Défilement automatique --- */
+    let autoRaf = 0, autoLast = 0, autoAcc = 0, autoPaused = false, autoHold = false, readerManualAt = 0;
+    function updateAutoScroll() {
+      cancelAnimationFrame(autoRaf); autoRaf = 0;
+      const show = rp.speed > 0 && !$('reader').hidden;
+      $('rdAuto').hidden = !show;
+      $('rdAutoSpeed').textContent = rp.speed;
+      $('rdAutoIcPlay').toggleAttribute('hidden', !autoPaused);
+      $('rdAutoIcPause').toggleAttribute('hidden', autoPaused);
+      $('rdAutoToggle').title = t(autoPaused ? 'rdAutoResume' : 'rdAutoPause');
+      if (show && !autoPaused) { autoLast = performance.now(); autoAcc = 0; autoRaf = requestAnimationFrame(autoTick); }
+    }
+    function autoTick(now) {
+      const s = $('rdScroll');
+      const dt = Math.min(100, now - autoLast);
+      autoLast = now;
+      if (!autoHold && !document.hidden) {
+        autoAcc += SCROLL_SPEEDS[rp.speed] * (READER_SIZES[rp.size] / 29) * dt / 1000;
+        const px = Math.floor(autoAcc);
+        if (px) { autoAcc -= px; s.scrollTop += px; readerUserScrolledAt = Date.now(); }
+      }
+      if (s.scrollTop + s.clientHeight >= s.scrollHeight - 1) { autoPaused = true; updateAutoScroll(); return; }
+      autoRaf = requestAnimationFrame(autoTick);
+    }
+    $('rdAutoToggle').onclick = () => { autoPaused = !autoPaused; updateAutoScroll(); };
+    $('rdAutoSlower').onclick = () => { rp.speed = Math.max(1, rp.speed - 1); applyPref('speed'); renderSheet(); };
+    $('rdAutoFaster').onclick = () => { rp.speed = Math.min(SCROLL_SPEEDS.length - 1, rp.speed + 1); applyPref('speed'); renderSheet(); };
+    $('rdAutoOff').onclick = () => { rp.speed = 0; applyPref('speed'); renderSheet(); };
+    // Doigt ou souris posé sur le texte : le défilement automatique attend
+    for (const ev of ['touchstart', 'mousedown']) $('rdScroll').addEventListener(ev, () => autoHold = true, { passive: true });
+    for (const ev of ['touchend', 'touchcancel', 'mouseup', 'mouseleave']) $('rdScroll').addEventListener(ev, () => autoHold = false, { passive: true });
+
+    /* --- Écran toujours allumé (Screen Wake Lock API) --- */
+    let wakeLock = null;
+    async function updateWakeLock() {
+      const want = rp.wake && !$('reader').hidden && document.visibilityState === 'visible';
+      if (want && !wakeLock && 'wakeLock' in navigator) {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        } catch { }
+      } else if (!want && wakeLock) {
+        wakeLock.release().catch(() => { });
+        wakeLock = null;
+      }
+    }
+    document.addEventListener('visibilitychange', updateWakeLock);
+
+    /* --- Commandes générales --- */
     $('readBtn').onclick = () => openReader();
     $('rdClose').onclick = closeReader;
-    $('rdPrev').onclick = () => readerN > 1 && renderReader(readerN - 1);
-    $('rdNext').onclick = () => readerN < 114 && renderReader(readerN + 1);
+    $('rdPrev').onclick = () => goSurah(readerN - 1);
+    $('rdNext').onclick = () => goSurah(readerN + 1);
     $('rdSel').onchange = () => renderReader(+$('rdSel').value);
-    $('rdSmaller').onclick = () => { readerSizeIdx = Math.max(0, readerSizeIdx - 1); applyReaderSize(); try { localStorage.setItem('readerSize', readerSizeIdx); } catch { } };
-    $('rdBigger').onclick = () => { readerSizeIdx = Math.min(READER_SIZES.length - 1, readerSizeIdx + 1); applyReaderSize(); try { localStorage.setItem('readerSize', readerSizeIdx); } catch { } };
+    $('rdSetBtn').onclick = () => openSheet(sheetMode === 'set' ? null : 'set');
+    $('rdProgBtn').onclick = () => openSheet(sheetMode === 'prog' ? null : 'prog');
     $('rdPlay').onclick = () => (readerN === current && audio.src && !hifdh) ? toggle() : select(readerN, true);
     $('rdScroll').addEventListener('scroll', () => {
+      updatePbar();
       clearTimeout(readerSaveTimer);
-      readerSaveTimer = setTimeout(saveReaderPos, 400);
+      readerSaveTimer = setTimeout(() => {
+        saveReaderPos();
+        // Versets dépassés en lisant (défilement manuel, automatique ou suivi de la récitation)
+        if (Date.now() - readerUserScrolledAt < 2500) {
+          const f = firstVisibleAyah();
+          if (f > readerSessionFrom) markRange(readerN, readerSessionFrom, f - 1);
+        }
+        checkEnd();
+      }, 400);
     }, { passive: true });
-    // Toucher un verset le met en évidence (repère de lecture)
-    $('rdPage').addEventListener('click', e => {
+    for (const ev of ['wheel', 'touchmove', 'keydown']) {
+      $('rdScroll').addEventListener(ev, () => { readerUserScrolledAt = readerManualAt = Date.now(); }, { passive: true });
+    }
+    $('rdScroll').addEventListener('click', e => {
+      if (sheetMode) return openSheet(null); // un toucher en dehors du panneau le ferme
       const ay = e.target.closest('.ay');
-      if (!ay) return;
-      const was = ay.classList.contains('sel');
-      $('rdPage').querySelectorAll('.ay.sel').forEach(el => el.classList.remove('sel'));
-      if (!was) ay.classList.add('sel');
+      if (ay) selectVerse(+ay.dataset.a);
     });
-    $('reader').addEventListener('keydown', e => { if (e.key === 'Escape') closeReader(); });
+    $('reader').addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (sheetMode) openSheet(null);
+      else if (selAyah) closeVerseBar();
+      else closeReader();
+    });
+    document.addEventListener('fullscreenchange', renderSheet);
     for (const ev of ['play', 'pause', 'emptied']) audio.addEventListener(ev, updateReaderPlay);
     readerReady = true;
     applyReaderLang();
