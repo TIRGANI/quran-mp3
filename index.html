@@ -1128,7 +1128,8 @@
       color: var(--muted);
     }
 
-    .dl {
+    .dl,
+    .rdb {
       flex: none;
       width: 34px;
       height: 34px;
@@ -1143,12 +1144,14 @@
       transition: .2s;
     }
 
-    .dl:hover {
+    .dl:hover,
+    .rdb:hover {
       border-color: var(--color-primary);
       color: var(--color-primary);
       transform: scale(1.08);
     }
 
+    .rdb svg,
     .dl svg {
       width: 16px;
       height: 16px;
@@ -1827,6 +1830,272 @@
     html[dir="rtl"] .rc {
       direction: rtl;
     }
+
+    /* ---------- Mode lecture (Mushaf) ---------- */
+    .readbtn {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 0;
+      border-radius: 33px;
+      padding: 8px 16px;
+      background: var(--color-accent-btn);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .18s ease, transform .18s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .readbtn:hover {
+      background: var(--color-accent-btn-hover);
+      transform: translateY(-1px);
+    }
+
+    .readbtn svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
+    }
+
+    .reader {
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      /* sous le lecteur audio (z-index 10), qui reste utilisable pendant la lecture */
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .rd-bar {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .18);
+    }
+
+    .rd-ic {
+      flex: none;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      transition: background .15s;
+    }
+
+    .rd-ic:hover {
+      background: rgba(255, 255, 255, .18);
+    }
+
+    .rd-ic svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    html[dir="rtl"] .rd-ic.flip svg {
+      transform: scaleX(-1);
+    }
+
+    #rdSel {
+      flex: 1 1 160px;
+      min-width: 0;
+      max-width: 320px;
+      height: 38px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 33px;
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 14px;
+    }
+
+    #rdSel option {
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .rd-sp {
+      flex: 1;
+    }
+
+    .rd-play {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 38px;
+      border: 0;
+      border-radius: 33px;
+      padding: 0 16px;
+      background: var(--color-accent-btn);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .rd-play:hover {
+      background: var(--color-accent-btn-hover);
+    }
+
+    .rd-play svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .rd-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 22px 16px 170px;
+    }
+
+    .rd-page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fffdf6;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(18, 63, 53, .07);
+      padding: 26px clamp(16px, 5vw, 48px) 32px;
+      direction: rtl;
+    }
+
+    .rd-head {
+      text-align: center;
+      border: 2px solid var(--orange);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 18px;
+      background: var(--orange-soft);
+    }
+
+    .rd-head h2 {
+      margin: 0;
+      font-family: var(--ar);
+      font-size: 30px;
+      line-height: 1.5;
+      color: var(--color-primary);
+    }
+
+    .rd-head small {
+      font-family: "Changa", sans-serif;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .rd-basmala {
+      text-align: center;
+      font-family: var(--ar);
+      font-size: 1.1em;
+      margin: 0 0 12px;
+      color: var(--color-primary);
+    }
+
+    .rd-text {
+      font-family: var(--ar);
+      line-height: 2.25;
+      text-align: justify;
+      text-align-last: center;
+      margin: 0;
+      word-spacing: .05em;
+    }
+
+    .rd-text .ay {
+      border-radius: 8px;
+      transition: background .25s;
+      cursor: pointer;
+    }
+
+    .rd-text .ay.sel {
+      background: rgba(198, 164, 92, .25);
+    }
+
+    .rd-text .am {
+      display: inline-grid;
+      place-items: center;
+      min-width: 1.45em;
+      height: 1.45em;
+      padding: 0 .15em;
+      margin: 0 .2em;
+      border: 1.5px solid var(--orange);
+      border-radius: 50%;
+      font-size: .62em;
+      line-height: 1;
+      color: var(--color-accent-btn);
+      vertical-align: .2em;
+    }
+
+    .rd-status {
+      text-align: center;
+      color: var(--muted);
+      font-family: "Changa", sans-serif;
+      font-size: 15px;
+      padding: 30px 0;
+    }
+
+    .rd-foot {
+      display: flex;
+      justify-content: center;
+      margin-top: 26px;
+    }
+
+    .rd-foot button {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--color-primary);
+      border-radius: 33px;
+      padding: 9px 20px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .rd-foot button:hover {
+      border-color: var(--color-primary);
+    }
+
+    @media (max-width: 560px) {
+      .rd-bar {
+        padding-left: 10px;
+        padding-right: 10px;
+        gap: 4px;
+      }
+
+      .rd-play span {
+        display: none;
+      }
+
+      .rd-play {
+        padding: 0 11px;
+      }
+
+      .rd-sp {
+        display: none;
+      }
+    }
   </style>
 </head>
 
@@ -1877,6 +2146,12 @@
         <button type="button" class="on" id="smSurah" data-m="surah">Sourates</button>
         <button type="button" id="smText" data-m="text">Texte du Coran</button>
       </div>
+      <button type="button" class="readbtn" id="readBtn" title="Lire le Coran">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z" />
+        </svg>
+        <span id="readBtnLabel">Lire</span>
+      </button>
       <input type="search" id="q" placeholder="Rechercher une sourate (nom, traduction ou numéro)…"
         aria-label="Rechercher une sourate">
       <button type="button" class="mic" id="micBtn" title="Recherche vocale" aria-label="Recherche vocale" hidden>
@@ -1974,6 +2249,42 @@
       </a>
     </div>
   </footer>
+
+  <div class="reader" id="reader" role="dialog" aria-modal="true" aria-label="Lire le Coran" hidden>
+    <div class="rd-bar">
+      <button type="button" class="rd-ic" id="rdClose" aria-label="Fermer" title="Fermer">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z" />
+        </svg>
+      </button>
+      <button type="button" class="rd-ic flip" id="rdPrev" aria-label="Sourate précédente" title="Sourate précédente">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+        </svg>
+      </button>
+      <select id="rdSel" aria-label="Sourate"></select>
+      <button type="button" class="rd-ic flip" id="rdNext" aria-label="Sourate suivante" title="Sourate suivante">
+        <svg viewBox="0 0 24 24">
+          <path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z" />
+        </svg>
+      </button>
+      <span class="rd-sp"></span>
+      <button type="button" class="rd-ic" id="rdSmaller" aria-label="Réduire le texte" title="Réduire le texte">A−</button>
+      <button type="button" class="rd-ic" id="rdBigger" aria-label="Agrandir le texte" title="Agrandir le texte">A+</button>
+      <button type="button" class="rd-play" id="rdPlay">
+        <svg id="rdIcPlay" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <svg id="rdIcPause" viewBox="0 0 24 24" hidden>
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+        </svg>
+        <span id="rdPlayLabel">Écouter</span>
+      </button>
+    </div>
+    <div class="rd-scroll" id="rdScroll">
+      <article class="rd-page" id="rdPage" lang="ar"></article>
+    </div>
+  </div>
 
   <div class="toast" id="toast" hidden></div>
 
@@ -2265,6 +2576,12 @@
         tafsirLoading: 'Chargement du Tafsir Al-Muyassar…', tafsirError: 'Tafsir indisponible pour cette sourate.',
         type: n => MEDINAN.has(n) ? 'Médinoise' : 'Mecquoise',
         verses: v => `${v} verset${v > 1 ? 's' : ''}`,
+        readBtn: 'Lire', readBtnTitle: 'Lire le Coran', rdOpen: 'Lire la sourate',
+        rdPrev: 'Sourate précédente', rdNext: 'Sourate suivante', rdSurah: 'Sourate',
+        rdSmaller: 'Réduire le texte', rdBigger: 'Agrandir le texte',
+        rdListen: 'Écouter', rdPause: 'Pause',
+        rdLoading: 'Chargement du texte du Coran…', rdError: 'Impossible de charger le texte du Coran. Vérifiez votre connexion.',
+        rdNextSurah: name => `Sourate suivante : ${name}`,
         cardMeta: (fr, versesText, typeLabel) => `${fr}<br>${versesText} · ${typeLabel}`,
         mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1).replace('.', ',')} Go` : `${Math.max(1, Math.round(b / 1e6))} Mo`,
         notConnectedDl: 'Pas de connexion : téléchargez cette sourate pour l’écouter hors ligne.',
@@ -2349,6 +2666,12 @@
         tafsirLoading: 'جاري تحميل التفسير الميسر…', tafsirError: 'التفسير غير متوفر لهذه السورة.',
         type: n => MEDINAN.has(n) ? 'مدنية' : 'مكية',
         verses: v => `${v} آية`,
+        readBtn: 'قراءة', readBtnTitle: 'قراءة القرآن', rdOpen: 'قراءة السورة',
+        rdPrev: 'السورة السابقة', rdNext: 'السورة التالية', rdSurah: 'السورة',
+        rdSmaller: 'تصغير الخط', rdBigger: 'تكبير الخط',
+        rdListen: 'استماع', rdPause: 'إيقاف',
+        rdLoading: 'جاري تحميل نص القرآن…', rdError: 'تعذّر تحميل نص القرآن. تحقّق من الاتصال.',
+        rdNextSurah: name => `السورة التالية: ${name}`,
         cardMeta: (fr, versesText, typeLabel) => `${versesText} · ${typeLabel}`,
         mb: (b) => b >= 1e9 ? `${(b / 1e9).toFixed(1)} جيجا` : `${Math.max(1, Math.round(b / 1e6))} ميجا`,
         notConnectedDl: 'لا يوجد اتصال: نزّل هذه السورة للاستماع إليها بدون إنترنت.',
@@ -2462,7 +2785,10 @@
         c.querySelector('.meta').innerHTML = cardMetaHTML(fr, v, n);
         const dl = c.querySelector('.dl');
         if (dl) dl.title = dl.classList.contains('done') ? t('dlTitleDone') : dl.classList.contains('loading') ? t('dlTitleLoading') : t('dlTitleGet');
+        const rdb = c.querySelector('.rdb');
+        rdb.title = t('rdOpen'); rdb.setAttribute('aria-label', t('rdOpen'));
       }
+      applyReaderLang();
       renderInstallHow();
       updateOnline();
       applyFilter();
@@ -2493,6 +2819,7 @@
     let hifdh = null; // { ayah, rep } quand le mode Hifdh (répétition par verset) est actif
 
     const ICON_GET = '<svg class="get" viewBox="0 0 24 24"><path d="M11 4h2v9.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6zM5 18h14v2H5z"/></svg>';
+    const ICON_READ = '<svg viewBox="0 0 24 24"><path d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>';
     const ICON_OK = '<svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
 
     const cardMetaHTML = (fr, v, n) => `${t('cardMeta', fr, t('verses', v), type(n))} · <span class="sz">${mb(size(n))}</span>`;
@@ -2508,9 +2835,11 @@
       c.innerHTML = `<div class="num"><b>${n}</b></div>
     <div class="info"><div class="tr">${tr}</div><div class="meta">${cardMetaHTML(fr, v, n)}</div></div>
     <div class="ar" lang="ar">${ar}<small>${MEDINAN.has(n) ? 'مدنية' : 'مكية'}</small></div>
+    <button class="rdb" title="${t('rdOpen')}" aria-label="${t('rdOpen')}">${ICON_READ}</button>
     ${canOffline ? `<button class="dl" title="${t('dlTitleGet')}">${ICON_GET}${ICON_OK}</button>` : ''}`;
+      c.querySelector('.rdb').addEventListener('click', () => openReader(n));
       c.onclick = e => {
-        if (e.target.closest('.dl')) return;
+        if (e.target.closest('.dl, .rdb')) return;
         if (!playable(n)) return toast(t('notConnectedDl'));
         (n === current && audio.src) ? toggle() : select(n, true);
       };
@@ -3284,10 +3613,11 @@
        Le texte complet (version Uthmani, un tableau de 114 sourates × versets) est chargé à la
        demande depuis quran-text.json plutôt qu'au démarrage, pour ne pas alourdir le chargement
        initial de l'application. */
-    let quranTextFlat = null, quranTextPromise = null;
+    let quranTextFlat = null, quranTextPromise = null, quranTextData = null;
     function loadQuranText() {
       if (!quranTextPromise) {
         quranTextPromise = fetch('quran-text.json').then(r => r.json()).then(data => {
+          quranTextData = data;
           const flat = [];
           data.forEach((ayat, i) => ayat.forEach((text, j) => flat.push({ n: i + 1, ayah: j + 1, text })));
           quranTextFlat = flat;
@@ -3414,6 +3744,156 @@
     $('smSurah').onclick = () => setSearchMode('surah');
     $('smText').onclick = () => setSearchMode('text');
     $('q').addEventListener('input', () => searchMode === 'text' ? scheduleTextSearch() : applyFilter());
+
+    /* ---------- Mode lecture (Mushaf) ----------
+       Texte Uthmani de quran-text.json (déjà utilisé par la recherche, donc aussi disponible hors
+       ligne une fois chargé), affiché sourate par sourate en texte continu avec le numéro de chaque
+       verset. La dernière position lue et la taille du texte sont mémorisées. Le lecteur audio reste
+       visible en bas pour écouter la sourate pendant la lecture. Fonctions déclarées avec `var` /
+       `function` car applyReaderLang() peut être appelée par le changement de langue au démarrage. */
+    var readerN = 1, readerSaveTimer = 0, readerReady = false;
+    const arNum = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    const READER_SIZES = [20, 23, 26, 29, 32, 36, 40, 46];
+    let readerSizeIdx = 3;
+    try { const v = +localStorage.getItem('readerSize'); if (READER_SIZES[v]) readerSizeIdx = v; } catch { }
+
+    S.forEach(([tr, ar], i) => {
+      const o = document.createElement('option');
+      o.value = i + 1; o.textContent = `${i + 1}. ${tr} — ${ar}`;
+      $('rdSel').appendChild(o);
+    });
+
+    function applyReaderLang() {
+      if (!readerReady) return; // changement de langue au démarrage, avant l'initialisation ci-dessous
+      $('readBtnLabel').textContent = t('readBtn');
+      $('readBtn').title = t('readBtnTitle');
+      $('reader').setAttribute('aria-label', t('readBtnTitle'));
+      for (const [id, key] of [['rdClose', 'close'], ['rdPrev', 'rdPrev'], ['rdNext', 'rdNext'], ['rdSmaller', 'rdSmaller'], ['rdBigger', 'rdBigger']]) {
+        $(id).title = t(key); $(id).setAttribute('aria-label', t(key));
+      }
+      $('rdSel').setAttribute('aria-label', t('rdSurah'));
+      updateReaderPlay();
+      const nx = $('rdPage').querySelector('.rd-foot button');
+      if (nx) nx.textContent = t('rdNextSurah', S[readerN][0]);
+    }
+
+    function updateReaderPlay() {
+      const playing = readerN === current && !!audio.src && !audio.paused && !hifdh;
+      $('rdIcPlay').hidden = playing;
+      $('rdIcPause').hidden = !playing;
+      $('rdPlayLabel').textContent = t(playing ? 'rdPause' : 'rdListen');
+    }
+
+    function applyReaderSize() {
+      $('rdPage').style.fontSize = READER_SIZES[readerSizeIdx] + 'px';
+      $('rdSmaller').disabled = readerSizeIdx === 0;
+      $('rdBigger').disabled = readerSizeIdx === READER_SIZES.length - 1;
+    }
+
+    async function renderReader(n, ayah) {
+      readerN = n;
+      $('rdSel').value = n;
+      $('rdPrev').disabled = n === 1;
+      $('rdNext').disabled = n === 114;
+      updateReaderPlay();
+      const page = $('rdPage');
+      const [tr, ar, , v] = S[n - 1];
+      const head = `<header class="rd-head"><h2>سورة ${esc(ar)}</h2>`
+        + `<small>${esc(tr)} · ${MEDINAN.has(n) ? 'مدنية' : 'مكية'} · ${arNum(v)} آية</small></header>`;
+      if (!quranTextData) {
+        page.innerHTML = head + `<div class="rd-status">${esc(t('rdLoading'))}</div>`;
+        try { await loadQuranText(); } catch {
+          if (readerN === n) page.innerHTML = head + `<div class="rd-status">${esc(t('rdError'))}</div>`;
+          return;
+        }
+        if (readerN !== n) return; // une autre sourate a été choisie entre-temps
+      }
+      const ayat = quranTextData[n - 1].slice();
+      // Le texte source inclut la Basmala au début du premier verset (sauf Al-Fatiha, où elle est le
+      // verset 1, et At-Tawba, qui n'en a pas) : on l'affiche à part, comme dans le Mushaf.
+      let basmala = '';
+      if (n !== 1 && n !== 9) {
+        // Basmala prise dans le fichier lui-même (verset 1 d'Al-Fatiha). Le début des autres sourates
+        // varie parfois d'un signe diacritique (ex. 95, 97) : on compare donc les 4 premiers mots
+        // sans voyelles ni signes.
+        basmala = `<p class="rd-basmala">${esc(quranTextData[0][0])}</p>`;
+        const bare = s => s.replace(/[ً-ٰۖ-ۭ]/g, '');
+        const words = ayat[0].split(' ');
+        if (bare(words.slice(0, 4).join(' ')) === bare(quranTextData[0][0])) ayat[0] = words.slice(4).join(' ');
+      }
+      const text = ayat.map((a, i) => `<span class="ay" data-a="${i + 1}">${esc(a)}<span class="am">${arNum(i + 1)}</span></span>`).join(' ');
+      page.innerHTML = head + basmala + `<p class="rd-text">${text}</p>`
+        + (n < 114 ? `<div class="rd-foot"><button type="button">${esc(t('rdNextSurah', S[n][0]))}</button></div>` : '');
+      page.querySelector('.rd-foot button')?.addEventListener('click', () => renderReader(n + 1));
+      const target = ayah > 1 && page.querySelector(`.ay[data-a="${ayah}"]`);
+      if (target) {
+        target.classList.add('sel');
+        target.scrollIntoView({ block: 'center' });
+      } else $('rdScroll').scrollTop = 0;
+      saveReaderPos();
+    }
+
+    function saveReaderPos() {
+      // Premier verset visible en haut de la zone de lecture
+      const box = $('rdScroll').getBoundingClientRect();
+      let ayah = 1;
+      for (const el of $('rdPage').querySelectorAll('.ay')) {
+        if (el.getBoundingClientRect().bottom > box.top + 8) { ayah = +el.dataset.a; break; }
+      }
+      try { localStorage.setItem('readerPos', JSON.stringify({ n: readerN, a: ayah })); } catch { }
+    }
+
+    function openReader(n, ayah) {
+      if (!n) {
+        try { const p = JSON.parse(localStorage.getItem('readerPos')); if (p?.n >= 1 && p.n <= 114) { n = p.n; ayah = p.a; } } catch { }
+      }
+      const wasOpen = !$('reader').hidden;
+      $('reader').hidden = false;
+      document.body.style.overflow = 'hidden';
+      // Bouton « retour » (Android, navigateur) : ferme la lecture au lieu de quitter l'app
+      if (!wasOpen) try { history.pushState({ reader: 1 }, ''); } catch { }
+      applyReaderSize();
+      renderReader(n || 1, ayah);
+      $('rdClose').focus({ preventScroll: true });
+    }
+
+    function hideReader() {
+      if ($('reader').hidden) return;
+      saveReaderPos();
+      $('reader').hidden = true;
+      document.body.style.overflow = '';
+      card(readerN)?.focus({ preventScroll: true });
+    }
+    function closeReader() {
+      if (history.state?.reader) history.back(); // déclenche popstate → hideReader()
+      else hideReader();
+    }
+    window.addEventListener('popstate', hideReader);
+
+    $('readBtn').onclick = () => openReader();
+    $('rdClose').onclick = closeReader;
+    $('rdPrev').onclick = () => readerN > 1 && renderReader(readerN - 1);
+    $('rdNext').onclick = () => readerN < 114 && renderReader(readerN + 1);
+    $('rdSel').onchange = () => renderReader(+$('rdSel').value);
+    $('rdSmaller').onclick = () => { readerSizeIdx = Math.max(0, readerSizeIdx - 1); applyReaderSize(); try { localStorage.setItem('readerSize', readerSizeIdx); } catch { } };
+    $('rdBigger').onclick = () => { readerSizeIdx = Math.min(READER_SIZES.length - 1, readerSizeIdx + 1); applyReaderSize(); try { localStorage.setItem('readerSize', readerSizeIdx); } catch { } };
+    $('rdPlay').onclick = () => (readerN === current && audio.src && !hifdh) ? toggle() : select(readerN, true);
+    $('rdScroll').addEventListener('scroll', () => {
+      clearTimeout(readerSaveTimer);
+      readerSaveTimer = setTimeout(saveReaderPos, 400);
+    }, { passive: true });
+    // Toucher un verset le met en évidence (repère de lecture)
+    $('rdPage').addEventListener('click', e => {
+      const ay = e.target.closest('.ay');
+      if (!ay) return;
+      const was = ay.classList.contains('sel');
+      $('rdPage').querySelectorAll('.ay.sel').forEach(el => el.classList.remove('sel'));
+      if (!was) ay.classList.add('sel');
+    });
+    $('reader').addEventListener('keydown', e => { if (e.key === 'Escape') closeReader(); });
+    for (const ev of ['play', 'pause', 'emptied']) audio.addEventListener(ev, updateReaderPlay);
+    readerReady = true;
+    applyReaderLang();
 
     /* ---------- Recherche vocale (Web Speech API) ----------
        Uniquement pour la recherche dans le texte du Coran (en arabe) : le bouton n'apparaît qu'en
