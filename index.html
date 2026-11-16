@@ -1249,6 +1249,18 @@
       opacity: .65;
     }
 
+    .footer .privacylink {
+      display: block;
+      margin: 6px 0 0;
+      font-size: 12.5px;
+      color: inherit;
+      opacity: .7;
+    }
+
+    .footer .privacylink:hover {
+      opacity: 1;
+    }
+
     .footer .copyright {
       margin: 10px 0 0;
       font-size: 11.5px;
@@ -2655,6 +2667,7 @@
         demandons rien en retour, si ce n'est une prière pour nous auprès d'Allah.</p>
       <p class="copyright" id="copyright">© 2026 Tirgani Badreddine — Tous droits réservés sur l'application. Le Saint
         Coran appartient à tous.</p>
+      <a class="privacylink" id="privacyLink" href="privacy.html">Politique de confidentialité</a>
       <a class="wa demolink" href="demo.html">
         <svg viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z" />
@@ -3017,6 +3030,7 @@
         demoLink: 'Voir la démo', demoTop: 'Démo',
         freeNote: "Application 100 % gratuite, toutes les fonctionnalités incluses — nous ne demandons rien en retour, si ce n'est une prière pour nous auprès d'Allah.",
         copyright: "© 2026 Tirgani Badreddine — Tous droits réservés sur l'application. Le Saint Coran appartient à tous.",
+        privacyLink: 'Politique de confidentialité',
         prevTitle: 'Précédente', playTitle: 'Lecture / Pause (Espace)', nextTitle: 'Suivante',
         seekAria: 'Position de lecture',
         autoToggle: 'Enchaîner', autoTitle: 'Enchaîner les sourates',
@@ -3134,6 +3148,7 @@
         demoLink: 'عرض توضيحي', demoTop: 'عرض',
         freeNote: 'تطبيق مجاني بالكامل بجميع مميزاته — لا نطلب مقابلًا سوى دعوة صالحة بيننا وبين الله.',
         copyright: '© 2026 Tirgani Badreddine — جميع الحقوق محفوظة للتطبيق. القرآن الكريم ملك للجميع.',
+        privacyLink: 'سياسة الخصوصية',
         prevTitle: 'السابقة', playTitle: 'تشغيل / إيقاف (مسافة)', nextTitle: 'التالية',
         seekAria: 'موضع التشغيل',
         autoToggle: 'تلقائي', autoTitle: 'الانتقال التلقائي بين السور',
@@ -3261,6 +3276,7 @@
       $('demoTopLink').textContent = t('demoTop');
       $('freeNote').textContent = t('freeNote');
       $('copyright').textContent = t('copyright');
+      $('privacyLink').textContent = t('privacyLink');
       $('prev').title = t('prevTitle');
       $('play').title = t('playTitle');
       $('next').title = t('nextTitle');
