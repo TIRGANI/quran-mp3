@@ -2681,6 +2681,13 @@
         </svg>
         <span id="androidApp">Application Android</span>
       </a>
+      <a class="wa apkfoot" id="iosFoot" href="#installCard">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7a4.5 4.5 0 0 0-3.5-1.9c-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8A4.7 4.7 0 0 0 4.2 9.5c-1.7 2.9-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8 2.1-1.2 2.9-2.4a10 10 0 0 0 1.3-2.7 4.2 4.2 0 0 1-2.6-3.9zM14 5.5A4.2 4.2 0 0 0 15 2.4a4.3 4.3 0 0 0-2.8 1.4 4 4 0 0 0-1 3 3.5 3.5 0 0 0 2.8-1.3z" />
+        </svg>
+        <span id="iosApp">Application iPhone</span>
+      </a>
       <a class="wa" href="https://wa.me/212602834831" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24">
           <path
@@ -3027,6 +3034,7 @@
         surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
         emptyMsg: 'Aucune sourate ne correspond.',
         androidApp: 'Application Android',
+        iosApp: 'Application iPhone',
         demoLink: 'Voir la démo', demoTop: 'Démo',
         freeNote: "Application 100 % gratuite, toutes les fonctionnalités incluses — nous ne demandons rien en retour, si ce n'est une prière pour nous auprès d'Allah.",
         copyright: "© 2026 Tirgani Badreddine — Tous droits réservés sur l'application. Le Saint Coran appartient à tous.",
@@ -3145,6 +3153,7 @@
         surahCount: n => `${n} سورة`,
         emptyMsg: 'لا توجد سورة مطابقة.',
         androidApp: 'تطبيق أندرويد',
+        iosApp: 'تطبيق آيفون',
         demoLink: 'عرض توضيحي', demoTop: 'عرض',
         freeNote: 'تطبيق مجاني بالكامل بجميع مميزاته — لا نطلب مقابلًا سوى دعوة صالحة بيننا وبين الله.',
         copyright: '© 2026 Tirgani Badreddine — جميع الحقوق محفوظة للتطبيق. القرآن الكريم ملك للجميع.',
@@ -3272,6 +3281,7 @@
       if (!confirmRm) $('rmAll').textContent = t('removeAllBtn');
       $('empty').textContent = t('emptyMsg');
       $('androidApp').textContent = t('androidApp');
+      $('iosApp').textContent = t('iosApp');
       $('demoLinkLabel').textContent = t('demoLink');
       $('demoTopLink').textContent = t('demoTop');
       $('freeNote').textContent = t('freeNote');
@@ -5239,6 +5249,25 @@
       showInstallCard('android', false);
     }
     if (APP) $('apkFoot').hidden = true; // déjà dans l'application
+
+    // Application iPhone : lien TestFlight puis App Store dès qu'il existe. En attendant, le
+    // bouton affiche la marche à suivre pour installer la version web sur l'écran d'accueil.
+    const IOS_APP_URL = ''; // ex. 'https://testflight.apple.com/join/XXXXXXXX' puis le lien App Store
+    if (APP || (isIOS && installed && !IOS_APP_URL)) $('iosFoot').hidden = true;
+    if (IOS_APP_URL) {
+      $('iosFoot').href = IOS_APP_URL;
+      $('iosFoot').target = '_blank';
+      $('iosFoot').rel = 'noopener';
+    } else {
+      $('iosFoot').onclick = e => {
+        e.preventDefault();
+        installHowKind = 'ios';
+        renderInstallHow();
+        $('installBtn').hidden = true;
+        $('installCard').hidden = false;
+        $('installCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      };
+    }
     $('install').onclick = doInstall;
     $('installBtn').onclick = doInstall;
     $('installClose').onclick = () => {
