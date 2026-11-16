@@ -7,6 +7,7 @@ import { SURAHS } from '@/data/surahs';
 import { getT } from '@/i18n';
 import { toast } from '@/lib/toast';
 import { getReciter, useSettings } from '@/stores/settings';
+import { tourEvent } from '@/tour/store';
 
 // Un seul lecteur audio pour toute l'application (onglets, page de lecture, écran verrouillé).
 export const player = createAudioPlayer(null, { updateInterval: 250 });
@@ -79,6 +80,7 @@ export function playSurah(n: number, opts: { startAt?: number; reciter?: Reciter
   player.setPlaybackRate(useSettings.getState().rate);
   player.play();
   usePlayer.setState({ mode: 'surah', surah: n, reciterId: r.id, currentTime: 0, duration: 0, playing: true, failed: false });
+  tourEvent('played');
   const ar = useSettings.getState().lang === 'ar';
   try {
     player.setActiveForLockScreen(

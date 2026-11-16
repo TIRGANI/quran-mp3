@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useHifdh } from '@/audio/hifdh';
 import { step, togglePlay, usePlayer } from '@/audio/player';
 import { Txt } from '@/components/ui';
+import { TourTarget } from '@/tour/TourTarget';
 import { SURAHS } from '@/data/surahs';
 import { useIsRTL, useT } from '@/i18n';
 import { getReciter } from '@/stores/settings';
@@ -29,6 +30,7 @@ export function MiniPlayer() {
   const subtitle = hifdhMode ? `${t.hifdhTitle} · ${hifdhAyah ? t.verseN(hifdhAyah) : t.hifdhBasmala} · ${hifdhRep}` : rtl ? r.ar : r.fr;
 
   return (
+    <TourTarget id="miniplayer">
     <Pressable onPress={() => router.push(hifdhMode ? '/hifdh' : '/player')} accessibilityLabel={t.nowPlaying} style={{ backgroundColor: c.playerBg, direction: rtl ? 'rtl' : 'ltr' }}>
       <View style={{ height: 2, backgroundColor: 'rgba(255,255,255,0.12)' }}>
         <View style={{ width: `${progress * 100}%`, height: 2, backgroundColor: c.accent }} />
@@ -55,5 +57,6 @@ export function MiniPlayer() {
         </View>
       </View>
     </Pressable>
+    </TourTarget>
   );
 }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Tip } from '@/components/Tip';
+import { TourTarget } from '@/tour/TourTarget';
 import { ArText, Button, Card, ProgressBar, Row, Screen, Segmented, SurahNumber, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { useIsRTL, useT } from '@/i18n';
@@ -38,6 +39,7 @@ export default function ReadScreen() {
       <Tip id="read" />
 
       {/* Reprendre */}
+      <TourTarget id="read.resume">
       <Pressable onPress={() => openReader(lastPos?.n ?? 1, lastPos?.a)} accessibilityRole="button">
         <View style={{ backgroundColor: c.hero, borderRadius: 20, padding: 18, gap: 6 }}>
           <Row style={{ justifyContent: 'space-between' }}>
@@ -52,6 +54,7 @@ export default function ReadScreen() {
           <Txt color="rgba(255,255,255,0.75)">{lastPos ? t.surahVerse(SURAHS[lastPos.n - 1].tr, lastPos.a) : SURAHS[0].tr}</Txt>
         </View>
       </Pressable>
+      </TourTarget>
 
       {/* Khatma + objectif du jour */}
       <Row gap={12} style={{ alignItems: 'stretch' }}>

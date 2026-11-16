@@ -9,6 +9,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { playSurah, seekTo, player, togglePlay, usePlayer } from '@/audio/player';
 import { TafsirSheet } from '@/components/TafsirSheet';
+import { tourEvent } from '@/tour/store';
+import { TourTarget } from '@/tour/TourTarget';
 import { Tip } from '@/components/Tip';
 import { Button, ProgressBar, Row, Segmented, SettingRow, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
@@ -55,6 +57,11 @@ export default function ReaderScreen() {
   const goTo = useCallback((s: number, a?: number) => {
     setTarget(a);
     setN(s);
+  }, []);
+  // Visite guidée : la page de lecture vient de s'ouvrir / de se fermer
+  useEffect(() => {
+    tourEvent('reader:open');
+    return () => tourEvent('reader:close');
   }, []);
   // Une clé par sourate : tout l'état de la page repart à zéro quand on change de sourate.
   return <SurahPage key={n} n={n} target={target} goTo={goTo} />;
@@ -213,7 +220,12 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
   const renderVerse = (a: number) => {
     const bg = a === sel ? c.highlight : a === cur ? c.following : undefined;
     return (
-      <Text key={a} onPress={() => setSel(x => (x === a ? null : a))} style={bg ? { backgroundColor: bg } : undefined} suppressHighlighting>
+      <Text
+        key={a}
+        onPress={() => {
+          setSel(x => (x === a ? null : a));
+          tourEvent('verse:selected');
+        }} style={bg ? { backgroundColor: bg } : undefined} suppressHighlighting>
         {show(verses[a - 1])}
         <Text style={{ color: bmSet.has(a) ? c.danger : c.accentStrong, fontFamily: FONTS.arabic }}>{` ۝${arNum(a)} `}</Text>
       </Text>
@@ -245,7 +257,13 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
       const ex = Array.isArray(extra) ? extra[a - 1] : null;
       return (
         <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
-          <Text style={arStyle}>{renderVerse(a)}</Text>
+          {a === 1 ? (
+            <TourTarget id="reader.verses">
+              <Text style={arStyle}>{renderVerse(a)}</Text>
+            </TourTarget>
+          ) : (
+            <Text style={arStyle}>{renderVerse(a)}</Text>
+          )}
           {ex ? (
             <Text style={{ fontFamily: FONTS.ui, fontSize: Math.max(14, fontSize * 0.52), lineHeight: Math.max(14, fontSize * 0.52) * 1.7, color: c.muted, textAlign: prefs.extra === 'fr' ? 'left' : 'right', writingDirection: prefs.extra === 'fr' ? 'ltr' : 'rtl' }}>
               {ex}
@@ -262,7 +280,8 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
     }
     const range = [];
     for (let a = item.from; a <= item.to; a++) range.push(a);
-    return <Text style={arStyle}>{range.map(renderVerse)}</Text>;
+    const para = <Text style={arStyle}>{range.map(renderVerse)}</Text>;
+    return item.from === 1 ? <TourTarget id="reader.verses">{para}</TourTarget> : para;
   };
 
   const initialIndex = target ? itemIndexOf(target) : 0;
@@ -271,7 +290,9 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
     <View style={{ flex: 1, backgroundColor: c.background }}>
       <SafeAreaView edges={['top']} style={{ backgroundColor: '#0b2920' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 6, direction: rtl ? 'rtl' : 'ltr' }}>
-          <IconBtn icon={rtl ? 'chevron-forward' : 'chevron-back'} label={t.close} onPress={() => router.back()} />
+          <TourTarget id="reader.back">
+            <IconBtn icon={rtl ? 'chevron-forward' : 'chevron-back'} label={t.close} onPress={() => router.back()} />
+          </TourTarget>
           <IconBtn icon={rtl ? 'caret-forward' : 'caret-back'} label={t.prevSurah} onPress={() => n > 1 && goTo(n - 1)} disabled={n === 1} />
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text numberOfLines={1} style={{ fontFamily: FONTS.arabicBold, fontSize: 20, lineHeight: 34, color: '#fff' }}>
@@ -279,14 +300,19 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
             </Text>
           </View>
           <IconBtn icon={rtl ? 'caret-back' : 'caret-forward'} label={t.nextSurah} onPress={goNext} disabled={n === 114} />
-          <IconBtn icon="library" label={t.tafsir} onPress={() => setPrefs({ extra: prefs.extra === 'none' ? 'tafsir' : 'none' })} on={prefs.extra !== 'none'} />
-          <IconBtn icon="text" label={t.readingOptions} onPress={() => setOptionsOpen(true)} />
+          <TourTarget id="reader.tafsir">
+            <IconBtn icon="library" label={t.tafsir} onPress={() => setPrefs({ extra: prefs.extra === 'none' ? 'tafsir' : 'none' })} on={prefs.extra !== 'none'} />
+          </TourTarget>
+          <TourTarget id="reader.options">
+            <IconBtn icon="text" label={t.readingOptions} onPress={() => setOptionsOpen(true)} />
+          </TourTarget>
           <IconBtn icon={listening && playing ? 'pause' : 'play'} label={listening && playing ? t.pause : t.listen} onPress={() => (listening ? togglePlay() : playSurah(n))} accent />
         </View>
         <ProgressBar value={readCount(useReading.getState().read, n) / s.verses} height={3} style={{ borderRadius: 0 }} />
       </SafeAreaView>
 
       {sel !== null && (
+        <TourTarget id="reader.actions">
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, padding: 10, backgroundColor: c.surface, borderBottomWidth: 1, borderBottomColor: c.line, direction: rtl ? 'rtl' : 'ltr' }}>
           <Txt weight="bold" style={{ marginEnd: 'auto' }} color={c.primary}>{`${rtl ? s.ar : s.tr} · ${t.verseN(sel)}`}</Txt>
           <Pill
@@ -321,6 +347,7 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
             <Ionicons name="close" size={20} color={c.muted} />
           </Pressable>
         </View>
+        </TourTarget>
       )}
 
       <View style={{ flex: 1 }}>

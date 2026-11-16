@@ -10,6 +10,7 @@ import { useT } from '@/i18n';
 import { toast } from '@/lib/toast';
 import { CAN_NOTIFY, ensurePermission } from '@/notifications/reminders';
 import { useSettings, type ReminderKey } from '@/stores/settings';
+import { startTour } from '@/tour/steps';
 import { useColors } from '@/theme/colors';
 
 export default function SettingsScreen() {
@@ -136,7 +137,7 @@ export default function SettingsScreen() {
             {t.help}
           </Txt>
           <Row gap={8} style={{ flexWrap: 'wrap' }}>
-            <Button label={t.replayIntro} kind="ghost" onPress={() => set({ onboarded: false })} />
+            <Button label={t.tourReplay} kind="ghost" onPress={startTour} />
             <Button
               label={t.replayTips}
               kind="ghost"

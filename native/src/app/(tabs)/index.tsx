@@ -6,6 +6,7 @@ import { Pressable, ScrollView, TextInput, View } from 'react-native';
 
 import { CAN_DOWNLOAD, dlKey, useDownloads } from '@/audio/downloads';
 import { isAvailable, playSurah, togglePlay, usePlayer } from '@/audio/player';
+import { TourTarget } from '@/tour/TourTarget';
 import { DownloadButton } from '@/components/DownloadButton';
 import { Tip } from '@/components/Tip';
 import { ReciterAvatar } from '@/components/ReciterAvatar';
@@ -48,26 +49,28 @@ export default function ListenScreen() {
         {t.appName}
       </Txt>
       <Tip id="listen" />
-      <Pressable
-        onPress={() => router.push('/reciters')}
-        accessibilityRole="button"
-        accessibilityLabel={`${t.reciter} : ${rtl ? reciter.ar : reciter.fr}`}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, borderRadius: 18, padding: 12, borderWidth: 1, borderColor: c.line }}>
-        <ReciterAvatar reciter={reciter} size={52} />
-        <View style={{ flex: 1 }}>
-          <Txt variant="small">{t.reciter}</Txt>
-          <Txt variant="h2" numberOfLines={1}>
-            {rtl ? reciter.ar : reciter.fr}
-          </Txt>
-          <Txt variant="small">{reciter.warsh ? t.warsh : t.hafs}</Txt>
-        </View>
-        <Row gap={4}>
-          <Txt variant="label" color={c.accentStrong}>
-            {t.changeReciter}
-          </Txt>
-          <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={16} color={c.accentStrong} />
-        </Row>
-      </Pressable>
+      <TourTarget id="listen.reciter">
+        <Pressable
+          onPress={() => router.push('/reciters')}
+          accessibilityRole="button"
+          accessibilityLabel={`${t.reciter} : ${rtl ? reciter.ar : reciter.fr}`}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, borderRadius: 18, padding: 12, borderWidth: 1, borderColor: c.line }}>
+          <ReciterAvatar reciter={reciter} size={52} />
+          <View style={{ flex: 1 }}>
+            <Txt variant="small">{t.reciter}</Txt>
+            <Txt variant="h2" numberOfLines={1}>
+              {rtl ? reciter.ar : reciter.fr}
+            </Txt>
+            <Txt variant="small">{reciter.warsh ? t.warsh : t.hafs}</Txt>
+          </View>
+          <Row gap={4}>
+            <Txt variant="label" color={c.accentStrong}>
+              {t.changeReciter}
+            </Txt>
+            <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={16} color={c.accentStrong} />
+          </Row>
+        </Pressable>
+      </TourTarget>
       <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: c.surface, borderRadius: 33, paddingHorizontal: 14, borderWidth: 1, borderColor: c.line }}>
         <Ionicons name="search" size={18} color={c.muted} />
         <TextInput
@@ -105,7 +108,7 @@ export default function ListenScreen() {
         renderItem={({ item: s }) => {
           const active = s.n === current;
           const available = isAvailable(reciter, s.n);
-          return (
+          const row = (
             <Pressable
               onPress={() => onPress(s)}
               disabled={!available}
@@ -131,9 +134,17 @@ export default function ListenScreen() {
                 </Txt>
               </View>
               <ArText numberOfLines={1} style={{ fontSize: 22, fontFamily: FONTS.arabicBold, flexShrink: 0 }}>{s.ar}</ArText>
-              <DownloadButton reciter={reciter} n={s.n} />
+              {s.n === 1 ? (
+                <TourTarget id="listen.download">
+                  <DownloadButton reciter={reciter} n={s.n} />
+                </TourTarget>
+              ) : (
+                <DownloadButton reciter={reciter} n={s.n} />
+              )}
             </Pressable>
           );
+          // Première sourate : cible de la visite guidée (« touchez Al-Fatiha »)
+          return s.n === 1 ? <TourTarget id="listen.surah">{row}</TourTarget> : row;
         }}
       />
     </Screen>

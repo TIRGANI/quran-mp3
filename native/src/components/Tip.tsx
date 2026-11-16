@@ -4,6 +4,7 @@ import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Txt } from '@/components/ui';
 import { useT, type TipId } from '@/i18n';
 import { useSettings } from '@/stores/settings';
+import { useTour } from '@/tour/store';
 import { useColors } from '@/theme/colors';
 
 /**
@@ -14,7 +15,8 @@ export function Tip({ id, style }: { id: TipId; style?: StyleProp<ViewStyle> }) 
   const c = useColors();
   const t = useT();
   const seen = useSettings(s => !!s.seenTips[id]);
-  if (seen) return null;
+  const touring = useTour(s => s.active);
+  if (seen || touring) return null;
   const tip = t.tips[id];
   const dismiss = () => {
     const { seenTips, set } = useSettings.getState();

@@ -14,6 +14,7 @@ import { Onboarding } from '@/components/Onboarding';
 import { Toast } from '@/components/Toast';
 import { handleNotificationTaps, syncReminders } from '@/notifications/reminders';
 import { useSettings } from '@/stores/settings';
+import { TourOverlay } from '@/tour/TourOverlay';
 import { useIsDark, useColors } from '@/theme/colors';
 
 SplashScreen.preventAutoHideAsync();
@@ -50,6 +51,7 @@ export default function RootLayout() {
             <Stack.Screen name="reciters" options={{ presentation: 'modal' }} />
           </Stack>
           <Toast />
+          <TourOverlay />
           {!onboarded && <Onboarding />}
         </View>
         <StatusBar style={dark ? 'light' : 'dark'} />
