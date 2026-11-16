@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { Tip } from '@/components/Tip';
 import { ArText, Button, Card, ProgressBar, Row, Screen, Segmented, SurahNumber, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { useIsRTL, useT } from '@/i18n';
@@ -34,6 +35,7 @@ export default function ReadScreen() {
       <Txt variant="title" style={{ color: c.primary }}>
         {t.tabRead}
       </Txt>
+      <Tip id="read" />
 
       {/* Reprendre */}
       <Pressable onPress={() => openReader(lastPos?.n ?? 1, lastPos?.a)} accessibilityRole="button">

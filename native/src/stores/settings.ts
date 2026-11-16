@@ -25,6 +25,10 @@ type SettingsState = {
   repeat: boolean; // répéter la sourate
   autoSave: boolean; // garder hors ligne les sourates écoutées
   reminders: Record<ReminderKey, Reminder>;
+  /** Présentation du premier lancement déjà vue */
+  onboarded: boolean;
+  /** Astuces déjà fermées, par écran */
+  seenTips: Record<string, true>;
   set: (patch: Partial<Omit<SettingsState, 'set'>>) => void;
 };
 
@@ -39,6 +43,8 @@ export const useSettings = create<SettingsState>()(
       repeat: false,
       autoSave: false,
       reminders: DEFAULT_REMINDERS,
+      onboarded: false,
+      seenTips: {},
       set: patch => set(patch),
     }),
     {

@@ -10,8 +10,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/audio/hifdh'; // enregistre le mode Hifdh auprès du lecteur
 import { initAudio } from '@/audio/player';
+import { Onboarding } from '@/components/Onboarding';
 import { Toast } from '@/components/Toast';
 import { handleNotificationTaps, syncReminders } from '@/notifications/reminders';
+import { useSettings } from '@/stores/settings';
 import { useIsDark, useColors } from '@/theme/colors';
 
 SplashScreen.preventAutoHideAsync();
@@ -22,6 +24,7 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ Amiri_400Regular, Amiri_700Bold, Changa_400Regular, Changa_500Medium, Changa_600SemiBold });
   const c = useColors();
   const dark = useIsDark();
+  const onboarded = useSettings(s => s.onboarded);
 
   const ready = fontsLoaded || !!fontError;
   useEffect(() => {
@@ -47,6 +50,7 @@ export default function RootLayout() {
             <Stack.Screen name="reciters" options={{ presentation: 'modal' }} />
           </Stack>
           <Toast />
+          {!onboarded && <Onboarding />}
         </View>
         <StatusBar style={dark ? 'light' : 'dark'} />
       </ThemeProvider>

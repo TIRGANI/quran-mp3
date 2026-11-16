@@ -8,6 +8,7 @@ import { seekTo, setRate, step, togglePlay, usePlayer } from '@/audio/player';
 import { DownloadButton } from '@/components/DownloadButton';
 import { ReciterAvatar } from '@/components/ReciterAvatar';
 import { SurahTafsirSheet } from '@/components/SurahTafsirSheet';
+import { Tip } from '@/components/Tip';
 import { ArText, Button, Row, Screen, Segmented, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { useIsRTL, useT } from '@/i18n';
@@ -45,6 +46,7 @@ export default function PlayerScreen() {
         {s ? <DownloadButton reciter={r} n={s.n} /> : <View style={{ width: 36 }} />}
       </Row>
 
+      <Tip id="player" style={{ marginHorizontal: 16, maxWidth: 560, alignSelf: 'center' }} />
       {s && (
         <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 24, gap: 26, maxWidth: 560, width: '100%', alignSelf: 'center' }}>
           <View style={{ alignItems: 'center', gap: 14 }}>

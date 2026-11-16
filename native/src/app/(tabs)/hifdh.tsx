@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { HIFDH_RECITERS, REPS, rewindHifdh, ROUNDS, startHifdh, stepVerse, stopHifdh, useHifdh } from '@/audio/hifdh';
 import { togglePlay, usePlayer } from '@/audio/player';
 import { NumberStepper, SurahPicker } from '@/components/SurahPicker';
+import { Tip } from '@/components/Tip';
 import { Button, Card, Chip, ProgressBar, Row, Screen, Segmented, SettingRow, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { arNum, useIsRTL, useT } from '@/i18n';
@@ -26,6 +27,7 @@ export default function HifdhScreen() {
           </Txt>
           <Txt variant="small">{t.hifdhSubtitle}</Txt>
         </View>
+        <Tip id="hifdh" />
 
         {h.active ? (
           <Session />

@@ -6,6 +6,34 @@ const fr = {
   tabListen: 'Écouter',
   tabRead: 'Lire',
   tabSettings: 'Réglages',
+  // Aide : présentation au premier lancement et astuces par écran
+  skip: 'Passer',
+  next: 'Suivant',
+  getStarted: 'Commencer',
+  gotIt: 'Compris',
+  help: 'Aide',
+  replayIntro: 'Revoir la présentation',
+  replayTips: 'Réafficher les astuces',
+  tipsReset: 'Les astuces s’afficheront à nouveau sur chaque écran.',
+  chooseLanguage: 'Choisissez votre langue',
+  previous: 'Précédent',
+  intro: [
+    { icon: 'heart', title: 'Bienvenue dans Wirdan', body: 'Écouter, lire et mémoriser le Saint Coran, avec les adhkar du quotidien. Gratuit, sans publicité, et utilisable hors connexion.' },
+    { icon: 'headset', title: 'Écouter', body: '69 récitateurs, Hafs et Warsh. Touchez une sourate pour l’écouter, téléchargez-la pour l’écouter sans internet. La lecture continue écran verrouillé.' },
+    { icon: 'book', title: 'Lire', body: 'Le texte complet du Coran, avec le tafsir et la traduction. Votre progression, vos marque-pages et votre khatma sont enregistrés automatiquement.' },
+    { icon: 'school', title: 'Hifdh', body: 'Mémorisez verset par verset : chaque verset est répété le nombre de fois choisi, avec le texte affiché ou masqué pour réciter de mémoire.' },
+    { icon: 'sparkles', title: 'Adhkar', body: 'Tout Hisn al-Muslim : adhkar du matin, du soir, du sommeil… avec un compteur pour chaque dhikr et l’audio.' },
+    { icon: 'notifications', title: 'Rappels', body: 'Dans Réglages, activez des rappels pour votre wird, les adhkar du matin et du soir, ou la sourate Al-Kahf le vendredi.' },
+  ] as { icon: 'heart' | 'headset' | 'book' | 'school' | 'sparkles' | 'notifications'; title: string; body: string }[],
+  tips: {
+    listen: { title: 'Écouter une sourate', items: ['Touchez une sourate pour l’écouter, touchez-la à nouveau pour mettre en pause.', '« Changer » : choisissez parmi 69 récitateurs.', 'La flèche ↓ télécharge la sourate pour l’écouter sans internet.', 'Le lecteur en bas de l’écran ouvre le lecteur complet.'] },
+    player: { title: 'Le lecteur', items: ['Faites glisser la barre pour avancer ou reculer, ±10 s avec les flèches doubles.', '« Enchaîner » passe à la sourate suivante, « Répéter » rejoue la même.', '« Lire le texte » suit la récitation verset par verset ; « Tafsir » explique chaque verset.'] },
+    read: { title: 'Votre lecture', items: ['« Reprendre » vous ramène au dernier verset lu.', 'Les versets que vous lisez sont comptés automatiquement pour votre khatma et votre objectif du jour.', 'Choisissez votre objectif quotidien ; vos marque-pages apparaissent ici.'] },
+    reader: { title: 'Lire le Coran', items: ['Touchez un verset : marque-page, tafsir, « lu jusqu’ici », écouter d’ici ou copier.', 'Bouton livres : le tafsir sous chaque verset. « Aa » : taille, thème, voyelles, défilement automatique…', '▶ écoute la sourate en surlignant le verset récité.'] },
+    hifdh: { title: 'Mémoriser (Hifdh)', items: ['Choisissez la sourate, puis le premier et le dernier verset à mémoriser.', 'Réglez le nombre de répétitions par verset et du passage entier, puis « Commencer ».', 'Pendant la séance, « Masquer le texte » vous laisse réciter de mémoire.'] },
+    adhkar: { title: 'Les adhkar', items: ['Ouvrez un chapitre : matin et soir, sommeil, après la prière…', 'Touchez le texte ou le bouton pour compter chaque répétition.', 'Les compteurs repartent à zéro chaque jour ; ✓ indique ce qui est fait.'] },
+    settings: { title: 'Les réglages', items: ['Activez des rappels et choisissez leur heure.', 'Changez la langue et le thème (clair, sombre ou automatique).', 'Gérez les sourates téléchargées pour l’écoute hors connexion.'] },
+  },
   tabHifdh: 'Hifdh',
   tabAdhkar: 'Adhkar',
   // Notifications
@@ -184,6 +212,33 @@ const ar: Dict = {
   tabListen: 'استماع',
   tabRead: 'قراءة',
   tabSettings: 'الإعدادات',
+  skip: 'تخطٍّ',
+  next: 'التالي',
+  getStarted: 'ابدأ',
+  gotIt: 'فهمت',
+  help: 'المساعدة',
+  replayIntro: 'إعادة عرض التعريف',
+  replayTips: 'إعادة إظهار النصائح',
+  tipsReset: 'ستظهر النصائح من جديد في كل شاشة.',
+  chooseLanguage: 'اختر لغتك',
+  previous: 'السابق',
+  intro: [
+    { icon: 'heart', title: 'مرحبًا بك في وِردان', body: 'استمع إلى القرآن الكريم واقرأه واحفظه، مع أذكار اليوم والليلة. مجاني، بلا إعلانات، ويعمل دون اتصال.' },
+    { icon: 'headset', title: 'الاستماع', body: '69 قارئًا بروايتي حفص وورش. المس سورة للاستماع إليها، وحمّلها للاستماع دون إنترنت. يستمر التشغيل والشاشة مقفلة.' },
+    { icon: 'book', title: 'القراءة', body: 'نص القرآن كاملًا مع التفسير والترجمة. يُحفظ تقدّمك وعلاماتك وختمتك تلقائيًا.' },
+    { icon: 'school', title: 'الحفظ', body: 'احفظ آية آية: تتكرر كل آية بعدد المرات الذي تختاره، مع إظهار النص أو إخفائه للتسميع من الذاكرة.' },
+    { icon: 'sparkles', title: 'الأذكار', body: 'حصن المسلم كاملًا: أذكار الصباح والمساء والنوم… مع عدّاد لكل ذكر وتلاوة صوتية.' },
+    { icon: 'notifications', title: 'التذكيرات', body: 'من الإعدادات، فعّل تذكيرات لوردك، ولأذكار الصباح والمساء، ولسورة الكهف يوم الجمعة.' },
+  ],
+  tips: {
+    listen: { title: 'الاستماع إلى سورة', items: ['المس سورة للاستماع إليها، والمسها مرة أخرى للإيقاف المؤقت.', '«تغيير»: اختر من بين 69 قارئًا.', 'السهم ↓ يحمّل السورة للاستماع دون إنترنت.', 'المشغّل في أسفل الشاشة يفتح المشغّل الكامل.'] },
+    player: { title: 'المشغّل', items: ['اسحب الشريط للتقديم أو الرجوع، و±10 ثوانٍ بالسهمين المزدوجين.', '«تتابع» ينتقل إلى السورة التالية، و«تكرار» يعيد السورة نفسها.', '«قراءة النص» يتابع التلاوة آية آية، و«التفسير» يشرح كل آية.'] },
+    read: { title: 'قراءتك', items: ['«متابعة القراءة» تعيدك إلى آخر آية قرأتها.', 'تُحتسب الآيات التي تقرؤها تلقائيًا في ختمتك وهدفك اليومي.', 'اختر وردك اليومي؛ وتظهر علاماتك هنا.'] },
+    reader: { title: 'قراءة القرآن', items: ['المس آية: علامة، تفسير، «قرأت إلى هنا»، الاستماع من هنا، أو النسخ.', 'زر الكتب: التفسير أسفل كل آية. «Aa»: الحجم والمظهر والتشكيل والتمرير التلقائي…', '▶ يشغّل السورة مع تظليل الآية المتلوة.'] },
+    hifdh: { title: 'الحفظ', items: ['اختر السورة، ثم الآية الأولى والأخيرة للحفظ.', 'حدّد عدد التكرار لكل آية وللمقطع كاملًا، ثم «ابدأ».', 'أثناء الحفظ، «إخفاء النص» يتيح لك التسميع من الذاكرة.'] },
+    adhkar: { title: 'الأذكار', items: ['افتح بابًا: الصباح والمساء، النوم، بعد الصلاة…', 'المس النص أو الزر لعدّ كل تكرار.', 'تُصفَّر العدّادات كل يوم؛ وعلامة ✓ تعني أنه تم.'] },
+    settings: { title: 'الإعدادات', items: ['فعّل التذكيرات واختر أوقاتها.', 'غيّر اللغة والمظهر (فاتح، داكن أو تلقائي).', 'أدِر السور المحمّلة للاستماع دون اتصال.'] },
+  },
   tabHifdh: 'الحفظ',
   tabAdhkar: 'الأذكار',
   reminders: 'التذكيرات',
@@ -347,6 +402,7 @@ const ar: Dict = {
 const DICTS: Record<Lang, Dict> = { fr, ar };
 
 export type T = Dict;
+export type TipId = keyof Dict['tips'];
 export const useT = (): Dict => DICTS[useSettings(s => s.lang)];
 /** Hors composant React (moteur audio, messages) : textes de la langue actuelle. */
 export const getT = (): Dict => DICTS[useSettings.getState().lang];

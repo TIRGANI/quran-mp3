@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Switch, View } from 'react-native';
 
 import { CAN_DOWNLOAD, deleteAll, usedBytes, useDownloads } from '@/audio/downloads';
 import { setRate } from '@/audio/player';
+import { Tip } from '@/components/Tip';
 import { Button, Card, Row, Screen, Segmented, Txt } from '@/components/ui';
 import { useT } from '@/i18n';
 import { toast } from '@/lib/toast';
@@ -33,6 +34,7 @@ export default function SettingsScreen() {
         <Txt variant="title" style={{ color: c.primary }}>
           {t.tabSettings}
         </Txt>
+        <Tip id="settings" />
 
         <Card style={{ gap: 12 }}>
           <Txt variant="label" color={c.accentStrong}>
@@ -128,6 +130,23 @@ export default function SettingsScreen() {
             )}
           </Card>
         )}
+
+        <Card style={{ gap: 10 }}>
+          <Txt variant="label" color={c.accentStrong}>
+            {t.help}
+          </Txt>
+          <Row gap={8} style={{ flexWrap: 'wrap' }}>
+            <Button label={t.replayIntro} kind="ghost" onPress={() => set({ onboarded: false })} />
+            <Button
+              label={t.replayTips}
+              kind="ghost"
+              onPress={() => {
+                set({ seenTips: {} });
+                toast(t.tipsReset);
+              }}
+            />
+          </Row>
+        </Card>
 
         <Card style={{ gap: 8 }}>
           <Txt variant="label" color={c.accentStrong}>

@@ -7,6 +7,7 @@ import { Pressable, ScrollView, TextInput, View } from 'react-native';
 import { CAN_DOWNLOAD, dlKey, useDownloads } from '@/audio/downloads';
 import { isAvailable, playSurah, togglePlay, usePlayer } from '@/audio/player';
 import { DownloadButton } from '@/components/DownloadButton';
+import { Tip } from '@/components/Tip';
 import { ReciterAvatar } from '@/components/ReciterAvatar';
 import { ArText, Chip, Row, Screen, SurahNumber, Txt } from '@/components/ui';
 import { SURAHS, type Surah } from '@/data/surahs';
@@ -46,6 +47,7 @@ export default function ListenScreen() {
       <Txt variant="title" style={{ fontFamily: rtl ? FONTS.arabicBold : FONTS.uiBold, color: c.primary }}>
         {t.appName}
       </Txt>
+      <Tip id="listen" />
       <Pressable
         onPress={() => router.push('/reciters')}
         accessibilityRole="button"

@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { playSurah, seekTo, player, togglePlay, usePlayer } from '@/audio/player';
 import { TafsirSheet } from '@/components/TafsirSheet';
+import { Tip } from '@/components/Tip';
 import { Button, ProgressBar, Row, Segmented, SettingRow, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { arNum, useIsRTL, useT } from '@/i18n';
@@ -223,6 +224,7 @@ function SurahPage({ n, target, goTo }: { n: number; target?: number; goTo: (s: 
     if (item.type === 'head') {
       return (
         <View style={{ paddingTop: 18, gap: 10 }}>
+          <Tip id="reader" />
           <View style={{ alignItems: 'center', borderWidth: 2, borderColor: c.accent, borderRadius: 14, paddingVertical: 8, backgroundColor: c.accentSoft }}>
             <Text style={{ fontFamily: FONTS.arabicBold, fontSize: 30, lineHeight: 52, color: c.primary }}>سورة {s.ar}</Text>
             <Txt variant="small" color={c.muted}>{`${s.tr} · ${s.medinan ? 'مدنية' : 'مكية'} · ${arNum(s.verses)} آية`}</Txt>

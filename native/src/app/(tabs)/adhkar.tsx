@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
+import { Tip } from '@/components/Tip';
 import { ProgressBar, Row, Screen, Txt } from '@/components/ui';
 import { useIsRTL, useT } from '@/i18n';
 import { chapterProgress, FEATURED, getChapter, searchChapters, useAdhkar } from '@/lib/adhkar';
@@ -27,6 +28,7 @@ export default function AdhkarScreen() {
         </Txt>
         <Txt variant="small">{t.adhkarSubtitle}</Txt>
       </View>
+      <Tip id="adhkar" />
       {!q && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {FEATURED.map(({ id, icon }) => {
