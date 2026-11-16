@@ -1,0 +1,95 @@
+{
+  "expo": {
+    "name": "Wirdan",
+    "slug": "wirdan",
+    "version": "2.0.0",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
+    "scheme": "wirdan",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#02160e",
+    "ios": {
+      "bundleIdentifier": "com.tirgani.wirdan",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "2"
+    },
+    "android": {
+      "package": "com.tirgani.coranmp3",
+      "adaptiveIcon": {
+        "backgroundColor": "#02160e",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 2,
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#02160e",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-sqlite",
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#C6A45C"
+        }
+      ],
+      "./plugins/with-release-signing",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "buildArchs": [
+              "arm64-v8a",
+              "armeabi-v7a"
+            ]
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "4c897c7c-7f25-42a5-9897-e82aa80164bd"
+      }
+    },
+    "owner": "tirgani"
+  }
+}

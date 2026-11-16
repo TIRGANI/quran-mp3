@@ -13,3 +13,7 @@ scripts/.venv/
 scripts/.cache/
 scripts/align_failures.log
 scripts/__pycache__/
+
+# Application native (native/) : dépendances et fichiers générés
+# (native/.gitignore gère le reste ; .expo/ peut aussi apparaître à la racine)
+.expo/
