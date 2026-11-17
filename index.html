@@ -3480,6 +3480,174 @@
       font-size: 16px;
       padding: 14px 20px;
     }
+
+    /* ---------- Lecteur réduit en pastille flottante (pour voir toute la page) ---------- */
+    .player.mini {
+      display: none;
+    }
+
+    .player .hide-btn {
+      position: absolute;
+      top: -17px;
+      right: 18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--color-accent);
+      background: var(--navy);
+      color: var(--color-accent);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+    }
+
+    html[dir="rtl"] .player .hide-btn {
+      right: auto;
+      left: 18px;
+    }
+
+    .player .hide-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .player-pill {
+      position: fixed;
+      left: 16px;
+      bottom: calc(var(--tabbar-h) + 14px);
+      z-index: 11;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 52px;
+      max-width: min(300px, calc(100vw - 110px));
+      padding: 0 12px 0 6px;
+      border-radius: 26px;
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 10px 26px rgba(11, 41, 32, .35);
+      overflow: hidden;
+      animation: fabIn .4s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    html[dir="rtl"] .player-pill {
+      left: auto;
+      right: 16px;
+      padding: 0 6px 0 12px;
+    }
+
+    .player-pill .pp-play {
+      flex: none;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .player-pill .pp-play svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .player-pill .pp-open {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .player-pill .pp-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    html[dir="rtl"] .player-pill .pp-name {
+      font-family: var(--ar);
+      font-size: 17px;
+    }
+
+    .player-pill .pp-open svg {
+      flex: none;
+      width: 20px;
+      height: 20px;
+      fill: var(--color-accent);
+    }
+
+    /* Égaliseur animé : la récitation est en cours */
+    .pp-eq {
+      flex: none;
+      display: none;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+    }
+
+    .player-pill.playing .pp-eq {
+      display: inline-flex;
+    }
+
+    .pp-eq i {
+      width: 3px;
+      background: var(--color-accent);
+      border-radius: 2px;
+      animation: ppEq 1s ease-in-out infinite;
+    }
+
+    .pp-eq i:nth-child(2) {
+      animation-delay: .2s;
+    }
+
+    .pp-eq i:nth-child(3) {
+      animation-delay: .4s;
+    }
+
+    @keyframes ppEq {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    .pp-prog {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, .12);
+    }
+
+    .pp-prog i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--color-accent);
+    }
+
+    html[dir="rtl"] .pp-prog i {
+      margin-left: auto;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pp-eq i { animation: none; height: 10px; }
+    }
   </style>
 </head>
 
@@ -3814,9 +3982,34 @@
     </div>
   </div>
 
+  <!-- Lecteur réduit : pastille flottante (lecture / pause, sourate en cours, afficher le lecteur) -->
+  <div class="player-pill" id="playerPill" hidden>
+    <button type="button" class="pp-play" id="ppPlay" aria-label="Lecture / Pause">
+      <svg viewBox="0 0 24 24" id="ppIcPlay">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+      <svg viewBox="0 0 24 24" id="ppIcPause" hidden>
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+      </svg>
+    </button>
+    <button type="button" class="pp-open" id="ppOpen" aria-label="Afficher le lecteur">
+      <span class="pp-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="pp-name" id="ppName"></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7.4 15.4 12 10.8l4.6 4.6L18 14l-6-6-6 6z" />
+      </svg>
+    </button>
+    <span class="pp-prog"><i id="ppProg"></i></span>
+  </div>
+
   <div class="toast" id="toast" hidden></div>
 
   <div class="player" id="player">
+    <button type="button" class="hide-btn" id="playerHide" title="Réduire le lecteur" aria-label="Réduire le lecteur">
+      <svg viewBox="0 0 24 24">
+        <path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z" />
+      </svg>
+    </button>
     <div class="container">
       <div class="now">
         <div class="num"><b id="pNum">1</b></div>
@@ -4174,6 +4367,7 @@
         downloadFailed: n => `Échec du téléchargement de la sourate ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'Warsh' : 'Hafs'}`,
         appInstalled: 'Application installée ✓',
+        pillShow: 'Afficher le lecteur', pillPlay: 'Écouter', pillPause: 'Pause', playerHide: 'Réduire le lecteur',
         fabInstall: 'Installer l’app', fabPhone: 'L’app sur mon téléphone', instTitle: 'Installer Wirdan',
         instAndroidIntro: 'L’application Android complète, gratuite et sans publicité : écoute hors connexion, rappels, adhkar, ruqya…',
         instAndroidBtn: 'Télécharger l’application (62 Mo)',
@@ -4332,6 +4526,7 @@
         downloadFailed: n => `فشل تنزيل السورة رقم ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'ورش' : 'حفص'}`,
         appInstalled: 'تم تثبيت التطبيق ✓',
+        pillShow: 'إظهار المشغّل', pillPlay: 'استماع', pillPause: 'إيقاف مؤقت', playerHide: 'تصغير المشغّل',
         fabInstall: 'ثبّت التطبيق', fabPhone: 'التطبيق على هاتفي', instTitle: 'تثبيت وِردان',
         instAndroidIntro: 'تطبيق أندرويد كامل، مجاني وبلا إعلانات: استماع دون اتصال، تذكيرات، أذكار، رقية…',
         instAndroidBtn: 'تنزيل التطبيق (62 م.ب)',
@@ -4457,6 +4652,7 @@
       applyReaderLang();
       if (typeof pgAudio !== 'undefined') applyPagesLang();
       if (typeof fabDevice !== 'undefined') fabRender();
+      if (typeof updatePill === 'function') updatePill();
       renderInstallHow();
       updateOnline();
       applyFilter();
@@ -4604,7 +4800,36 @@
        Hifdh/Tafsir s'ouvre ; elle se replie toute seule après un court délai d'inactivité, sauf si
        un de ces panneaux est resté ouvert. */
     let playerCollapseTimer;
+    /* Lecteur réduit en pastille flottante : toute la page reste visible. Choix mémorisé ;
+       réduit par défaut. Le mode Hifdh et le tafsir, qui ont besoin du lecteur, le rouvrent. */
+    function setPlayerMini(on) {
+      $('player').classList.toggle('mini', on);
+      $('playerPill').hidden = !on;
+      try { localStorage.setItem('playerMini', on ? '1' : '0'); } catch { }
+      updatePill();
+    }
+    function updatePill() {
+      const sur = S[current - 1];
+      $('ppName').textContent = sur ? (lang === 'ar' ? `سورة ${sur[1]}` : `${current}. ${sur[0]}`) : '';
+      const playing = !audio.paused;
+      $('playerPill').classList.toggle('playing', playing);
+      $('ppIcPlay').toggleAttribute('hidden', playing);
+      $('ppIcPause').toggleAttribute('hidden', !playing);
+      $('ppPlay').setAttribute('aria-label', t(playing ? 'pillPause' : 'pillPlay'));
+      $('ppOpen').setAttribute('aria-label', `${$('ppName').textContent} — ${t('pillShow')}`);
+      $('playerHide').title = t('playerHide');
+      $('playerHide').setAttribute('aria-label', t('playerHide'));
+    }
+    $('playerHide').onclick = () => setPlayerMini(true);
+    $('ppOpen').onclick = () => setPlayerMini(false);
+    $('ppPlay').onclick = () => toggle();
+    for (const ev of ['play', 'pause', 'loadedmetadata', 'emptied']) audio.addEventListener(ev, updatePill);
+    audio.addEventListener('timeupdate', () => {
+      if ($('playerPill').hidden || !audio.duration) return;
+      $('ppProg').style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+    });
     function setPlayerExpanded(on) {
+      if (on && $('player').classList.contains('mini')) setPlayerMini(false);
       $('player').classList.toggle('expanded', on);
       $('playerMore').setAttribute('aria-expanded', on ? 'true' : 'false');
     }
@@ -7000,6 +7225,8 @@
     addEventListener('appinstalled', () => { $('installFab').hidden = true; });
     fabRender();
     fabVisibility();
+
+    try { setPlayerMini(localStorage.getItem('playerMini') !== '0'); } catch { setPlayerMini(true); }
 
     /* ---------- Démarrage ---------- */
     (async () => {
