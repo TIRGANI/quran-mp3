@@ -1,5 +1,5 @@
 // Service worker : met l'application en cache et sert les sourates téléchargées hors ligne.
-const SHELL = 'shell-v8';
+const SHELL = 'shell-v9'; // à incrémenter pour forcer le rechargement de l'app chez tous les utilisateurs
 const AUDIO = 'audio-v1'; // même nom que dans index.html
 
 self.addEventListener('install', event => {
@@ -41,7 +41,9 @@ self.addEventListener('fetch', event => {
     const cache = await caches.open(SHELL);
     if (isAppShell) {
       try {
-        const res = await fetch(req);
+        // « no-cache » : toujours revérifier auprès du serveur (sinon le navigateur peut resservir
+        // une ancienne page pendant 10 minutes, durée de cache de GitHub Pages)
+        const res = await fetch(req, { cache: 'no-cache' });
         if (res.ok) cache.put(req, res.clone());
         return res;
       } catch {
