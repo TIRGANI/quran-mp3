@@ -3648,6 +3648,174 @@
     @media (prefers-reduced-motion: reduce) {
       .pp-eq i { animation: none; height: 10px; }
     }
+
+    /* ---------- Adhan : horaires de prière ---------- */
+    .np-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto 14px;
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: #123b2b;
+      color: #fff;
+      font: inherit;
+      text-align: start;
+      cursor: pointer;
+    }
+
+    .np-card .ic {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-accent);
+      display: grid;
+      place-items: center;
+    }
+
+    .np-card .ic svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--color-accent);
+    }
+
+    .np-card .txt {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .np-card small {
+      display: block;
+      opacity: .72;
+      font-size: 12px;
+    }
+
+    .np-card b {
+      color: var(--color-accent);
+      font-size: 18px;
+    }
+
+    html[dir="rtl"] .np-card b {
+      font-family: var(--ar);
+      font-size: 21px;
+    }
+
+    .np-card .clock {
+      font-weight: 700;
+      font-size: 17px;
+      margin-inline-start: 8px;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+
+    .ad-hero {
+      text-align: center;
+      background: #0b2920;
+      color: #fff;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .ad-hero b {
+      display: block;
+      color: var(--color-accent);
+      font-size: 30px;
+      line-height: 1.5;
+    }
+
+    html[dir="rtl"] .ad-hero b {
+      font-family: var(--ar);
+    }
+
+    .ad-hero .clock {
+      font-size: 24px;
+      font-weight: 700;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+
+    .ad-hero small {
+      display: block;
+      opacity: .78;
+    }
+
+    .pr-list {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .pr-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .pr-row:first-child {
+      border-top: 0;
+    }
+
+    .pr-row.next {
+      background: var(--orange-soft);
+    }
+
+    .pr-row .n {
+      flex: 1;
+      font-weight: 600;
+    }
+
+    html[dir="rtl"] .pr-row .n {
+      font-family: var(--ar);
+      font-size: 19px;
+    }
+
+    .pr-row.sun .n {
+      color: var(--muted);
+    }
+
+    .pr-row .tm {
+      font-weight: 700;
+      font-size: 17px;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+
+    .pr-row.next .tm {
+      color: var(--color-accent-btn);
+    }
+
+    .pg-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .adj-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 0;
+    }
+
+    .adj-row .ctl {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      direction: ltr;
+    }
+
+    .adj-row .ctl b {
+      min-width: 40px;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -3720,6 +3888,13 @@
         <button class="chip" data-f="dl" id="chipDl" hidden>Téléchargées</button>
       </div>
     </div>
+
+    <button type="button" class="np-card" id="npCard">
+      <span class="ic"><svg viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+        </svg></span>
+      <span class="txt" id="npTxt"></span>
+    </button>
 
     <div class="installcard" id="installCard" hidden>
       <img src="icon-192.png" alt="">
@@ -3905,6 +4080,21 @@
     </div>
     <div class="pg-scroll" id="ruqyaScroll">
       <div class="pg-inner" id="ruqyaInner"></div>
+    </div>
+  </div>
+
+  <div class="page" id="adhanPage" role="dialog" aria-modal="true" aria-labelledby="adhanBarTitle" hidden>
+    <div class="pg-bar">
+      <button type="button" class="rd-ic flip" id="adhanBack" aria-label="Retour" title="Retour">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+        </svg>
+      </button>
+      <h2 id="adhanBarTitle">مواقيت الصلاة</h2>
+      <span class="pg-count"></span>
+    </div>
+    <div class="pg-scroll">
+      <div class="pg-inner" id="adhanInner"></div>
     </div>
   </div>
 
@@ -4367,6 +4557,15 @@
         downloadFailed: n => `Échec du téléchargement de la sourate ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'Warsh' : 'Hafs'}`,
         appInstalled: 'Application installée ✓',
+        prTitle: 'Horaires de prière', prSub: 'Calculés sur votre appareil, même hors connexion', prNext: 'Prochaine prière',
+        prNames: { fajr: 'Fajr', sunrise: 'Lever du soleil', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' },
+        prIn: (h, m) => (h ? `dans ${h} h ${String(m).padStart(2, '0')}` : `dans ${m} min`), prNoPlace: 'Choisissez votre position ou votre ville',
+        prChange: 'Modifier', prMyLocation: 'Utiliser ma position', prLocating: 'Localisation…', prChooseCity: 'Ou choisir une ville', prMyPlace: 'Ma position',
+        prDenied: 'Position ou notifications refusées : choisissez une ville dans la liste.',
+        prNotify: 'Notifications de prière', prNotifyNote: 'Sur le site, elles ne sonnent que si la page reste ouverte. Pour des rappels fiables, même téléphone verrouillé, installez l’application Android.',
+        prNotifTitle: name => `C’est l’heure de ${name}`,
+        prMethod: 'Méthode de calcul', prAsr: 'Asr (école)', prAsrStd: 'Standard (Maliki, Shafi‘i…)', prAsrHanafi: 'Hanafi',
+        prAdjust: 'Ajuster les horaires (minutes)', prAdjustNote: 'Décalez une prière de quelques minutes pour coller aux horaires de votre mosquée.',
         pillShow: 'Afficher le lecteur', pillPlay: 'Écouter', pillPause: 'Pause', playerHide: 'Réduire le lecteur',
         fabInstall: 'Installer l’app', fabPhone: 'L’app sur mon téléphone', instTitle: 'Installer Wirdan',
         instAndroidIntro: 'L’application Android complète, gratuite et sans publicité : écoute hors connexion, rappels, adhkar, ruqya…',
@@ -4526,6 +4725,15 @@
         downloadFailed: n => `فشل تنزيل السورة رقم ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'ورش' : 'حفص'}`,
         appInstalled: 'تم تثبيت التطبيق ✓',
+        prTitle: 'مواقيت الصلاة', prSub: 'تُحسب على جهازك، حتى دون اتصال', prNext: 'الصلاة القادمة',
+        prNames: { fajr: 'الفجر', sunrise: 'الشروق', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' },
+        prIn: (h, m) => (h ? `بعد ${h} س ${String(m).padStart(2, '0')} د` : `بعد ${m} دقيقة`), prNoPlace: 'اختر موقعك أو مدينتك',
+        prChange: 'تغيير', prMyLocation: 'استعمال موقعي', prLocating: 'جاري تحديد الموقع…', prChooseCity: 'أو اختر مدينة', prMyPlace: 'موقعي',
+        prDenied: 'تم رفض الموقع أو الإشعارات: اختر مدينة من القائمة.',
+        prNotify: 'إشعارات الصلاة', prNotifyNote: 'على الموقع لا تعمل إلا والصفحة مفتوحة. للتذكير الموثوق حتى والهاتف مقفل، ثبّت تطبيق أندرويد.',
+        prNotifTitle: name => `حان وقت صلاة ${name}`,
+        prMethod: 'طريقة الحساب', prAsr: 'العصر (المذهب)', prAsrStd: 'الجمهور (المالكي، الشافعي…)', prAsrHanafi: 'الحنفي',
+        prAdjust: 'ضبط المواقيت (دقائق)', prAdjustNote: 'قدّم أو أخّر صلاة ببضع دقائق لتطابق مواقيت مسجدك.',
         pillShow: 'إظهار المشغّل', pillPlay: 'استماع', pillPause: 'إيقاف مؤقت', playerHide: 'تصغير المشغّل',
         fabInstall: 'ثبّت التطبيق', fabPhone: 'التطبيق على هاتفي', instTitle: 'تثبيت وِردان',
         instAndroidIntro: 'تطبيق أندرويد كامل، مجاني وبلا إعلانات: استماع دون اتصال، تذكيرات، أذكار، رقية…',
@@ -5951,7 +6159,7 @@
       }
       const wasOpen = !$('reader').hidden;
       const pageWasOpen = pagesOpen();
-      if (pageWasOpen) { pgStop(); $('adhkarPage').hidden = true; $('ruqyaPage').hidden = true; }
+      if (pageWasOpen) { pgStop(); for (const id of ['adhkarPage', 'ruqyaPage', 'adhanPage']) $(id).hidden = true; }
       $('reader').hidden = false;
       $('reader').dataset.theme = rp.theme;
       document.body.style.overflow = 'hidden';
@@ -6782,8 +6990,9 @@
     audio.addEventListener('play', pgStop); // une sourate reprend : l'audio de la page s'arrête
 
     /* --- Ouverture / fermeture des pages --- */
+    const PAGE_IDS = ['adhkarPage', 'ruqyaPage', 'adhanPage'];
     function pagesOpen() {
-      return !$('adhkarPage').hidden || !$('ruqyaPage').hidden;
+      return PAGE_IDS.some(id => !$(id).hidden);
     }
     function anyOverlayOpen() {
       return !$('reader').hidden || pagesOpen();
@@ -6791,15 +7000,14 @@
     function hidePages() {
       if (!pagesOpen()) return;
       pgStop();
-      $('adhkarPage').hidden = true;
-      $('ruqyaPage').hidden = true;
+      for (const id of PAGE_IDS) $(id).hidden = true;
       if ($('reader').hidden) document.body.style.overflow = '';
     }
     function showPage(id) {
       const was = anyOverlayOpen();
       if (!$('reader').hidden) hideReader();
       if ($(id).hidden) pgStop();
-      for (const p of ['adhkarPage', 'ruqyaPage']) $(p).hidden = p !== id;
+      for (const p of PAGE_IDS) $(p).hidden = p !== id;
       document.body.style.overflow = 'hidden';
       if (!was) try { history.pushState({ reader: 1 }, ''); } catch { }
     }
@@ -7150,6 +7358,155 @@
     $('fbFootLink').onclick = openFeedback;
     $('fbTopBtn').onclick = openFeedback;
 
+
+    /* --- Adhan : horaires de prière calculés dans le navigateur (bibliothèque adhan, hébergée sur
+       wirdan.app : fonctionne hors connexion). Mêmes méthodes et réglages que l'application. Sur le
+       web, les notifications ne peuvent sonner que tant que la page est ouverte. --- */
+    const PR_NAMES = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    const PR_SALAT = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    const PR_METHODS = [
+      ['morocco', 'Maroc (Fajr 19°, Isha 17°)', 'المغرب (الفجر 19°، العشاء 17°)'], ['mwl', 'Ligue islamique mondiale', 'رابطة العالم الإسلامي'],
+      ['egyptian', 'Égypte', 'الهيئة المصرية'], ['ummalqura', 'Umm al-Qura (La Mecque)', 'أم القرى (مكة)'], ['dubai', 'Dubaï', 'دبي'],
+      ['kuwait', 'Koweït', 'الكويت'], ['qatar', 'Qatar', 'قطر'], ['turkey', 'Turquie (Diyanet)', 'تركيا'], ['karachi', 'Karachi', 'كراتشي'],
+      ['isna', 'Amérique du Nord (ISNA)', 'أمريكا الشمالية'], ['france', 'France (UOIF, 12°)', 'فرنسا (12°)'], ['singapore', 'Singapour', 'سنغافورة'],
+    ];
+    const PR_CITIES = [
+      ['Casablanca', 'الدار البيضاء', 33.5731, -7.5898], ['Rabat', 'الرباط', 34.0209, -6.8416], ['Fès', 'فاس', 34.0181, -5.0078],
+      ['Marrakech', 'مراكش', 31.6295, -7.9811], ['Tanger', 'طنجة', 35.7595, -5.834], ['Agadir', 'أكادير', 30.4278, -9.5981],
+      ['Meknès', 'مكناس', 33.8935, -5.5473], ['Oujda', 'وجدة', 34.6814, -1.9086], ['Tétouan', 'تطوان', 35.5785, -5.3684],
+      ['Laâyoune', 'العيون', 27.1253, -13.1625], ['Paris', 'باريس', 48.8566, 2.3522], ['Bruxelles', 'بروكسل', 50.8503, 4.3517],
+      ['Alger', 'الجزائر', 36.7538, 3.0588], ['Tunis', 'تونس', 36.8065, 10.1815], ['La Mecque', 'مكة المكرمة', 21.3891, 39.8579],
+    ];
+    let pr = Object.assign({ place: null, method: 'morocco', hanafi: false, offsets: {}, notify: false }, lsGet('prayerSettings', {}));
+    const prSave = () => lsSet('prayerSettings', pr);
+    let prLib = null, prLibPromise = null, prUi = { cities: false, adjust: false, locating: false };
+    function prLoadLib() {
+      if (prLib) return Promise.resolve(prLib);
+      prLibPromise ??= new Promise((ok, ko) => {
+        const sc = document.createElement('script');
+        sc.src = 'vendor/adhan-4.4.6.umd.min.js';
+        sc.onload = () => { prLib = window.adhan; ok(prLib); };
+        sc.onerror = () => { prLibPromise = null; ko(new Error('adhan')); };
+        document.head.appendChild(sc);
+      });
+      return prLibPromise;
+    }
+    function prParams() {
+      const A = prLib, m = pr.method;
+      const p = m === 'morocco' ? new A.CalculationParameters('Other', 19, 17) : m === 'france' ? new A.CalculationParameters('Other', 12, 12)
+        : ({ mwl: A.CalculationMethod.MuslimWorldLeague, egyptian: A.CalculationMethod.Egyptian, ummalqura: A.CalculationMethod.UmmAlQura, dubai: A.CalculationMethod.Dubai, kuwait: A.CalculationMethod.Kuwait, qatar: A.CalculationMethod.Qatar, turkey: A.CalculationMethod.Turkey, karachi: A.CalculationMethod.Karachi, isna: A.CalculationMethod.NorthAmerica, singapore: A.CalculationMethod.Singapore }[m] || A.CalculationMethod.MuslimWorldLeague)();
+      p.madhab = pr.hanafi ? A.Madhab.Hanafi : A.Madhab.Shafi;
+      return p;
+    }
+    function prTimes(date) {
+      if (!prLib || !pr.place) return null;
+      const pt = new prLib.PrayerTimes(new prLib.Coordinates(pr.place.lat, pr.place.lng), date, prParams());
+      const out = {};
+      for (const n of PR_NAMES) out[n] = new Date(new Date(pt[n]).getTime() + (pr.offsets[n] || 0) * 60000);
+      return out;
+    }
+    function prNext(now = new Date()) {
+      const today = prTimes(now);
+      if (!today) return null;
+      for (const n of PR_SALAT) if (today[n] > now) return { name: n, time: today[n] };
+      const tm = new Date(now); tm.setDate(tm.getDate() + 1);
+      return { name: 'fajr', time: prTimes(tm).fajr };
+    }
+    const prClock = d => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const prLeft = time => { const m = Math.max(0, Math.round((time - Date.now()) / 60000)); return t('prIn', Math.floor(m / 60), m % 60); };
+
+    function renderNpCard() {
+      const next = prNext();
+      $('npTxt').innerHTML = next
+        ? `<small>${esc(t('prNext'))} · ${esc(pr.place.label)}</small><b>${esc(t('prNames')[next.name])}</b><span class="clock">${prClock(next.time)}</span><small>${esc(prLeft(next.time))}</small>`
+        : `<b style="font-size:16px">${esc(t('prTitle'))}</b><small>${esc(t('prNoPlace'))}</small>`;
+    }
+    function renderAdhan() {
+      const inner = $('adhanInner');
+      if (!prLib) { inner.innerHTML = `<p class="pg-sub">${esc(t('rdLoading'))}</p>`; return; }
+      const now = new Date(), times = prTimes(now), next = prNext(now);
+      const cityBtns = PR_CITIES.map(([fr, ar, lat, lng]) => {
+        const label = lang === 'ar' ? ar : fr;
+        return `<button type="button" class="chip${pr.place?.label === label ? ' on' : ''}" data-act="city" data-lat="${lat}" data-lng="${lng}" data-label="${esc(label)}">${esc(label)}</button>`;
+      }).join('');
+      const placeCard = `<div class="pg-card" style="display:flex;flex-direction:column;gap:10px">`
+        + `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>📍 ${esc(pr.place?.label || t('prNoPlace'))}</b>`
+        + (pr.place && !prUi.cities ? `<button type="button" class="pg-btn ghost" style="padding:6px 14px" data-act="change">${esc(t('prChange'))}</button>` : '') + `</div>`
+        + (!pr.place || prUi.cities ? `<button type="button" class="pg-btn" data-act="locate">${esc(t(prUi.locating ? 'prLocating' : 'prMyLocation'))}</button><p class="pg-sub">${esc(t('prChooseCity'))}</p><div class="pg-chips">${cityBtns}</div>` : '')
+        + `</div>`;
+      if (!times) { inner.innerHTML = `<div><h1 class="pg-title">${esc(t('prTitle'))}</h1><p class="pg-sub">${esc(t('prSub'))}</p></div>` + placeCard; return; }
+      const sameDay = next.time.getDate() === now.getDate();
+      const rows = PR_NAMES.map(n => `<div class="pr-row${n === 'sunrise' ? ' sun' : ''}${sameDay && next.name === n ? ' next' : ''}"><span class="n">${esc(t('prNames')[n])}</span><span class="tm">${prClock(times[n])}</span></div>`).join('');
+      const methods = PR_METHODS.map(([id, fr, ar]) => `<button type="button" class="chip${pr.method === id ? ' on' : ''}" data-act="method" data-id="${id}">${esc(lang === 'ar' ? ar : fr)}</button>`).join('');
+      const adjust = PR_NAMES.map(n => `<div class="adj-row"><span>${esc(t('prNames')[n])}</span><span class="ctl"><button type="button" class="round-btn" data-act="adj" data-n="${n}" data-d="-1" aria-label="-1">−</button><b>${(pr.offsets[n] || 0) > 0 ? '+' : ''}${pr.offsets[n] || 0}</b><button type="button" class="round-btn" data-act="adj" data-n="${n}" data-d="1" aria-label="+1">+</button></span></div>`).join('');
+      inner.innerHTML = `<div class="ad-hero"><small>${esc(t('prNext'))}</small><b>${esc(t('prNames')[next.name])}</b><div class="clock">${prClock(next.time)}</div><small>${esc(prLeft(next.time))}</small></div>`
+        + placeCard
+        + `<div class="pr-list">${rows}</div>`
+        + `<div class="pg-card" style="display:flex;flex-direction:column;gap:10px"><label style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600">${esc(t('prNotify'))}<input type="checkbox" id="prNotify" ${pr.notify ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--color-accent-btn)"></label><p class="pg-sub" style="margin:0">${esc(t('prNotifyNote'))}</p></div>`
+        + `<div class="pg-card" style="display:flex;flex-direction:column;gap:10px"><p class="pg-label">${esc(t('prMethod'))}</p><div class="pg-chips">${methods}</div>`
+        + `<p class="pg-label">${esc(t('prAsr'))}</p><div class="pg-chips"><button type="button" class="chip${!pr.hanafi ? ' on' : ''}" data-act="hanafi" data-v="0">${esc(t('prAsrStd'))}</button><button type="button" class="chip${pr.hanafi ? ' on' : ''}" data-act="hanafi" data-v="1">${esc(t('prAsrHanafi'))}</button></div>`
+        + `<button type="button" class="pg-btn ghost" data-act="toggleAdj">${esc(t('prAdjust'))} ${prUi.adjust ? '▲' : '▼'}</button>`
+        + (prUi.adjust ? `<p class="pg-sub">${esc(t('prAdjustNote'))}</p>${adjust}` : '') + `</div>`;
+    }
+    function openAdhan() {
+      showPage('adhanPage');
+      prUi = { cities: false, adjust: false, locating: false };
+      renderAdhan();
+      prLoadLib().then(renderAdhan).catch(() => { $('adhanInner').innerHTML = `<p class="pg-sub">${esc(t('pgError'))}</p>`; });
+    }
+    $('npCard').onclick = openAdhan;
+    $('adhanBack').onclick = closeOverlays;
+    $('adhanInner').addEventListener('click', e => {
+      const b = e.target.closest('[data-act]');
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === 'city') { pr.place = { lat: +b.dataset.lat, lng: +b.dataset.lng, label: b.dataset.label }; prUi.cities = false; }
+      else if (act === 'change') prUi.cities = true;
+      else if (act === 'method') pr.method = b.dataset.id;
+      else if (act === 'hanafi') pr.hanafi = b.dataset.v === '1';
+      else if (act === 'toggleAdj') prUi.adjust = !prUi.adjust;
+      else if (act === 'adj') { const n = b.dataset.n; pr.offsets[n] = Math.max(-30, Math.min(30, (pr.offsets[n] || 0) + +b.dataset.d)); }
+      else if (act === 'locate') {
+        if (!navigator.geolocation) return toast(t('prDenied'));
+        prUi.locating = true; renderAdhan();
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          pr.place = { lat, lng, label: t('prMyPlace') };
+          prUi = { ...prUi, cities: false, locating: false };
+          prSave(); renderAdhan(); renderNpCard(); prSchedule();
+        }, () => { prUi.locating = false; prUi.cities = true; toast(t('prDenied')); renderAdhan(); }, { timeout: 15000, maximumAge: 3600000 });
+        return;
+      }
+      prSave(); renderAdhan(); renderNpCard(); prSchedule();
+    });
+    $('adhanInner').addEventListener('change', async e => {
+      if (e.target.id !== 'prNotify') return;
+      if (e.target.checked && 'Notification' in window && Notification.permission !== 'granted') {
+        const perm = await Notification.requestPermission().catch(() => 'denied');
+        if (perm !== 'granted') { e.target.checked = false; return toast(t('prDenied')); }
+      }
+      pr.notify = e.target.checked && 'Notification' in window;
+      prSave(); prSchedule();
+    });
+    // Notifications web : programmées pour les prières restantes de la journée, tant que la page est ouverte
+    let prTimers = [];
+    function prSchedule() {
+      prTimers.forEach(clearTimeout); prTimers = [];
+      if (!pr.notify || !prLib || !pr.place || !('Notification' in window) || Notification.permission !== 'granted') return;
+      const times = prTimes(new Date());
+      for (const n of PR_SALAT) {
+        const ms = times[n] - Date.now();
+        if (ms > 0 && ms < 24 * 3600000) prTimers.push(setTimeout(() => {
+          try { new Notification(t('prNotifTitle', t('prNames')[n]), { body: `${prClock(times[n])} · ${pr.place.label}`, icon: 'icon-192.png', tag: 'prayer-' + n }); } catch { }
+          prSchedule();
+        }, ms));
+      }
+    }
+    // Carte d'accueil : bibliothèque chargée dès qu'un lieu est connu, puis rafraîchie chaque minute
+    if (pr.place) prLoadLib().then(() => { renderNpCard(); prSchedule(); }).catch(() => { });
+    renderNpCard();
+    setInterval(() => { if (prLib) { renderNpCard(); if (!$('adhanPage').hidden) renderAdhan(); } }, 60000);
+
     /* --- Langue de l'interface pour ces nouveautés --- */
     function applyPagesLang() {
       const labels = { listen: 'tabListen', read: 'tabRead', hifdh: 'tabHifdh', adhkar: 'tabAdhkar', ruqya: 'tabRuqya' };
@@ -7161,6 +7518,9 @@
       if (!$('adhkarPage').hidden) renderAdhkar(false);
       if (!$('ruqyaPage').hidden) renderRuqya();
       if (!$('fbModal').hidden) renderFeedback();
+      renderNpCard();
+      if (!$('adhanPage').hidden) renderAdhan();
+      for (const id of ['adhanBack']) { $(id).title = t('back'); $(id).setAttribute('aria-label', t('back')); }
     }
     applyPagesLang();
     updateTabbar();
@@ -7177,7 +7537,7 @@
       $('installFab').setAttribute('aria-label', t('fabInstall'));
     }
     function fabVisibility() {
-      const overlay = !$('reader').hidden || !$('adhkarPage').hidden || !$('ruqyaPage').hidden || !$('fbModal').hidden || !$('instModal').hidden;
+      const overlay = !$('reader').hidden || !$('adhkarPage').hidden || !$('ruqyaPage').hidden || !$('adhanPage').hidden || !$('fbModal').hidden || !$('instModal').hidden;
       $('installFab').hidden = !fabUseful || overlay;
     }
     function instBodyHTML() {
@@ -7221,7 +7581,7 @@
     // Le bouton se place juste au-dessus du lecteur, quelle que soit sa hauteur (replié / déplié)
     new ResizeObserver(() => document.documentElement.style.setProperty('--player-h', $('player').offsetHeight + 'px')).observe($('player'));
     const fabObserver = new MutationObserver(fabVisibility);
-    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'fbModal', 'instModal']) fabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
+    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'adhanPage', 'fbModal', 'instModal']) fabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
     addEventListener('appinstalled', () => { $('installFab').hidden = true; });
     fabRender();
     fabVisibility();

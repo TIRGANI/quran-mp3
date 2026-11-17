@@ -8,6 +8,7 @@ import { CAN_DOWNLOAD, dlKey, useDownloads } from '@/audio/downloads';
 import { isAvailable, playSurah, togglePlay, usePlayer } from '@/audio/player';
 import { TourTarget } from '@/tour/TourTarget';
 import { DownloadButton } from '@/components/DownloadButton';
+import { NextPrayerCard } from '@/components/NextPrayerCard';
 import { Tip } from '@/components/Tip';
 import { ReciterAvatar } from '@/components/ReciterAvatar';
 import { ArText, Chip, Row, Screen, SurahNumber, Txt } from '@/components/ui';
@@ -60,6 +61,7 @@ export default function ListenScreen() {
           </Pressable>
         </TourTarget>
       </Row>
+      <NextPrayerCard />
       <Tip id="listen" />
       <TourTarget id="listen.reciter">
         <Pressable
