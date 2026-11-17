@@ -4164,7 +4164,7 @@
     </div>
   </div>
 
-  <!-- « Donner mon avis » : envoyé directement au formulaire Formspree (transféré par e-mail à l'éditeur) -->
+  <!-- « Donner mon avis » : envoyé directement à FormSubmit (transféré par e-mail à l'éditeur) -->
   <div class="fb-modal" id="fbModal" role="dialog" aria-modal="true" aria-labelledby="fbTitle" hidden>
     <div class="fb-box">
       <div class="fb-head">
@@ -4180,7 +4180,7 @@
       <textarea id="fbMsg"></textarea>
       <p class="pg-label" id="fbEmailLabel"></p>
       <input type="email" id="fbEmail" class="fb-email" autocomplete="email" placeholder="nom@exemple.com" dir="ltr">
-      <input type="text" id="fbHp" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
+      <input type="text" id="fbHp" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
       <button type="button" class="pg-btn" id="fbSend">
         <svg viewBox="0 0 24 24">
           <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
@@ -7035,8 +7035,8 @@
       help: 'M11 18h2v-2h-2v2zm1-16a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-14a4 4 0 0 0-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z',
     };
     const pgSvg = name => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${PG_ICONS[name] || PG_ICONS['shield-checkmark']}"/></svg>`;
-    // Avis : formulaire Formspree (transféré par e-mail). Identifiant : formspree.io > le formulaire > « Integration ».
-    const FORMSPREE_ID = 'REMPLACER_PAR_ID';
+    // Avis : envoyés à FormSubmit, qui les transfère par e-mail (l'identifiant aléatoire remplace l'adresse).
+    const FORMSUBMIT_ID = '99eaf9bf89bed72bd6f3bb3e959e77f6';
 
     /* --- Lecteur audio des pages (adhkar, versets de ruqya), séparé du lecteur de sourates --- */
     const pgAudio = new Audio();
@@ -7439,7 +7439,7 @@
       const kind = t({ bug: 'fbBug', idea: 'fbIdea', thanks: 'fbThanks', other: 'fbOther' }[fb.kind]);
       const body = {
         _subject: `Wirdan — ${kind}${fb.rating ? ` · ${fb.rating}/5` : ''}`,
-        message: msg, type: kind, _gotcha: $('fbHp').value,
+        message: msg, type: kind, _honey: $('fbHp').value, _template: 'table',
         appareil: `web · ${navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'} · ${lang}`,
       };
       if (email) body.email = email;
@@ -7447,10 +7447,11 @@
       fbSending = true;
       $('fbSendLabel').textContent = t('fbSending');
       try {
-        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        const res = await fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_ID}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body),
         });
-        if (!res.ok) throw new Error(res.status);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || String(json.success) !== 'true') throw new Error(res.status);
         toast(t('fbSent'));
         closeFeedback();
       } catch {

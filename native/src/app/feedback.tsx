@@ -12,7 +12,7 @@ import { FONTS, useColors } from '@/theme/colors';
 
 type Kind = 'bug' | 'idea' | 'thanks' | 'other';
 
-/** Avis de l'utilisateur, envoyé directement depuis l'app (formulaire Formspree, voir lib/feedback). */
+/** Avis de l'utilisateur, envoyé directement depuis l'app (FormSubmit, voir lib/feedback). */
 export default function FeedbackScreen() {
   const c = useColors();
   const t = useT();
