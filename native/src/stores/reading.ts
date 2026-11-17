@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { SURAHS } from '@/data/surahs';
+import { fromAbs, TOTAL, toAbs, unitAt, type WirdUnit } from '@/lib/divisions';
 import { zustandStorage } from '@/lib/storage';
 
 export const TOTAL_AYAT = 6236;
@@ -27,6 +28,10 @@ type ReadingState = {
   /** Nombre de versets nouvellement lus par jour (AAAA-MM-JJ), pour l'objectif et la série. */
   days: Record<string, number>;
   goal: number;
+  /** Unité du wird quotidien : un nombre de versets, ou une division du Mushaf (thumun, hizb…) */
+  goalUnit: WirdUnit;
+  /** Passage du wird du jour (index absolus inclus), fixé pour la journée */
+  wird: { day: string; unit: WirdUnit; start: number; end: number } | null;
   khatmas: number;
   lastPos: { n: number; a: number } | null;
   prefs: ReaderPrefs;
@@ -35,6 +40,9 @@ type ReadingState = {
   removeBookmark: (n: number, a: number) => void;
   setLastPos: (n: number, a: number) => void;
   setGoal: (goal: number) => void;
+  setGoalUnit: (unit: WirdUnit) => void;
+  /** Calcule (une fois par jour) le passage du wird à partir de la dernière position lue */
+  ensureWird: () => void;
   setPrefs: (patch: Partial<ReaderPrefs>) => void;
   resetKhatma: () => void;
 };
@@ -55,6 +63,8 @@ export const useReading = create<ReadingState>()(
       bookmarks: [],
       days: {},
       goal: 20,
+      goalUnit: 'verses',
+      wird: null,
       khatmas: 0,
       lastPos: null,
       prefs: {
@@ -116,6 +126,19 @@ export const useReading = create<ReadingState>()(
         if (p?.n !== n || p?.a !== a) set({ lastPos: { n, a } });
       },
       setGoal: goal => set({ goal }),
+      setGoalUnit: goalUnit => {
+        set({ goalUnit, wird: null });
+        get().ensureWird();
+      },
+      ensureWird: () => {
+        const { goalUnit, wird, lastPos, read } = get();
+        if (goalUnit === 'verses') return;
+        if (wird && wird.day === today() && wird.unit === goalUnit) return;
+        // On reprend là où l'on s'est arrêté ; une division déjà entièrement lue est sautée
+        let u = unitAt(goalUnit, lastPos ? toAbs(lastPos.n, lastPos.a) : 0);
+        while (rangeRead(read, u.start, u.end) === u.end - u.start + 1 && u.end < TOTAL - 1) u = unitAt(goalUnit, u.end + 1);
+        set({ wird: { day: today(), unit: goalUnit, start: u.start, end: u.end } });
+      },
       setPrefs: patch => set({ prefs: { ...get().prefs, ...patch } }),
       resetKhatma: () => {
         const complete = totalRead(get().read) === TOTAL_AYAT;
@@ -147,4 +170,23 @@ export function streak(days: Record<string, number>) {
     d.setDate(d.getDate() - 1);
   }
   return s;
+}
+
+/** Nombre de versets lus dans un passage (index absolus inclus). */
+export function rangeRead(read: Record<number, string>, start: number, end: number) {
+  let c = 0;
+  for (let i = start; i <= end; i++) {
+    const { n, a } = fromAbs(i);
+    if (read[n]?.[a - 1] === '1') c++;
+  }
+  return c;
+}
+
+/** Premier verset non lu du passage (ou son début s'il est entièrement lu). */
+export function firstUnread(read: Record<number, string>, start: number, end: number) {
+  for (let i = start; i <= end; i++) {
+    const { n, a } = fromAbs(i);
+    if (read[n]?.[a - 1] !== '1') return { n, a };
+  }
+  return fromAbs(start);
 }

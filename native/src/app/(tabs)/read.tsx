@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Tip } from '@/components/Tip';
@@ -9,7 +9,8 @@ import { TourTarget } from '@/tour/TourTarget';
 import { ArText, Button, Card, ProgressBar, Row, Screen, Segmented, SurahNumber, Txt } from '@/components/ui';
 import { SURAHS } from '@/data/surahs';
 import { useIsRTL, useT } from '@/i18n';
-import { GOALS, readCount, streak, surahsDone, today, TOTAL_AYAT, totalRead, useReading } from '@/stores/reading';
+import { fromAbs, WIRD_UNITS, type WirdUnit } from '@/lib/divisions';
+import { firstUnread, GOALS, rangeRead, readCount, streak, surahsDone, today, TOTAL_AYAT, totalRead, useReading } from '@/stores/reading';
 import { FONTS, useColors } from '@/theme/colors';
 
 const openReader = (n: number, a?: number) =>
@@ -19,7 +20,18 @@ export default function ReadScreen() {
   const c = useColors();
   const t = useT();
   const rtl = useIsRTL();
-  const { read, bookmarks, days, goal, khatmas, lastPos, setGoal, removeBookmark, resetKhatma } = useReading();
+  const { read, bookmarks, days, goal, goalUnit, wird, khatmas, lastPos, setGoal, setGoalUnit, ensureWird, removeBookmark, resetKhatma } = useReading();
+  // Wird en divisions du Mushaf : passage du jour calculé à l'ouverture (une fois par jour)
+  useEffect(() => {
+    ensureWird();
+  }, [ensureWird, goalUnit, lastPos]);
+  const unitWird = goalUnit !== 'verses' && wird && wird.unit === goalUnit ? wird : null;
+  const wirdDone = unitWird ? rangeRead(read, unitWird.start, unitWird.end) : 0;
+  const wirdLen = unitWird ? unitWird.end - unitWird.start + 1 : 0;
+  const place = (i: number) => {
+    const p = fromAbs(i);
+    return rtl ? `${SURAHS[p.n - 1].ar} ${p.a}` : `${SURAHS[p.n - 1].tr} ${p.a}`;
+  };
   const [armed, setArmed] = useState(false);
 
   const tot = totalRead(read);
@@ -67,21 +79,62 @@ export default function ReadScreen() {
           <Txt variant="small">{t.khatmaStat(tot, done)}</Txt>
           {khatmas > 0 && <Txt variant="small">{t.khatmasDone(khatmas)}</Txt>}
         </Card>
-        <Card style={{ flex: 1, gap: 6 }}>
-          <Txt variant="label" color={c.accentStrong}>
-            {t.today}
-          </Txt>
-          <Txt variant="title">
-            {td}
-            <Txt variant="small">{` / ${goal}`}</Txt>
-          </Txt>
-          <ProgressBar value={td / goal} color={td >= goal ? c.success : c.accent} />
-          <Txt variant="small">{t.todayStat(goal, st)}</Txt>
-        </Card>
+        {goalUnit === 'verses' && (
+          <Card style={{ flex: 1, gap: 6 }}>
+            <Txt variant="label" color={c.accentStrong}>
+              {t.today}
+            </Txt>
+            <Txt variant="title">
+              {td}
+              <Txt variant="small">{` / ${goal}`}</Txt>
+            </Txt>
+            <ProgressBar value={td / goal} color={td >= goal ? c.success : c.accent} />
+            <Txt variant="small">{t.todayStat(goal, st)}</Txt>
+          </Card>
+        )}
       </Row>
-      <Card style={{ gap: 8 }}>
+
+      {/* Wird du jour en divisions du Mushaf : passage précis, avancement, lecture directe */}
+      {unitWird && (
+        <Pressable onPress={() => {
+          const p = firstUnread(read, unitWird.start, unitWird.end);
+          openReader(p.n, p.a);
+        }} accessibilityRole="button">
+          <Card style={{ gap: 8, borderColor: c.accent, borderWidth: 1.5 }}>
+            <Row style={{ justifyContent: 'space-between' }}>
+              <Txt variant="label" color={c.accentStrong}>
+                {`${t.wirdToday} · ${t.wirdUnit[goalUnit]}`}
+              </Txt>
+              {st > 0 && <Txt variant="small">{t.streakDays(st)}</Txt>}
+            </Row>
+            <ArText style={{ fontSize: 19, lineHeight: 34, fontFamily: FONTS.arabicBold, textAlign: rtl ? 'right' : 'left' }}>
+              {`${t.wirdFrom} ${place(unitWird.start)} ${t.wirdTo} ${place(unitWird.end)}`}
+            </ArText>
+            <ProgressBar value={wirdLen ? wirdDone / wirdLen : 0} height={7} color={wirdDone === wirdLen ? c.success : c.accent} />
+            <Row style={{ justifyContent: 'space-between' }}>
+              <Txt variant="small">{wirdDone === wirdLen ? `✓ ${t.wirdDone}` : t.surahProgress(wirdDone, wirdLen)}</Txt>
+              <Row gap={4}>
+                <Txt variant="label" color={c.accentStrong}>
+                  {wirdDone ? t.continueReading : t.startReading}
+                </Txt>
+                <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={16} color={c.accentStrong} />
+              </Row>
+            </Row>
+          </Card>
+        </Pressable>
+      )}
+
+      <Card style={{ gap: 10 }}>
         <Txt variant="label">{t.dailyGoal}</Txt>
-        <Segmented options={GOALS.map(g => [g, g === 208 ? t.juz : String(g)] as [number, string])} value={goal} onChange={setGoal} />
+        <Segmented
+          options={(['verses', ...WIRD_UNITS] as WirdUnit[]).map(u => [u, t.wirdUnit[u]] as [WirdUnit, string])}
+          value={goalUnit}
+          onChange={setGoalUnit}
+        />
+        {goalUnit === 'verses' && (
+          <Segmented options={GOALS.map(g => [g, g === 208 ? t.juz : String(g)] as [number, string])} value={goal} onChange={setGoal} />
+        )}
+        {(goalUnit === 'thumun' || goalUnit === 'nisfThumun') && <Txt variant="small">{t.athmanNote}</Txt>}
       </Card>
 
       {/* Marque-pages */}

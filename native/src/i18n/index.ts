@@ -1,5 +1,6 @@
 import { useSettings, type Lang } from '@/stores/settings';
 import type { TourKey } from '@/tour/steps';
+import type { WirdUnit } from '@/lib/divisions';
 
 // Textes de l'interface. Le contenu du Coran (texte, noms arabes) ne change pas avec la langue.
 const fr = {
@@ -107,7 +108,7 @@ const fr = {
   reminderSleep: 'Adhkar avant de dormir',
   reminderKahf: 'Sourate Al-Kahf (vendredi)',
   notifWirdTitle: 'Votre wird du jour',
-  notifWirdBody: (goal: number) => `Il est temps de lire votre wird : ${goal} versets aujourd’hui.`,
+  notifWirdBody: (portion: string) => `Il est temps de lire votre wird : ${portion} aujourd’hui.`,
   notifMorningTitle: 'Adhkar du matin',
   notifMorningBody: 'Commencez votre journée par le rappel d’Allah.',
   notifEveningTitle: 'Adhkar du soir',
@@ -201,6 +202,13 @@ const fr = {
   todayStat: (goal: number, streak: number) =>
     `objectif ${goal}${streak ? ` · ${streak} jour${streak > 1 ? 's' : ''} d’affilée` : ''}`,
   dailyGoal: 'Objectif quotidien',
+  wirdToday: 'Wird du jour',
+  wirdFrom: 'De',
+  wirdTo: 'à',
+  wirdDone: 'Wird du jour terminé',
+  streakDays: (n: number) => `${n} jour${n > 1 ? 's' : ''} d’affilée`,
+  wirdUnit: { verses: 'Versets', nisfThumun: '½ thumun', thumun: 'Thumun', rub: '2 athman (rub‘)', nisfHizb: '½ hizb', hizb: 'Hizb', juz: 'Juz’ (2 hizb)' } as Record<WirdUnit, string>,
+  athmanNote: 'Les hizb et rub‘ suivent les repères du Mushaf. Les athman sont calculés au verset le plus proche du milieu de chaque rub‘ : ils peuvent différer de quelques versets de votre Mushaf.',
   juz: '1 juz’',
   bookmarks: 'Marque-pages',
   noBookmarks: 'Aucun marque-page. Touchez un verset pendant la lecture pour en ajouter un.',
@@ -375,7 +383,7 @@ const ar: Dict = {
   reminderSleep: 'أذكار النوم',
   reminderKahf: 'سورة الكهف (الجمعة)',
   notifWirdTitle: 'وردك اليومي',
-  notifWirdBody: goal => `حان وقت وردك: ${goal} آية اليوم.`,
+  notifWirdBody: portion => `حان وقت وردك: ${portion} اليوم.`,
   notifMorningTitle: 'أذكار الصباح',
   notifMorningBody: 'ابدأ يومك بذكر الله.',
   notifEveningTitle: 'أذكار المساء',
@@ -462,6 +470,13 @@ const ar: Dict = {
   today: 'اليوم',
   todayStat: (goal, streak) => `الهدف ${goal}${streak ? ` · ${streak} يوم متتالٍ` : ''}`,
   dailyGoal: 'الورد اليومي',
+  wirdToday: 'ورد اليوم',
+  wirdFrom: 'من',
+  wirdTo: 'إلى',
+  wirdDone: 'تمّ ورد اليوم',
+  streakDays: n => `${n} يوم متتالٍ`,
+  wirdUnit: { verses: 'آيات', nisfThumun: 'نصف ثمن', thumun: 'ثمن', rub: 'ثمنان (ربع)', nisfHizb: 'نصف حزب', hizb: 'حزب', juz: 'جزء (حزبان)' },
+  athmanNote: 'الأحزاب والأرباع وفق علامات المصحف. أما الأثمان فمحسوبة عند أقرب آية لمنتصف كل ربع، وقد تختلف ببضع آيات عن مصحفك.',
   juz: 'جزء',
   bookmarks: 'العلامات',
   noBookmarks: 'لا توجد علامات. المس آية أثناء القراءة لإضافة علامة.',

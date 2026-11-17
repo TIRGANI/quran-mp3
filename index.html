@@ -4005,6 +4005,9 @@
         rdToday: 'Aujourd’hui',
         rdTodayStat: (td, goal, s) => `verset${td > 1 ? 's' : ''} lu${td > 1 ? 's' : ''} · objectif ${goal}${s ? ` · ${s} jour${s > 1 ? 's' : ''} d’affilée` : ''}`,
         rdGoal: 'Objectif quotidien', rdJuz: '1 juz’',
+        rdWirdToday: 'Wird du jour', rdFrom: 'De', rdTo: 'à', rdWirdDone: 'Wird du jour terminé', rdWirdRead: 'Lire mon wird', rdWirdContinue: 'Continuer mon wird',
+        rdWirdUnit: { verses: 'Versets', nisfThumun: '½ thumun', thumun: 'Thumun', rub: '2 athman (rub‘)', nisfHizb: '½ hizb', hizb: 'Hizb', juz: 'Juz’ (2 hizb)' },
+        rdAthmanNote: 'Les hizb et rub‘ suivent les repères du Mushaf. Les athman sont calculés au verset le plus proche du milieu de chaque rub‘ : ils peuvent différer de quelques versets de votre Mushaf.',
         rdThisSurah: (tr, ar) => `Sourate ${tr}`,
         rdSurahStat: (r, v) => `${r} / ${v} versets lus`,
         rdMarkRead: 'Marquer comme lue', rdMarkUnread: 'Marquer comme non lue',
@@ -4143,6 +4146,9 @@
         rdToday: 'اليوم',
         rdTodayStat: (td, goal, s) => `آية مقروءة · الهدف ${goal}${s ? ` · ${s} يوم متتالٍ` : ''}`,
         rdGoal: 'الورد اليومي', rdJuz: 'جزء',
+        rdWirdToday: 'ورد اليوم', rdFrom: 'من', rdTo: 'إلى', rdWirdDone: 'تمّ ورد اليوم', rdWirdRead: 'اقرأ وردك', rdWirdContinue: 'تابع وردك',
+        rdWirdUnit: { verses: 'آيات', nisfThumun: 'نصف ثمن', thumun: 'ثمن', rub: 'ثمنان (ربع)', nisfHizb: 'نصف حزب', hizb: 'حزب', juz: 'جزء (حزبان)' },
+        rdAthmanNote: 'الأحزاب والأرباع وفق علامات المصحف. أما الأثمان فمحسوبة عند أقرب آية لمنتصف كل ربع، وقد تختلف ببضع آيات عن مصحفك.',
         rdThisSurah: (tr, ar) => `سورة ${ar}`,
         rdSurahStat: (r, v) => `${r} من ${v} آية مقروءة`,
         rdMarkRead: 'تعليم كمقروءة', rdMarkUnread: 'تعليم كغير مقروءة',
@@ -5248,6 +5254,64 @@
     const READER_SIZES = [20, 23, 26, 29, 32, 36, 40, 46];
     const SCROLL_SPEEDS = [0, 10, 17, 26, 38, 55]; // px/s pour une taille de texte de 29px
     const GOALS = [5, 10, 20, 50, 100, 208]; // 208 ≈ un juz' (6236 / 30)
+
+    /* Wird en divisions du Mushaf (comme dans l'application) : 240 quarts de hizb des métadonnées
+       Tanzil (numérotation Hafs) ; hizb, demi-hizb, juz en sont des regroupements exacts ; athman et
+       demi-athman sont calculés au verset le plus proche du milieu de chaque division (en lettres). */
+    const RUB = [[1,1],[2,26],[2,44],[2,60],[2,75],[2,92],[2,106],[2,124],[2,142],[2,158],[2,177],[2,189],[2,203],[2,219],[2,233],[2,243],[2,253],[2,263],[2,272],[2,283],[3,15],[3,33],[3,52],[3,75],[3,93],[3,113],[3,133],[3,153],[3,171],[3,186],[4,1],[4,12],[4,24],[4,36],[4,58],[4,74],[4,88],[4,100],[4,114],[4,135],[4,148],[4,163],[5,1],[5,12],[5,27],[5,41],[5,51],[5,67],[5,82],[5,97],[5,109],[6,13],[6,36],[6,59],[6,74],[6,95],[6,111],[6,127],[6,141],[6,151],[7,1],[7,31],[7,47],[7,65],[7,88],[7,117],[7,142],[7,156],[7,171],[7,189],[8,1],[8,22],[8,41],[8,61],[9,1],[9,19],[9,34],[9,46],[9,60],[9,75],[9,93],[9,111],[9,122],[10,11],[10,26],[10,53],[10,71],[10,90],[11,6],[11,24],[11,41],[11,61],[11,84],[11,108],[12,7],[12,30],[12,53],[12,77],[12,101],[13,5],[13,19],[13,35],[14,10],[14,28],[15,1],[15,50],[16,1],[16,30],[16,51],[16,75],[16,90],[16,111],[17,1],[17,23],[17,50],[17,70],[17,99],[18,17],[18,32],[18,51],[18,75],[18,99],[19,22],[19,59],[20,1],[20,55],[20,83],[20,111],[21,1],[21,29],[21,51],[21,83],[22,1],[22,19],[22,38],[22,60],[23,1],[23,36],[23,75],[24,1],[24,21],[24,35],[24,53],[25,1],[25,21],[25,53],[26,1],[26,52],[26,111],[26,181],[27,1],[27,27],[27,56],[27,82],[28,12],[28,29],[28,51],[28,76],[29,1],[29,26],[29,46],[30,1],[30,31],[30,54],[31,22],[32,11],[33,1],[33,18],[33,31],[33,51],[33,60],[34,10],[34,24],[34,46],[35,15],[35,41],[36,28],[36,60],[37,22],[37,83],[37,145],[38,21],[38,52],[39,8],[39,32],[39,53],[40,1],[40,21],[40,41],[40,66],[41,9],[41,25],[41,47],[42,13],[42,27],[42,51],[43,24],[43,57],[44,17],[45,12],[46,1],[46,21],[47,10],[47,33],[48,18],[49,1],[49,14],[50,27],[51,31],[52,24],[53,26],[54,9],[55,1],[56,1],[56,75],[57,16],[58,1],[58,14],[59,11],[60,7],[62,1],[63,4],[65,1],[66,1],[67,1],[68,1],[69,1],[70,19],[72,1],[73,20],[75,1],[76,19],[78,1],[80,1],[82,1],[84,1],[87,1],[90,1],[94,1],[100,9]];
+    const WIRD_UNITS = ['nisfThumun', 'thumun', 'rub', 'nisfHizb', 'hizb', 'juz'];
+    let wdOffsets = null, wdLetters = null;
+    const wdCache = new Map();
+    function wdInit() {
+      if (wdOffsets || !quranTextData) return !!wdOffsets;
+      wdOffsets = []; let acc = 0;
+      for (const sv of quranTextData) { wdOffsets.push(acc); acc += sv.length; }
+      wdLetters = quranTextData.flat().map(v => v.replace(/[\s\u064B-\u065F\u0670\u06D6-\u06ED]/g, '').length || 1);
+      return true;
+    }
+    const wdToAbs = (n, a) => wdOffsets[n - 1] + a - 1;
+    function wdFromAbs(i) { let n = 1; while (n < 114 && wdOffsets[n] <= i) n++; return { n, a: i - wdOffsets[n - 1] + 1 }; }
+    function wdMid(starts) {
+      const out = [];
+      starts.forEach((st, k) => {
+        out.push(st);
+        const e = k + 1 < starts.length ? starts[k + 1] : TOTAL_AYAT;
+        let tot = 0; for (let i = st; i < e; i++) tot += wdLetters[i];
+        let acc = 0;
+        for (let i = st; i < e; i++) { acc += wdLetters[i]; if (acc >= tot / 2) { if (i + 1 < e) out.push(i + 1); break; } }
+      });
+      return out;
+    }
+    function wdBounds(unit) {
+      if (!wdCache.has(unit)) {
+        const rub = RUB.map(([n, a]) => wdToAbs(n, a));
+        const every = k => rub.filter((_, i) => i % k === 0);
+        wdCache.set(unit, { juz: () => every(8), hizb: () => every(4), nisfHizb: () => every(2), rub: () => rub, thumun: () => wdMid(rub), nisfThumun: () => wdMid(wdMid(rub)) }[unit]());
+      }
+      return wdCache.get(unit);
+    }
+    function wdUnitAt(unit, pos) {
+      const b = wdBounds(unit); let k = 0;
+      while (k + 1 < b.length && b[k + 1] <= pos) k++;
+      return { start: b[k], end: (k + 1 < b.length ? b[k + 1] : TOTAL_AYAT) - 1 };
+    }
+    function wdRangeRead(start, end) {
+      let c = 0;
+      for (let i = start; i <= end; i++) { const { n, a } = wdFromAbs(i); if (prog.read[n]?.[a - 1] === '1') c++; }
+      return c;
+    }
+    /** Passage du wird du jour (fixé pour la journée), à partir de la dernière position lue. */
+    function wdToday() {
+      const unit = prog.goalUnit || 'verses';
+      if (unit === 'verses' || !wdInit()) return null;
+      if (prog.wird && prog.wird.day === today() && prog.wird.unit === unit) return prog.wird;
+      const pos = lsGet('readerPos', null);
+      let u = wdUnitAt(unit, pos ? wdToAbs(pos.n, pos.a) : 0);
+      while (wdRangeRead(u.start, u.end) === u.end - u.start + 1 && u.end < TOTAL_AYAT - 1) u = wdUnitAt(unit, u.end + 1);
+      prog.wird = { day: today(), unit, start: u.start, end: u.end };
+      saveProg();
+      return prog.wird;
+    }
     const TOTAL_AYAT = 6236;
     const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
     const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } };
@@ -5608,6 +5672,18 @@
         + `<p class="snote">${esc(t('rdFollowNote'))}</p>`;
     }
 
+    function wirdHTML() {
+      const w = wdToday();
+      if (!w) return '';
+      const done = wdRangeRead(w.start, w.end), len = w.end - w.start + 1;
+      const place = i => { const p = wdFromAbs(i); return lang === 'ar' ? `${S[p.n - 1][1]} ${p.a}` : `${S[p.n - 1][0]} ${p.a}`; };
+      return `<h3>${esc(t('rdWirdToday'))} · ${esc(t('rdWirdUnit')[w.unit])}</h3>`
+        + `<p style="font-family:var(--ar);font-size:18px;margin:4px 0">${esc(`${t('rdFrom')} ${place(w.start)} ${t('rdTo')} ${place(w.end)}`)}</p>`
+        + `<div class="pline"><i style="width:${(done / len) * 100}%"></i></div>`
+        + `<p class="snote">${esc(done === len ? '✓ ' + t('rdWirdDone') : t('rdSurahStat', done, len))}</p>`
+        + `<div class="sbtns"><button type="button" class="sbtn" data-act="goWird">${esc(t(done ? 'rdWirdContinue' : 'rdWirdRead'))}</button></div>`
+        + (w.unit === 'thumun' || w.unit === 'nisfThumun' ? `<p class="snote">${esc(t('rdAthmanNote'))}</p>` : '');
+    }
     function progressHTML() {
       const tot = totalRead(), pct = tot / TOTAL_AYAT * 100;
       let done = 0;
@@ -5623,7 +5699,8 @@
         + `<h3>${esc(t('rdToday'))}</h3>`
         + `<div class="pbig"><b>${td}</b><span>${esc(t('rdTodayStat', td, goal, streak()))}</span></div>`
         + `<div class="pline"><i style="width:${Math.min(100, td / goal * 100)}%"></i></div>`
-        + row(t('rdGoal'), segBtns('goal', GOALS.map(g => [g, g === 208 ? t('rdJuz') : g]), goal))
+        + row(t('rdGoal'), segBtns('goalUnit', ['verses', ...WIRD_UNITS].map(u => [u, t('rdWirdUnit')[u]]), prog.goalUnit || 'verses'))
+        + ((prog.goalUnit || 'verses') === 'verses' ? row('', segBtns('goal', GOALS.map(g => [g, g === 208 ? t('rdJuz') : g]), goal)) : wirdHTML())
         + `<h3>${esc(t('rdThisSurah', S[readerN - 1][0], S[readerN - 1][1]))}</h3>`
         + `<div class="pline"><i style="width:${rc / v * 100}%"></i></div>`
         + `<p class="snote">${esc(t('rdSurahStat', rc, v))}</p>`
@@ -5661,6 +5738,19 @@
       if (!b) return;
       if (b.dataset.set === 'goal') {
         prog.goal = +b.dataset.v; saveProg(); renderSheet(); return;
+      }
+      if (b.dataset.set === 'goalUnit') {
+        prog.goalUnit = b.dataset.v; prog.wird = null; saveProg(); renderSheet(); return;
+      }
+      if (b.dataset.act === 'goWird') {
+        const w = wdToday();
+        if (!w) return;
+        let i = w.start;
+        while (i <= w.end) { const p = wdFromAbs(i); if (prog.read[p.n]?.[p.a - 1] !== '1') break; i++; }
+        const p = wdFromAbs(Math.min(i, w.end));
+        openSheet(null);
+        renderReader(p.n, p.a);
+        return;
       }
       if (b.dataset.set) {
         const k = b.dataset.set;

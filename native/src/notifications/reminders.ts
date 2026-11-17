@@ -31,10 +31,11 @@ export async function ensurePermission(): Promise<boolean> {
 
 function content(key: ReminderKey): Notifications.NotificationContentInput {
   const t = getT();
-  const goal = useReading.getState().goal;
+  const { goal, goalUnit } = useReading.getState();
+  const portion = goalUnit === 'verses' ? `${goal} ${t.wirdUnit.verses.toLowerCase()}` : t.wirdUnit[goalUnit];
   switch (key) {
     case 'wird':
-      return { title: t.notifWirdTitle, body: t.notifWirdBody(goal), data: { url: '/read' } };
+      return { title: t.notifWirdTitle, body: t.notifWirdBody(portion), data: { url: '/read' } };
     case 'morning':
       return { title: t.notifMorningTitle, body: t.notifMorningBody, data: { url: `/adhkar/${ADHKAR.morning}` } };
     case 'evening':
@@ -100,5 +101,5 @@ useSettings.subscribe((s, prev) => {
   if (s.reminders !== prev.reminders || s.lang !== prev.lang) syncReminders();
 });
 useReading.subscribe((s, prev) => {
-  if (s.goal !== prev.goal && useSettings.getState().reminders.wird.on) syncReminders();
+  if ((s.goal !== prev.goal || s.goalUnit !== prev.goalUnit) && useSettings.getState().reminders.wird.on) syncReminders();
 });
