@@ -29,6 +29,23 @@ export default function AdhkarScreen() {
         <Txt variant="small">{t.adhkarSubtitle}</Txt>
       </View>
       <Tip id="adhkar" />
+      <Pressable
+        onPress={() => router.push('/ruqya')}
+        accessibilityRole="button"
+        style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.hero, borderRadius: 18, padding: 16, opacity: pressed ? 0.85 : 1 })}>
+        <View style={{ width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Ionicons name="shield-checkmark" size={24} color={c.accent} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Txt color="#fff" style={{ fontFamily: FONTS.arabicBold, fontSize: 20, lineHeight: 32, textAlign: rtl ? 'auto' : 'left' }}>
+            الرقية الشرعية
+          </Txt>
+          <Txt variant="small" color="rgba(255,255,255,0.75)">
+            {t.ruqyaCard}
+          </Txt>
+        </View>
+        <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={20} color={c.accent} />
+      </Pressable>
       {!q && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {FEATURED.map(({ id, icon }) => {

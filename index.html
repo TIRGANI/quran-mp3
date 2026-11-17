@@ -2536,6 +2536,739 @@
         padding: 8px 10px;
       }
     }
+
+    /* ---------- Menu d'onglets en bas (comme l'application mobile) ---------- */
+    :root {
+      --tabbar-h: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .tabbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 12;
+      height: var(--tabbar-h);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      display: flex;
+      background: var(--white);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -4px 16px rgba(18, 63, 53, .08);
+    }
+
+    .tabbar button {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color .15s;
+    }
+
+    .tabbar button svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .tabbar button.on {
+      color: var(--color-accent-btn);
+    }
+
+    .tabbar button:hover {
+      color: var(--color-primary);
+    }
+
+    /* Le lecteur, les messages et le bas de page remontent au-dessus du menu */
+    .player {
+      bottom: var(--tabbar-h);
+      padding-bottom: 12px;
+    }
+
+    .toast {
+      bottom: calc(150px + var(--tabbar-h));
+    }
+
+    .footer {
+      padding-bottom: calc(170px + var(--tabbar-h));
+    }
+
+    .rd-scroll {
+      padding-bottom: calc(170px + var(--tabbar-h));
+    }
+
+    .rd-auto {
+      bottom: calc(150px + var(--tabbar-h) - env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ---------- Pages plein écran : Adhkar, Ruqya ---------- */
+    .page {
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .pg-bar {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+      background: #0b2920;
+      color: #fff;
+    }
+
+    .pg-bar h2 {
+      flex: 1;
+      margin: 0;
+      text-align: center;
+      font-family: var(--ar);
+      font-size: 22px;
+      line-height: 1.6;
+    }
+
+    .pg-bar .pg-count {
+      min-width: 40px;
+      text-align: center;
+      color: var(--color-accent);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .pg-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 18px 16px calc(180px + var(--tabbar-h));
+    }
+
+    .pg-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .pg-title {
+      margin: 0;
+      color: var(--color-primary);
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    .pg-sub {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pg-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .pg-card.gold {
+      background: var(--orange-soft);
+      border-color: var(--color-accent);
+    }
+
+    .pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 33px;
+      padding: 12px 20px;
+      background: var(--color-accent-btn);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pg-btn:hover {
+      background: var(--color-accent-btn-hover);
+    }
+
+    .pg-btn.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .pg-btn.ghost:hover {
+      border-color: var(--color-accent);
+    }
+
+    .pg-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .pg-search {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--white);
+      border-radius: 33px;
+      padding: 12px 18px;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    .pg-label {
+      color: var(--color-accent-btn);
+      font-weight: 600;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .pg-bar-progress {
+      flex: none;
+      height: 3px;
+      background: rgba(127, 127, 127, .2);
+    }
+
+    .pg-bar-progress i,
+    .pline2 i {
+      display: block;
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 4px;
+    }
+
+    .pline2 {
+      height: 5px;
+      border-radius: 4px;
+      background: var(--line);
+      overflow: hidden;
+    }
+
+    /* Adhkar : carte Ruqya, chapitres mis en avant, liste */
+    .ruqya-entry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 16px;
+      background: #123b2b;
+      color: #fff;
+      text-align: start;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .ruqya-entry .ic {
+      flex: none;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-accent);
+      display: grid;
+      place-items: center;
+    }
+
+    .ruqya-entry .ic svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--color-accent);
+    }
+
+    .ruqya-entry b {
+      display: block;
+      font-family: var(--ar);
+      font-size: 21px;
+      line-height: 1.5;
+    }
+
+    .ruqya-entry small {
+      opacity: .75;
+      font-size: 12.5px;
+    }
+
+    .ad-feat {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .ad-feat button {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: start;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: var(--white);
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .ad-feat button:first-child {
+      grid-column: 1 / -1;
+      background: #123b2b;
+      border-color: #123b2b;
+      color: #fff;
+    }
+
+    .ad-feat button:hover {
+      border-color: var(--color-accent);
+    }
+
+    .ad-feat b {
+      font-family: var(--ar);
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+
+    .ad-feat small {
+      opacity: .7;
+      font-size: 12px;
+    }
+
+    .ad-feat .done {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .ad-list {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .ad-list button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: none;
+      padding: 12px 16px;
+      font: inherit;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: right;
+      direction: rtl;
+    }
+
+    .ad-list button:last-child {
+      border-bottom: 0;
+    }
+
+    .ad-list button:hover {
+      background: var(--bg);
+    }
+
+    .ad-list .t {
+      flex: 1;
+      font-family: var(--ar);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .ad-list .n {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dh-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: opacity .2s, border-color .2s;
+    }
+
+    .dh-card.done {
+      border-color: var(--green);
+      opacity: .72;
+    }
+
+    .dh-card .dh-text {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: none;
+      padding: 16px;
+      font-family: var(--ar);
+      font-size: 21px;
+      line-height: 1.95;
+      text-align: right;
+      direction: rtl;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .dh-foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    .dh-foot .idx {
+      min-width: 22px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dh-foot .times {
+      margin-inline-start: auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .round-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--color-accent-btn);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .round-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .count-btn {
+      min-width: 66px;
+      height: 44px;
+      border: 0;
+      border-radius: 22px;
+      padding: 0 14px;
+      background: var(--color-accent-btn);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .dh-card.done .count-btn {
+      background: var(--green);
+    }
+
+    /* Ruqya */
+    .rq-answers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rq-answers button {
+      border: 2px solid var(--line);
+      background: var(--white);
+      border-radius: 16px;
+      padding: 16px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 17px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .rq-answers button:hover,
+    .rq-answers button.on {
+      border-color: var(--color-accent);
+      background: var(--orange-soft);
+    }
+
+    .rq-question {
+      font-size: 19px;
+      line-height: 1.6;
+      font-weight: 600;
+      margin: 0;
+      min-height: 90px;
+    }
+
+    .rq-sec {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .rq-sec>summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      cursor: pointer;
+    }
+
+    .rq-sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .rq-sec>summary .ic {
+      flex: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--orange-soft);
+      display: grid;
+      place-items: center;
+    }
+
+    .rq-sec>summary .ic svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--color-accent-btn);
+    }
+
+    .rq-sec>summary b {
+      display: block;
+    }
+
+    .rq-sec>summary small {
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .rq-sec>summary .chev {
+      margin-inline-start: auto;
+      color: var(--muted);
+      transition: transform .2s;
+    }
+
+    .rq-sec[open]>summary .chev {
+      transform: rotate(180deg);
+    }
+
+    .rq-body {
+      padding: 0 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rq-ref {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .rq-ref .hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .rq-ref .hd button {
+      border: 0;
+      background: none;
+      color: var(--color-accent-btn);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .rq-verses {
+      font-family: var(--ar);
+      font-size: 23px;
+      line-height: 2.1;
+      text-align: right;
+      direction: rtl;
+      margin: 6px 0 0;
+    }
+
+    .rq-verses .v.cur {
+      background: rgba(61, 122, 92, .16);
+      border-radius: 6px;
+    }
+
+    .rq-verses .am,
+    .rq-basmala {
+      color: var(--color-accent-btn);
+    }
+
+    .rq-basmala {
+      text-align: center;
+      font-family: var(--ar);
+      font-size: 20px;
+      margin: 4px 0 0;
+    }
+
+    .rq-dua {
+      font-family: var(--ar);
+      font-size: 21px;
+      line-height: 2;
+      text-align: right;
+      direction: rtl;
+      margin: 0;
+    }
+
+    .rq-src {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .rq-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .rq-chips button {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 33px;
+      padding: 6px 14px;
+      font-family: var(--ar);
+      font-size: 16px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .rq-chips button:hover {
+      border-color: var(--color-accent);
+    }
+
+    .rq-method {
+      margin: 0;
+      padding-inline-start: 22px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    /* ---------- Fenêtre « Donner mon avis » ---------- */
+    .fb-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(0, 0, 0, .45);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .fb-box {
+      width: min(560px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      background: var(--white);
+      border-radius: 22px 22px 0 0;
+      padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .fb-modal {
+        align-items: center;
+      }
+
+      .fb-box {
+        border-radius: 22px;
+      }
+    }
+
+    .fb-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fb-head h3 {
+      margin: 0;
+      color: var(--color-primary);
+      font-size: 21px;
+    }
+
+    .fb-close {
+      border: 0;
+      background: none;
+      font-size: 26px;
+      line-height: 1;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .fb-stars {
+      display: flex;
+      gap: 4px;
+      direction: ltr;
+    }
+
+    .fb-stars button {
+      border: 0;
+      background: none;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--color-accent);
+      cursor: pointer;
+      padding: 0 2px;
+    }
+
+    .fb-kinds {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .fb-box textarea {
+      min-height: 120px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      font: inherit;
+      color: var(--ink);
+      resize: vertical;
+    }
+
+    .fb-note {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      margin: 0;
+    }
+
+    .fb-link {
+      border: 0;
+      background: none;
+      color: inherit;
+      opacity: .75;
+      font: inherit;
+      font-size: 12.5px;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 4px;
+    }
   </style>
 </head>
 
@@ -2549,6 +3282,7 @@
         <span class="status" id="status">En ligne</span>
         <button class="install" id="install" hidden>Installer l'app</button>
         <a class="langBtn" id="demoTopLink" href="demo.html">Démo</a>
+        <button class="langBtn" id="fbTopBtn" type="button">Avis</button>
         <button class="langBtn" id="langBtn" type="button"
           title="Changer la langue de l'interface / تغيير لغة الواجهة">FR / عربي</button>
       </div>
@@ -2668,6 +3402,7 @@
       <p class="copyright" id="copyright">© 2026 Tirgani Badreddine — Tous droits réservés sur l'application. Le Saint
         Coran appartient à tous.</p>
       <a class="privacylink" id="privacyLink" href="privacy.html">Politique de confidentialité</a>
+      <button type="button" class="fb-link" id="fbFootLink">Donner mon avis</button>
       <a class="wa demolink" href="demo.html">
         <svg viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z" />
@@ -2761,6 +3496,97 @@
       <button type="button" id="rdAutoOff">×</button>
     </div>
   </div>
+
+  <!-- Pages plein écran : Adhkar (Hisn al-Muslim) et Ruqya — contenu rendu par le script -->
+  <div class="page" id="adhkarPage" role="dialog" aria-modal="true" aria-labelledby="adhkarBarTitle" hidden>
+    <div class="pg-bar">
+      <button type="button" class="rd-ic flip" id="adhkarBack" aria-label="Retour" title="Retour">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+        </svg>
+      </button>
+      <h2 id="adhkarBarTitle">الأذكار</h2>
+      <span class="pg-count" id="adhkarCount"></span>
+    </div>
+    <div class="pg-bar-progress"><i id="adhkarProgress" style="width:0"></i></div>
+    <div class="pg-scroll" id="adhkarScroll">
+      <div class="pg-inner" id="adhkarInner"></div>
+    </div>
+  </div>
+
+  <div class="page" id="ruqyaPage" role="dialog" aria-modal="true" aria-labelledby="ruqyaBarTitle" hidden>
+    <div class="pg-bar">
+      <button type="button" class="rd-ic flip" id="ruqyaBack" aria-label="Retour" title="Retour">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z" />
+        </svg>
+      </button>
+      <h2 id="ruqyaBarTitle">الرقية الشرعية</h2>
+      <span class="pg-count"></span>
+    </div>
+    <div class="pg-scroll" id="ruqyaScroll">
+      <div class="pg-inner" id="ruqyaInner"></div>
+    </div>
+  </div>
+
+  <!-- « Donner mon avis » : message préparé puis envoyé par WhatsApp (rien n'est envoyé sans l'utilisateur) -->
+  <div class="fb-modal" id="fbModal" role="dialog" aria-modal="true" aria-labelledby="fbTitle" hidden>
+    <div class="fb-box">
+      <div class="fb-head">
+        <h3 id="fbTitle">Donner mon avis</h3>
+        <button type="button" class="fb-close" id="fbClose" aria-label="Fermer">×</button>
+      </div>
+      <p class="pg-sub" id="fbSub"></p>
+      <p class="pg-label" id="fbRatingLabel"></p>
+      <div class="fb-stars" id="fbStars"></div>
+      <p class="pg-label" id="fbTypeLabel"></p>
+      <div class="fb-kinds" id="fbKinds"></div>
+      <p class="pg-label" id="fbMsgLabel"></p>
+      <textarea id="fbMsg"></textarea>
+      <button type="button" class="pg-btn" id="fbSend">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z" />
+        </svg>
+        <span id="fbSendLabel">Envoyer sur WhatsApp</span>
+      </button>
+      <p class="fb-note" id="fbNote"></p>
+    </div>
+  </div>
+
+  <!-- Menu d'onglets en bas, comme dans l'application mobile -->
+  <nav class="tabbar" id="tabbar" aria-label="Navigation">
+    <button type="button" data-tab="listen" class="on">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2a7 7 0 0 1 14 0v2h-4v8h3c1.66 0 3-1.34 3-3v-7a9 9 0 0 0-9-9z" />
+      </svg>
+      <span>Écouter</span>
+    </button>
+    <button type="button" data-tab="read">
+      <svg viewBox="0 0 24 24">
+        <path d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z" />
+      </svg>
+      <span>Lire</span>
+    </button>
+    <button type="button" data-tab="hifdh">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+      </svg>
+      <span>Hifdh</span>
+    </button>
+    <button type="button" data-tab="adhkar">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z" />
+      </svg>
+      <span>Adhkar</span>
+    </button>
+    <button type="button" data-tab="ruqya">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+      </svg>
+      <span>Ruqya</span>
+    </button>
+  </nav>
 
   <div class="toast" id="toast" hidden></div>
 
@@ -3033,6 +3859,24 @@
         cancelBtn: 'Annuler', removeAllBtn: 'Tout supprimer', confirmRemove: 'Confirmer la suppression ?',
         surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
         emptyMsg: 'Aucune sourate ne correspond.',
+        tabListen: 'Écouter', tabRead: 'Lire', tabHifdh: 'Hifdh', tabAdhkar: 'Adhkar', tabRuqya: 'Ruqya', tabsNav: 'Navigation', back: 'Retour',
+        pgError: 'Chargement impossible. Vérifiez votre connexion.',
+        adhkarTitle: 'Adhkar', adhkarSub: 'Hisn al-Muslim — invocations et rappels du Prophète ﷺ', adhkarSearch: 'Rechercher un dhikr…',
+        adhkarAll: 'Tous les chapitres', adhkarTimes: n => `${n} fois`, adhkarReset: 'Recommencer', adhkarAllDone: 'Qu’Allah accepte vos adhkar.',
+        adhkarTap: 'Touchez pour compter', adhkarPlay: 'Écouter',
+        ruqyaCard: 'La ruqya selon votre situation : mauvais œil, sorcellerie, sommeil, soucis…',
+        ruqyaTitle: 'Ruqya sharʿiyya', ruqyaSub: 'Les versets et invocations de guérison, selon votre situation', ruqyaWarning: 'À lire avant de commencer',
+        ruqyaStart: 'Répondre au questionnaire', ruqyaLast: 'Voir mes derniers résultats', ruqyaAll: 'Voir toute la ruqya',
+        ruqyaQ: (n, total) => `Question ${n} / ${total}`, ruqyaNo: 'Non', ruqyaSometimes: 'Parfois', ruqyaOften: 'Souvent', ruqyaPrev: 'Question précédente',
+        ruqyaResults: 'Ruqya suggérée pour vous', ruqyaResultsNote: 'D’après vos réponses — une orientation, pas un diagnostic.',
+        ruqyaNothing: 'Aucun signe marqué : la ruqya de base et les adhkar du matin et du soir suffisent pour vous protéger.',
+        ruqyaMethod: 'Comment faire la ruqya', ruqyaRestart: 'Refaire le questionnaire', ruqyaVerses: 'Versets', ruqyaDuas: 'Invocations',
+        ruqyaHisn: 'Dans Hisn al-Muslim', ruqyaListen: 'Écouter', ruqyaStop: 'Arrêter', ruqyaOpen: 'Ouvrir',
+        fbTitle: 'Donner mon avis', fbSub: 'Une idée, un problème, un remerciement ? Votre avis nous aide à améliorer Wirdan.',
+        fbRating: 'Votre note', fbType: 'Type', fbBug: 'Problème', fbIdea: 'Idée', fbThanks: 'Remerciement', fbOther: 'Autre',
+        fbMsg: 'Votre message', fbPh: 'Décrivez votre idée ou le problème rencontré…', fbSend: 'Envoyer sur WhatsApp',
+        fbNote: 'Le message s’ouvre dans WhatsApp : vous le relisez avant de l’envoyer. Rien n’est envoyé sans votre accord.',
+        fbEmpty: 'Écrivez quelques mots avant d’envoyer.', fbTop: 'Avis', fbFoot: 'Donner mon avis',
         androidApp: 'Application Android',
         iosApp: 'Application iPhone',
         demoLink: 'Voir la démo', demoTop: 'Démo',
@@ -3152,6 +3996,24 @@
         cancelBtn: 'إلغاء', removeAllBtn: 'حذف الكل', confirmRemove: 'تأكيد الحذف؟',
         surahCount: n => `${n} سورة`,
         emptyMsg: 'لا توجد سورة مطابقة.',
+        tabListen: 'استماع', tabRead: 'قراءة', tabHifdh: 'الحفظ', tabAdhkar: 'الأذكار', tabRuqya: 'الرقية', tabsNav: 'التنقل', back: 'رجوع',
+        pgError: 'تعذّر التحميل. تحقّق من الاتصال.',
+        adhkarTitle: 'الأذكار', adhkarSub: 'حصن المسلم — من أذكار الكتاب والسنة', adhkarSearch: 'ابحث عن ذكر…',
+        adhkarAll: 'جميع الأبواب', adhkarTimes: n => `${n} مرة`, adhkarReset: 'إعادة', adhkarAllDone: 'تقبّل الله أذكارك.',
+        adhkarTap: 'المس للعدّ', adhkarPlay: 'استماع',
+        ruqyaCard: 'الرقية بحسب حالتك: العين، السحر، النوم، الهم…',
+        ruqyaTitle: 'الرقية الشرعية', ruqyaSub: 'آيات وأدعية الشفاء بحسب حالتك', ruqyaWarning: 'تنبيه',
+        ruqyaStart: 'ابدأ الاستبيان', ruqyaLast: 'عرض نتائجي الأخيرة', ruqyaAll: 'عرض الرقية كاملة',
+        ruqyaQ: (n, total) => `السؤال ${n} من ${total}`, ruqyaNo: 'لا', ruqyaSometimes: 'أحيانًا', ruqyaOften: 'كثيرًا', ruqyaPrev: 'السؤال السابق',
+        ruqyaResults: 'الرقية المقترحة لك', ruqyaResultsNote: 'بحسب إجاباتك — للإرشاد وليس تشخيصًا.',
+        ruqyaNothing: 'لا توجد علامات واضحة: الرقية الأساسية وأذكار الصباح والمساء تكفي لتحصينك.',
+        ruqyaMethod: 'كيفية الرقية', ruqyaRestart: 'إعادة الاستبيان', ruqyaVerses: 'الآيات', ruqyaDuas: 'الأدعية',
+        ruqyaHisn: 'من حصن المسلم', ruqyaListen: 'استماع', ruqyaStop: 'إيقاف', ruqyaOpen: 'فتح',
+        fbTitle: 'أرسل رأيك', fbSub: 'فكرة، مشكلة، أو كلمة شكر؟ رأيك يساعدنا على تحسين وِردان.',
+        fbRating: 'تقييمك', fbType: 'النوع', fbBug: 'مشكلة', fbIdea: 'فكرة', fbThanks: 'شكر', fbOther: 'أخرى',
+        fbMsg: 'رسالتك', fbPh: 'اكتب فكرتك أو المشكلة التي واجهتها…', fbSend: 'إرسال عبر واتساب',
+        fbNote: 'تُفتح الرسالة في واتساب لتراجعها قبل الإرسال. لا يُرسل شيء دون موافقتك.',
+        fbEmpty: 'اكتب بضع كلمات قبل الإرسال.', fbTop: 'رأيك', fbFoot: 'أرسل رأيك',
         androidApp: 'تطبيق أندرويد',
         iosApp: 'تطبيق آيفون',
         demoLink: 'عرض توضيحي', demoTop: 'عرض',
@@ -3325,6 +4187,7 @@
         rdb.title = t('rdOpen'); rdb.setAttribute('aria-label', t('rdOpen'));
       }
       applyReaderLang();
+      if (typeof pgAudio !== 'undefined') applyPagesLang();
       renderInstallHow();
       updateOnline();
       applyFilter();
@@ -4535,11 +5398,13 @@
         if (p?.n >= 1 && p.n <= 114) { n = p.n; ayah = p.a; }
       }
       const wasOpen = !$('reader').hidden;
+      const pageWasOpen = pagesOpen();
+      if (pageWasOpen) { pgStop(); $('adhkarPage').hidden = true; $('ruqyaPage').hidden = true; }
       $('reader').hidden = false;
       $('reader').dataset.theme = rp.theme;
       document.body.style.overflow = 'hidden';
       // Bouton « retour » (Android, navigateur) : ferme la lecture au lieu de quitter l'app
-      if (!wasOpen) try { history.pushState({ reader: 1 }, ''); } catch { }
+      if (!wasOpen && !pageWasOpen) try { history.pushState({ reader: 1 }, ''); } catch { }
       applyReaderSize();
       renderReader(n || 1, ayah);
       autoPaused = false;
@@ -5281,6 +6146,408 @@
       try { localStorage.setItem('lang', lang); } catch { }
       applyI18n();
     };
+
+
+    /* ---------- Menu d'onglets, pages Adhkar et Ruqya, avis (comme l'application mobile) ----------
+       Les pages Adhkar et Ruqya s'affichent en plein écran comme le mode lecture ; une seule entrée
+       d'historique est ajoutée tant qu'une de ces pages (ou la lecture) est ouverte, pour que le
+       bouton « retour » d'Android / du navigateur les ferme toutes. Données partagées avec
+       l'application : adhkar.json (Hisn al-Muslim) et ruqya.json. */
+    const PG_ICONS = {
+      'shield-checkmark': 'M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z',
+      eye: 'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
+      flash: 'M7 2v11h3v9l7-12h-4l4-8z',
+      moon: 'M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z',
+      bed: 'M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z',
+      heart: 'M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+      medkit: 'M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4 12h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z',
+      play: 'M8 5v14l11-7z',
+      stop: 'M6 6h12v12H6z',
+      volume: 'M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z',
+      check: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z',
+      chevron: 'M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z',
+      refresh: 'M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z',
+      help: 'M11 18h2v-2h-2v2zm1-16a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-14a4 4 0 0 0-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z',
+    };
+    const pgSvg = name => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${PG_ICONS[name] || PG_ICONS['shield-checkmark']}"/></svg>`;
+    const WHATSAPP_NUMBER = '212602834831'; // déjà public dans le pied de page
+
+    /* --- Lecteur audio des pages (adhkar, versets de ruqya), séparé du lecteur de sourates --- */
+    const pgAudio = new Audio();
+    pgAudio.preload = 'none';
+    let pgQueue = null; // { key, urls, idx, onStep(idx | -1) }
+    function pgPlay(key, urls, onStep) {
+      if (!urls.length) return;
+      if (!audio.paused) audio.pause();
+      pgStop();
+      pgQueue = { key, urls, idx: 0, onStep };
+      pgAudio.src = urls[0];
+      pgAudio.play().catch(() => { toast(t('playbackError')); pgStop(); });
+      onStep?.(0);
+    }
+    function pgStop() {
+      if (!pgQueue) return;
+      const q = pgQueue;
+      pgQueue = null;
+      pgAudio.pause();
+      q.onStep?.(-1);
+    }
+    pgAudio.addEventListener('ended', () => {
+      if (!pgQueue) return;
+      pgQueue.idx++;
+      if (pgQueue.idx >= pgQueue.urls.length) return pgStop();
+      pgAudio.src = pgQueue.urls[pgQueue.idx];
+      pgAudio.play().catch(() => pgStop());
+      pgQueue.onStep?.(pgQueue.idx);
+    });
+    audio.addEventListener('play', pgStop); // une sourate reprend : l'audio de la page s'arrête
+
+    /* --- Ouverture / fermeture des pages --- */
+    function pagesOpen() {
+      return !$('adhkarPage').hidden || !$('ruqyaPage').hidden;
+    }
+    function anyOverlayOpen() {
+      return !$('reader').hidden || pagesOpen();
+    }
+    function hidePages() {
+      if (!pagesOpen()) return;
+      pgStop();
+      $('adhkarPage').hidden = true;
+      $('ruqyaPage').hidden = true;
+      if ($('reader').hidden) document.body.style.overflow = '';
+    }
+    function showPage(id) {
+      const was = anyOverlayOpen();
+      if (!$('reader').hidden) hideReader();
+      if ($(id).hidden) pgStop();
+      for (const p of ['adhkarPage', 'ruqyaPage']) $(p).hidden = p !== id;
+      document.body.style.overflow = 'hidden';
+      if (!was) try { history.pushState({ reader: 1 }, ''); } catch { }
+    }
+    function closeOverlays() {
+      if (!anyOverlayOpen()) return;
+      if (history.state?.reader) history.back(); // popstate → hideReader() + hidePages()
+      else { hideReader(); hidePages(); }
+    }
+    window.addEventListener('popstate', hidePages);
+
+    /* --- Menu d'onglets --- */
+    function currentTab() {
+      if (!$('reader').hidden) return 'read';
+      if (!$('adhkarPage').hidden) return 'adhkar';
+      if (!$('ruqyaPage').hidden) return 'ruqya';
+      if (!$('hifdhBar').hidden) return 'hifdh';
+      return 'listen';
+    }
+    function updateTabbar() {
+      const cur = currentTab();
+      for (const b of document.querySelectorAll('#tabbar button')) {
+        const on = b.dataset.tab === cur;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-current', on ? 'page' : 'false');
+      }
+    }
+    const tabObserver = new MutationObserver(updateTabbar);
+    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'hifdhBar']) tabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
+    $('tabbar').addEventListener('click', e => {
+      const tab = e.target.closest('button')?.dataset.tab;
+      if (!tab) return;
+      if (tab === 'listen') {
+        closeOverlays();
+        if (!$('hifdhBar').hidden) { $('hifdhBar').hidden = true; setOn($('hifdhToggle'), false); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'read') openReader();
+      else if (tab === 'hifdh') { closeOverlays(); openHifdhPanel(); }
+      else if (tab === 'adhkar') openAdhkar();
+      else if (tab === 'ruqya') openRuqya();
+    });
+
+    /* --- Adhkar (Hisn al-Muslim) --- */
+    let adData = null;
+    const adLoad = () => adData ? Promise.resolve(adData) : fetch('adhkar.json').then(r => r.json()).then(d => (adData = d));
+    const AD_FEATURED = [27, 28, 1, 25, 129, 130, 34];
+    let adCounts = lsGet('adhkarCounts', { day: '', counts: {} });
+    const adCount = id => (adCounts.day === today() ? adCounts.counts[id] || 0 : 0);
+    const adDone = ch => ch.items.filter(d => adCount(d.id) >= d.repeat).length;
+    let adView = { chapter: null, q: '' };
+
+    function openAdhkar(chapterId) {
+      showPage('adhkarPage');
+      adView = { chapter: chapterId ?? null, q: '' };
+      renderAdhkar(true);
+    }
+    function renderAdhkar(scrollTop) {
+      const inner = $('adhkarInner');
+      if (!adData) inner.innerHTML = `<p class="pg-sub">${esc(t('rdLoading'))}</p>`;
+      adLoad().then(() => {
+        const ch = adView.chapter && adData.find(c => c.id === adView.chapter);
+        $('adhkarBarTitle').textContent = ch ? ch.title : t('adhkarTitle');
+        $('adhkarCount').textContent = ch ? `${adDone(ch)}/${ch.items.length}` : '';
+        $('adhkarProgress').style.width = ch ? `${(adDone(ch) / ch.items.length) * 100}%` : '0';
+        inner.innerHTML = ch ? adChapterHTML(ch) : adHomeHTML();
+        if (!ch) renderAdhkarList();
+        if (scrollTop) $('adhkarScroll').scrollTop = 0;
+      }).catch(() => { inner.innerHTML = `<p class="pg-sub">${esc(t('pgError'))}</p>`; });
+    }
+    function adHomeHTML() {
+      const feat = AD_FEATURED.map(id => adData.find(c => c.id === id)).filter(Boolean).map(c => {
+        const done = adDone(c);
+        return `<button type="button" data-act="open" data-id="${c.id}"><b lang="ar">${esc(c.title)}</b>`
+          + `<div class="pline2"><i style="width:${(done / c.items.length) * 100}%"></i></div>`
+          + `<small class="${done === c.items.length ? 'done' : ''}">${done === c.items.length ? '✓ ' : ''}${done} / ${c.items.length}</small></button>`;
+      }).join('');
+      return `<div><h1 class="pg-title">${esc(t('adhkarTitle'))}</h1><p class="pg-sub">${esc(t('adhkarSub'))}</p></div>`
+        + `<button type="button" class="ruqya-entry" data-act="ruqya"><span class="ic">${pgSvg('shield-checkmark')}</span>`
+        + `<span><b lang="ar">الرقية الشرعية</b><small>${esc(t('ruqyaCard'))}</small></span></button>`
+        + `<div class="ad-feat">${feat}</div>`
+        + `<input type="search" class="pg-search" id="adSearch" placeholder="${esc(t('adhkarSearch'))}" aria-label="${esc(t('adhkarSearch'))}">`
+        + `<p class="pg-label">${esc(t('adhkarAll'))}</p><div class="ad-list" id="adList"></div>`;
+    }
+    function renderAdhkarList() {
+      const list = $('adList');
+      if (!list) return;
+      const q = normText(adView.q);
+      const items = adData.filter(c => !q || normText(c.title + ' ' + c.items.map(i => i.text).join(' ')).includes(q));
+      list.innerHTML = items.map(c => {
+        const done = adDone(c) === c.items.length;
+        return `<button type="button" data-act="open" data-id="${c.id}"><span class="t">${esc(c.title)}</span><span class="n">${done ? '✓' : c.items.length}</span></button>`;
+      }).join('') || `<p class="pg-sub" style="padding:16px">${esc(t('emptyMsg'))}</p>`;
+    }
+    function adChapterHTML(ch) {
+      const cards = ch.items.map((d, i) => {
+        const n = adCount(d.id), done = n >= d.repeat;
+        const playing = pgQueue?.key === 'dhikr:' + d.id;
+        return `<div class="dh-card${done ? ' done' : ''}" data-id="${d.id}">`
+          + `<button type="button" class="dh-text" data-act="count" data-id="${d.id}" lang="ar">${esc(d.text)}</button>`
+          + `<div class="dh-foot"><span class="idx">${arNum(i + 1)}</span>`
+          + `<button type="button" class="round-btn" data-act="play" data-id="${d.id}" aria-label="${esc(t('adhkarPlay'))}">${pgSvg(playing ? 'stop' : 'volume')}</button>`
+          + (d.repeat > 1 ? `<span class="times">${esc(t('adhkarTimes', d.repeat))}</span>` : '<span class="times"></span>')
+          + `<button type="button" class="count-btn" data-act="count" data-id="${d.id}" aria-label="${esc(t('adhkarTap'))} ${n}/${d.repeat}">${done ? '✓' : d.repeat > 1 ? `${n}/${d.repeat}` : '✓'}</button>`
+          + `</div></div>`;
+      }).join('');
+      const all = adDone(ch) === ch.items.length;
+      return cards
+        + (all ? `<p class="pg-sub" style="text-align:center;color:var(--green);font-weight:600">${esc(t('adhkarAllDone'))}</p>` : '')
+        + `<div style="text-align:center"><button type="button" class="pg-btn ghost" data-act="reset">${pgSvg('refresh')}${esc(t('adhkarReset'))}</button></div>`;
+    }
+    const normText = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ً-ٰٟۖ-ۭ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
+
+    $('adhkarInner').addEventListener('input', e => {
+      if (e.target.id !== 'adSearch') return;
+      adView.q = e.target.value;
+      renderAdhkarList();
+    });
+    $('adhkarInner').addEventListener('click', e => {
+      const b = e.target.closest('[data-act]');
+      if (!b) return;
+      const act = b.dataset.act, id = +b.dataset.id;
+      if (act === 'open') { adView.chapter = id; return renderAdhkar(true); }
+      if (act === 'ruqya') return openRuqya();
+      const ch = adData.find(c => c.id === adView.chapter);
+      if (!ch) return;
+      if (act === 'count') {
+        const d = ch.items.find(x => x.id === id);
+        if (!d || adCount(id) >= d.repeat) return;
+        if (adCounts.day !== today()) adCounts = { day: today(), counts: {} };
+        adCounts.counts[id] = adCount(id) + 1;
+        lsSet('adhkarCounts', adCounts);
+        try { navigator.vibrate?.(adCounts.counts[id] >= d.repeat ? 30 : 10); } catch { }
+        renderAdhkar(false);
+      } else if (act === 'play') {
+        const d = ch.items.find(x => x.id === id);
+        if (pgQueue?.key === 'dhikr:' + id) pgStop();
+        else pgPlay('dhikr:' + id, [d.audio], () => renderAdhkar(false));
+        renderAdhkar(false);
+      } else if (act === 'reset') {
+        for (const d of ch.items) delete adCounts.counts[d.id];
+        lsSet('adhkarCounts', adCounts);
+        renderAdhkar(false);
+      }
+    });
+    $('adhkarBack').onclick = () => {
+      if (adView.chapter) { adView.chapter = null; pgStop(); renderAdhkar(true); }
+      else closeOverlays();
+    };
+
+    /* --- Ruqya : questionnaire d'orientation, puis versets et invocations --- */
+    let rqData = null;
+    const rqLoad = () => rqData ? Promise.resolve(rqData) : fetch('ruqya.json').then(r => r.json()).then(d => (rqData = d));
+    let rqState = { stage: 'intro', q: 0, answers: {} };
+    function rqSuggest(answers) {
+      const scores = {};
+      for (const q of rqData.questions) {
+        const a = answers[q.id] || 0;
+        for (const [cat, w] of Object.entries(q.weights)) scores[cat] = (scores[cat] || 0) + a * w;
+      }
+      return ['base', ...Object.entries(scores).filter(([, s]) => s >= 2).sort((x, y) => y[1] - x[1]).map(([c]) => c)];
+    }
+    function openRuqya() {
+      showPage('ruqyaPage');
+      rqState = { stage: 'intro', q: 0, answers: {} };
+      renderRuqya();
+    }
+    function renderRuqya() {
+      const inner = $('ruqyaInner');
+      if (!rqData) inner.innerHTML = `<p class="pg-sub">${esc(t('rdLoading'))}</p>`;
+      const needText = rqState.stage === 'result' || rqState.stage === 'all';
+      Promise.all([rqLoad(), adLoad(), needText ? loadQuranText() : null]).then(() => {
+        inner.innerHTML = rqState.stage === 'quiz' ? rqQuizHTML() : needText ? rqResultHTML() : rqIntroHTML();
+        $('ruqyaScroll').scrollTop = 0;
+      }).catch(() => { inner.innerHTML = `<p class="pg-sub">${esc(t('pgError'))}</p>`; });
+    }
+    const rqMethodHTML = () => `<div class="pg-card"><p class="pg-label">${esc(t('ruqyaMethod'))}</p><ol class="rq-method">${rqData.method[lang].map(l => `<li>${esc(l)}</li>`).join('')}</ol></div>`;
+    function rqIntroHTML() {
+      const saved = lsGet('ruqyaAnswers', null);
+      return `<div><h1 class="pg-title">${esc(t('ruqyaTitle'))}</h1><p class="pg-sub">${esc(t('ruqyaSub'))}</p></div>`
+        + `<div class="pg-card gold"><p class="pg-label">${esc(t('ruqyaWarning'))}</p><p style="margin:6px 0 0;font-size:14px;line-height:1.7">${esc(rqData.disclaimer[lang])}</p></div>`
+        + `<button type="button" class="pg-btn" data-act="start">${pgSvg('help')}${esc(t('ruqyaStart'))}</button>`
+        + (saved ? `<button type="button" class="pg-btn ghost" data-act="last">${esc(t('ruqyaLast'))}</button>` : '')
+        + `<button type="button" class="pg-btn ghost" data-act="all">${esc(t('ruqyaAll'))}</button>`
+        + rqMethodHTML();
+    }
+    function rqQuizHTML() {
+      const q = rqData.questions[rqState.q], total = rqData.questions.length, cur = rqState.answers[q.id];
+      return `<p class="pg-label">${esc(t('ruqyaQ', rqState.q + 1, total))}</p>`
+        + `<div class="pline2"><i style="width:${(rqState.q / total) * 100}%"></i></div>`
+        + `<div class="pg-card"><p class="rq-question">${esc(q.text[lang])}</p></div>`
+        + `<div class="rq-answers">${[[0, 'ruqyaNo'], [1, 'ruqyaSometimes'], [2, 'ruqyaOften']].map(([v, k]) => `<button type="button" data-act="answer" data-v="${v}" class="${cur === v ? 'on' : ''}">${esc(t(k))}</button>`).join('')}</div>`
+        + (rqState.q > 0 ? `<button type="button" class="pg-btn ghost" data-act="prev">${esc(t('ruqyaPrev'))}</button>` : '');
+    }
+    function rqVersesHTML(s, a, b) {
+      const ayat = quranTextData[s - 1].slice();
+      if (a === 1 && s !== 1 && s !== 9) {
+        const words = ayat[0].split(' ');
+        if (bareAr(words.slice(0, 4).join(' ')) === bareAr(quranTextData[0][0])) ayat[0] = words.slice(4).join(' ');
+      }
+      let html = '';
+      for (let v = a; v <= b; v++) html += `<span class="v" id="rqv-${s}-${v}">${esc(ayat[v - 1])} <span class="am">۝${arNum(v)}</span></span> `;
+      const name = lang === 'ar' ? `سورة ${S[s - 1][1]}` : S[s - 1][0];
+      return `<div class="rq-ref"><div class="hd"><span>${esc(name)} ${a === b ? a : `${a}–${b}`}</span>`
+        + `<button type="button" data-act="read" data-s="${s}" data-a="${a}">${esc(t('ruqyaOpen'))}</button></div>`
+        + (a === 1 && s !== 1 && s !== 9 ? `<p class="rq-basmala" lang="ar">${esc(quranTextData[0][0])}</p>` : '')
+        + `<p class="rq-verses" lang="ar">${html}</p></div>`;
+    }
+    function rqSectionHTML(cat, open) {
+      const playing = pgQueue?.key === 'ruqya:' + cat.id;
+      const verses = cat.verses.length
+        ? `<div style="display:flex;justify-content:space-between;align-items:center"><p class="pg-label">${esc(t('ruqyaVerses'))}</p>`
+        + `<button type="button" class="pg-btn ghost" style="padding:7px 14px" data-act="listen" data-cat="${cat.id}">${pgSvg(playing ? 'stop' : 'play')}${esc(t(playing ? 'ruqyaStop' : 'ruqyaListen'))}</button></div>`
+        + cat.verses.map(([s, a, b]) => rqVersesHTML(s, a, b)).join('')
+        : '';
+      const duas = cat.duas.length ? `<p class="pg-label">${esc(t('ruqyaDuas'))}</p>` + cat.duas.map(d => `<p class="rq-dua" lang="ar">${esc(d.text)}</p><span class="rq-src">${esc(d.source[lang])}</span>`).join('') : '';
+      const hisn = cat.hisn.length ? `<p class="pg-label">${esc(t('ruqyaHisn'))}</p><div class="rq-chips">${cat.hisn.map(id => `<button type="button" data-act="hisn" data-id="${id}" lang="ar">${esc(adData.find(c => c.id === id)?.title || '')}</button>`).join('')}</div>` : '';
+      return `<details class="rq-sec" data-cat="${cat.id}"${open ? ' open' : ''}><summary><span class="ic">${pgSvg(cat.icon)}</span>`
+        + `<span><b>${esc(cat.title[lang])}</b><small>${esc(cat.desc[lang])}</small></span><span class="chev">${pgSvg('chevron')}</span></summary>`
+        + `<div class="rq-body">${verses}<div class="pg-card gold" style="padding:12px;font-size:14px;line-height:1.7">${esc(cat.note[lang])}</div>${duas}${hisn}</div></details>`;
+    }
+    function rqResultHTML() {
+      const ids = rqState.stage === 'all' ? rqData.categories.map(c => c.id) : rqSuggest(rqState.answers);
+      const cats = ids.map(id => rqData.categories.find(c => c.id === id)).filter(Boolean);
+      const head = rqState.stage === 'result'
+        ? `<div><h1 class="pg-title">${esc(t('ruqyaResults'))}</h1><p class="pg-sub">${esc(t('ruqyaResultsNote'))}</p></div>`
+        + (cats.length === 1 ? `<div class="pg-card gold" style="font-size:14px">${esc(t('ruqyaNothing'))}</div>` : '')
+        : `<div><h1 class="pg-title">${esc(t('ruqyaTitle'))}</h1></div>`;
+      return head + cats.map((c, i) => rqSectionHTML(c, i < 2)).join('') + rqMethodHTML()
+        + `<p class="pg-sub" style="line-height:1.7">${esc(rqData.disclaimer[lang])}</p>`
+        + (rqState.stage === 'result' ? `<button type="button" class="pg-btn ghost" data-act="start">${esc(t('ruqyaRestart'))}</button>` : '');
+    }
+    const verseAudioUrl = (s, a) => `https://everyayah.com/data/Alafasy_128kbps/${pad(s)}${pad(a)}.mp3`;
+    $('ruqyaInner').addEventListener('click', e => {
+      const b = e.target.closest('[data-act]');
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === 'start') { rqState = { stage: 'quiz', q: 0, answers: {} }; return renderRuqya(); }
+      if (act === 'last') { rqState = { stage: 'result', q: 0, answers: lsGet('ruqyaAnswers', {}) }; return renderRuqya(); }
+      if (act === 'all') { rqState.stage = 'all'; return renderRuqya(); }
+      if (act === 'prev') { rqState.q = Math.max(0, rqState.q - 1); return renderRuqya(); }
+      if (act === 'answer') {
+        rqState.answers[rqData.questions[rqState.q].id] = +b.dataset.v;
+        if (rqState.q < rqData.questions.length - 1) rqState.q++;
+        else { lsSet('ruqyaAnswers', rqState.answers); rqState.stage = 'result'; }
+        return renderRuqya();
+      }
+      if (act === 'read') return openReader(+b.dataset.s, +b.dataset.a);
+      if (act === 'hisn') return openAdhkar(+b.dataset.id);
+      if (act === 'listen') {
+        const cat = rqData.categories.find(c => c.id === b.dataset.cat);
+        const key = 'ruqya:' + cat.id;
+        const refresh = () => {
+          const sec = $('ruqyaInner').querySelector(`.rq-sec[data-cat="${cat.id}"] [data-act="listen"]`);
+          if (sec) sec.innerHTML = pgSvg(pgQueue?.key === key ? 'stop' : 'play') + esc(t(pgQueue?.key === key ? 'ruqyaStop' : 'ruqyaListen'));
+        };
+        if (pgQueue?.key === key) { pgStop(); return refresh(); }
+        const items = cat.verses.flatMap(([s, a, z]) => Array.from({ length: z - a + 1 }, (_, i) => [s, a + i]));
+        pgPlay(key, items.map(([s, a]) => verseAudioUrl(s, a)), idx => {
+          $('ruqyaInner').querySelectorAll('.rq-verses .v.cur').forEach(el => el.classList.remove('cur'));
+          if (idx >= 0) {
+            const el = $(`rqv-${items[idx][0]}-${items[idx][1]}`);
+            el?.classList.add('cur');
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          refresh();
+        });
+      }
+    });
+    $('ruqyaBack').onclick = () => {
+      if (rqState.stage !== 'intro') { pgStop(); rqState = { stage: 'intro', q: 0, answers: {} }; renderRuqya(); }
+      else closeOverlays();
+    };
+
+    /* --- « Donner mon avis » (WhatsApp) --- */
+    let fb = { rating: 0, kind: 'idea' };
+    function renderFeedback() {
+      $('fbTitle').textContent = t('fbTitle');
+      $('fbSub').textContent = t('fbSub');
+      $('fbRatingLabel').textContent = t('fbRating');
+      $('fbTypeLabel').textContent = t('fbType');
+      $('fbMsgLabel').textContent = t('fbMsg');
+      $('fbMsg').placeholder = t('fbPh');
+      $('fbSendLabel').textContent = t('fbSend');
+      $('fbNote').textContent = t('fbNote');
+      $('fbClose').setAttribute('aria-label', t('close'));
+      $('fbStars').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" aria-label="${n} / 5" aria-pressed="${fb.rating === n}">${n <= fb.rating ? '★' : '☆'}</button>`).join('');
+      $('fbKinds').innerHTML = [['bug', 'fbBug'], ['idea', 'fbIdea'], ['thanks', 'fbThanks'], ['other', 'fbOther']]
+        .map(([k, key]) => `<button type="button" class="chip${fb.kind === k ? ' on' : ''}" data-k="${k}">${esc(t(key))}</button>`).join('');
+    }
+    function openFeedback() {
+      fb = { rating: 0, kind: 'idea' };
+      $('fbMsg').value = '';
+      renderFeedback();
+      $('fbModal').hidden = false;
+      setTimeout(() => $('fbMsg').focus(), 50);
+    }
+    const closeFeedback = () => { $('fbModal').hidden = true; };
+    $('fbStars').onclick = e => { const n = +e.target.closest('button')?.dataset.n; if (n) { fb.rating = n; renderFeedback(); } };
+    $('fbKinds').onclick = e => { const k = e.target.closest('button')?.dataset.k; if (k) { fb.kind = k; renderFeedback(); } };
+    $('fbClose').onclick = closeFeedback;
+    $('fbModal').addEventListener('click', e => { if (e.target === $('fbModal')) closeFeedback(); });
+    $('fbModal').addEventListener('keydown', e => { if (e.key === 'Escape') closeFeedback(); });
+    $('fbSend').onclick = () => {
+      const msg = $('fbMsg').value.trim();
+      if (!msg && !fb.rating) return toast(t('fbEmpty'));
+      const kind = t({ bug: 'fbBug', idea: 'fbIdea', thanks: 'fbThanks', other: 'fbOther' }[fb.kind]);
+      const text = [`Wirdan — ${t('fbTitle')}`, fb.rating ? `${t('fbRating')} : ${'★'.repeat(fb.rating)}${'☆'.repeat(5 - fb.rating)}` : '', `${t('fbType')} : ${kind}`, msg, `— web · ${navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'}`]
+        .filter(Boolean).join('\n');
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+      closeFeedback();
+    };
+    $('fbFootLink').onclick = openFeedback;
+    $('fbTopBtn').onclick = openFeedback;
+
+    /* --- Langue de l'interface pour ces nouveautés --- */
+    function applyPagesLang() {
+      const labels = { listen: 'tabListen', read: 'tabRead', hifdh: 'tabHifdh', adhkar: 'tabAdhkar', ruqya: 'tabRuqya' };
+      for (const b of document.querySelectorAll('#tabbar button')) b.querySelector('span').textContent = t(labels[b.dataset.tab]);
+      $('tabbar').setAttribute('aria-label', t('tabsNav'));
+      for (const id of ['adhkarBack', 'ruqyaBack']) { $(id).title = t('back'); $(id).setAttribute('aria-label', t('back')); }
+      $('fbFootLink').textContent = t('fbFoot');
+      $('fbTopBtn').textContent = t('fbTop');
+      if (!$('adhkarPage').hidden) renderAdhkar(false);
+      if (!$('ruqyaPage').hidden) renderRuqya();
+      if (!$('fbModal').hidden) renderFeedback();
+    }
+    applyPagesLang();
+    updateTabbar();
 
     /* ---------- Démarrage ---------- */
     (async () => {

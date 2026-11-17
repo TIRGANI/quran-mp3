@@ -49,6 +49,8 @@ export default function RootLayout() {
             <Stack.Screen name="adhkar/[id]" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="player" options={{ presentation: 'modal' }} />
             <Stack.Screen name="reciters" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="ruqya" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="feedback" options={{ presentation: 'modal' }} />
           </Stack>
           <Toast />
           <TourOverlay />

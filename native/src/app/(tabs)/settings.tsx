@@ -11,6 +11,7 @@ import { toast } from '@/lib/toast';
 import { CAN_NOTIFY, ensurePermission } from '@/notifications/reminders';
 import { useSettings, type ReminderKey } from '@/stores/settings';
 import { startTour } from '@/tour/steps';
+import { router } from 'expo-router';
 import { useColors } from '@/theme/colors';
 
 export default function SettingsScreen() {
@@ -138,6 +139,7 @@ export default function SettingsScreen() {
           </Txt>
           <Row gap={8} style={{ flexWrap: 'wrap' }}>
             <Button label={t.tourReplay} kind="ghost" onPress={startTour} />
+            <Button label={t.feedback} kind="ghost" onPress={() => router.push('/feedback')} />
             <Button
               label={t.replayTips}
               kind="ghost"
