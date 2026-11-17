@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer } from 'expo-audio';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { player as mainPlayer } from '@/audio/player';
@@ -11,7 +12,7 @@ import { SURAHS } from '@/data/surahs';
 import { arNum, useIsRTL, useT } from '@/i18n';
 import { getChapter } from '@/lib/adhkar';
 import { basmala, surahVerses } from '@/lib/quran';
-import { getRuqya, suggest, useRuqya, type Answer, type RuqyaCategory } from '@/lib/ruqya';
+import { getRuqya, suggest, useRepeatCount, useRuqya, useRuqyaCount, type Answer, type RuqyaCategory } from '@/lib/ruqya';
 import { useSettings } from '@/stores/settings';
 import { FONTS, useColors } from '@/theme/colors';
 
@@ -140,6 +141,12 @@ export default function RuqyaScreen() {
                 )}
               </View>
             )}
+            <Card style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 12 }}>
+              <Ionicons name="repeat" size={20} color={c.accentStrong} />
+              <Txt variant="small" style={{ flex: 1, lineHeight: 19 }}>
+                {data.repeatNote[lang]}
+              </Txt>
+            </Card>
             {cats.map((cat, i) => (
               <Section key={cat.id} cat={cat} open={i < 2} audio={audio} />
             ))}
@@ -192,6 +199,65 @@ function Method() {
 
 type Queue = ReturnType<typeof useVerseQueue>;
 
+const haptic = (style: Haptics.ImpactFeedbackStyle) => {
+  if (Platform.OS !== 'web') Haptics.impactAsync(style).catch(() => {});
+};
+
+/** Compteur de répétitions d'un passage : barre d'avancement, « n / N » à toucher, annulation. */
+function RepeatCounter({ id, repeat }: { id: string; repeat: number }) {
+  const c = useColors();
+  const t = useT();
+  const count = useRepeatCount(id);
+  const add = useRuqyaCount(s => s.add);
+  const undo = useRuqyaCount(s => s.undo);
+  const done = count >= repeat;
+  const onCount = () => {
+    if (done) return;
+    add(id, repeat);
+    haptic(count + 1 >= repeat ? Haptics.ImpactFeedbackStyle.Heavy : Haptics.ImpactFeedbackStyle.Light);
+  };
+  return (
+    <View style={{ gap: 8 }}>
+      {repeat > 1 && <ProgressBar value={count / repeat} height={4} color={done ? c.success : c.accent} />}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        {count > 0 && (
+          <Pressable
+            onPress={() => {
+              undo(id);
+              haptic(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t.undo}
+            style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="arrow-undo" size={17} color={c.muted} />
+          </Pressable>
+        )}
+        <View style={{ flex: 1 }} />
+        {!done && repeat > 1 && <Txt variant="small">{t.times(repeat)}</Txt>}
+        <Pressable
+          onPress={onCount}
+          accessibilityRole="button"
+          accessibilityLabel={`${t.tapToCount} ${count}/${repeat}`}
+          style={({ pressed }) => ({ minWidth: 72, height: 42, paddingHorizontal: 14, borderRadius: 21, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, backgroundColor: done ? c.success : c.accentStrong, transform: [{ scale: pressed && !done ? 0.94 : 1 }] })}>
+          {done ? (
+            <>
+              <Ionicons name="checkmark" size={18} color="#fff" />
+              <Txt weight="bold" color="#fff">
+                {t.dhikrDone}
+              </Txt>
+            </>
+          ) : (
+            <Txt weight="bold" color="#fff" style={{ fontSize: 16, writingDirection: 'ltr', direction: 'ltr' }}>
+              {repeat > 1 ? `${count} / ${repeat}` : '✓'}
+            </Txt>
+          )}
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 /** Une catégorie : versets (avec écoute), invocations, chapitres de Hisn al-Muslim. */
 function Section({ cat, open: initialOpen, audio }: { cat: RuqyaCategory; open: boolean; audio: Queue }) {
   const c = useColors();
@@ -231,7 +297,7 @@ function Section({ cat, open: initialOpen, audio }: { cat: RuqyaCategory; open: 
                   style={{ paddingVertical: 7 }}
                 />
               </Row>
-              {cat.verses.map(([s, a, b]) => {
+              {cat.verses.map(([s, a, b, repeat]) => {
                 const { verses } = surahVerses(s);
                 const range = Array.from({ length: b - a + 1 }, (_, i) => a + i);
                 return (
@@ -256,6 +322,7 @@ function Section({ cat, open: initialOpen, audio }: { cat: RuqyaCategory; open: 
                         );
                       })}
                     </Text>
+                    <RepeatCounter id={`${cat.id}:${s}:${a}`} repeat={repeat} />
                   </View>
                 );
               })}
@@ -275,6 +342,7 @@ function Section({ cat, open: initialOpen, audio }: { cat: RuqyaCategory; open: 
                 <View key={i} style={{ gap: 4 }}>
                   <Text style={{ fontFamily: FONTS.arabic, fontSize: 21, lineHeight: 40, color: c.text, writingDirection: 'rtl', textAlign: 'right' }}>{d.text}</Text>
                   <Txt variant="small">{d.source[lang]}</Txt>
+                  <RepeatCounter id={`${cat.id}:d${i}`} repeat={d.repeat} />
                 </View>
               ))}
             </View>

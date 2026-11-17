@@ -2965,6 +2965,7 @@
     }
 
     .count-btn {
+      direction: ltr;
       min-width: 66px;
       height: 44px;
       border: 0;
@@ -3004,6 +3005,44 @@
 
     .dh-card.done .dh-bar i {
       background: var(--green);
+    }
+
+    .rq-rep {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .rq-rep .dh-bar {
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .rq-rep .dh-foot {
+      border: 0;
+      background: none;
+      padding: 0;
+    }
+
+    .rq-rep.done .count-btn,
+    .rq-rep.done .dh-bar i {
+      background: var(--green);
+    }
+
+    .rq-repnote {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .rq-repnote svg {
+      flex: none;
+      width: 20px;
+      height: 20px;
+      fill: var(--color-accent-btn);
     }
 
     .count-btn:active {
@@ -7318,7 +7357,20 @@
         + `<div class="rq-answers">${[[0, 'ruqyaNo'], [1, 'ruqyaSometimes'], [2, 'ruqyaOften']].map(([v, k]) => `<button type="button" data-act="answer" data-v="${v}" class="${cur === v ? 'on' : ''}">${esc(t(k))}</button>`).join('')}</div>`
         + (rqState.q > 0 ? `<button type="button" class="pg-btn ghost" data-act="prev">${esc(t('ruqyaPrev'))}</button>` : '');
     }
-    function rqVersesHTML(s, a, b) {
+    /* Compteurs de répétitions de la ruqya, remis à zéro chaque jour (comme les adhkar) */
+    let rqCounts = lsGet('ruqyaCounts', { day: '', counts: {} });
+    const rqCount = key => (rqCounts.day === today() ? rqCounts.counts[key] || 0 : 0);
+    function rqRepeatHTML(key, repeat) {
+      const n = rqCount(key), done = n >= repeat;
+      return `<div class="rq-rep${done ? ' done' : ''}" data-key="${key}" data-max="${repeat}">`
+        + (repeat > 1 ? `<div class="dh-bar"><i style="width:${(n / repeat) * 100}%"></i></div>` : '')
+        + `<div class="dh-foot">`
+        + (n > 0 ? `<button type="button" class="round-btn" data-act="rqundo" aria-label="${esc(t('adhkarUndo'))}" title="${esc(t('adhkarUndo'))}">${pgSvg('undo')}</button>` : '')
+        + `<span class="times">${done || repeat < 2 ? '' : esc(t('adhkarTimes', repeat))}</span>`
+        + `<button type="button" class="count-btn" data-act="rqcount" aria-label="${esc(t('adhkarTap'))} ${n}/${repeat}">${done ? '✓ ' + esc(t('adhkarDhikrDone')) : repeat > 1 ? `${n} / ${repeat}` : '✓'}</button>`
+        + `</div></div>`;
+    }
+    function rqVersesHTML(s, a, b, repeat, catId) {
       const ayat = quranTextData[s - 1].slice();
       if (a === 1 && s !== 1 && s !== 9) {
         const words = ayat[0].split(' ');
@@ -7330,16 +7382,16 @@
       return `<div class="rq-ref"><div class="hd"><span>${esc(name)} ${a === b ? a : `${a}–${b}`}</span>`
         + `<button type="button" data-act="read" data-s="${s}" data-a="${a}">${esc(t('ruqyaOpen'))}</button></div>`
         + (a === 1 && s !== 1 && s !== 9 ? `<p class="rq-basmala" lang="ar">${esc(quranTextData[0][0])}</p>` : '')
-        + `<p class="rq-verses" lang="ar">${html}</p></div>`;
+        + `<p class="rq-verses" lang="ar">${html}</p>${rqRepeatHTML(`${catId}:${s}:${a}`, repeat || 1)}</div>`;
     }
     function rqSectionHTML(cat, open) {
       const playing = pgQueue?.key === 'ruqya:' + cat.id;
       const verses = cat.verses.length
         ? `<div style="display:flex;justify-content:space-between;align-items:center"><p class="pg-label">${esc(t('ruqyaVerses'))}</p>`
         + `<button type="button" class="pg-btn ghost" style="padding:7px 14px" data-act="listen" data-cat="${cat.id}">${pgSvg(playing ? 'stop' : 'play')}${esc(t(playing ? 'ruqyaStop' : 'ruqyaListen'))}</button></div>`
-        + cat.verses.map(([s, a, b]) => rqVersesHTML(s, a, b)).join('')
+        + cat.verses.map(([s, a, b, r]) => rqVersesHTML(s, a, b, r, cat.id)).join('')
         : '';
-      const duas = cat.duas.length ? `<p class="pg-label">${esc(t('ruqyaDuas'))}</p>` + cat.duas.map(d => `<p class="rq-dua" lang="ar">${esc(d.text)}</p><span class="rq-src">${esc(d.source[lang])}</span>`).join('') : '';
+      const duas = cat.duas.length ? `<p class="pg-label">${esc(t('ruqyaDuas'))}</p>` + cat.duas.map((d, i) => `<p class="rq-dua" lang="ar">${esc(d.text)}</p><span class="rq-src">${esc(d.source[lang])}</span>${rqRepeatHTML(`${cat.id}:d${i}`, d.repeat || 1)}`).join('') : '';
       const hisn = cat.hisn.length ? `<p class="pg-label">${esc(t('ruqyaHisn'))}</p><div class="rq-chips">${cat.hisn.map(id => `<button type="button" data-act="hisn" data-id="${id}" lang="ar">${esc(adData.find(c => c.id === id)?.title || '')}</button>`).join('')}</div>` : '';
       return `<details class="rq-sec" data-cat="${cat.id}"${open ? ' open' : ''}><summary><span class="ic">${pgSvg(cat.icon)}</span>`
         + `<span><b>${esc(cat.title[lang])}</b><small>${esc(cat.desc[lang])}</small></span><span class="chev">${pgSvg('chevron')}</span></summary>`
@@ -7352,7 +7404,8 @@
         ? `<div><h1 class="pg-title">${esc(t('ruqyaResults'))}</h1><p class="pg-sub">${esc(t('ruqyaResultsNote'))}</p></div>`
         + (cats.length === 1 ? `<div class="pg-card gold" style="font-size:14px">${esc(t('ruqyaNothing'))}</div>` : '')
         : `<div><h1 class="pg-title">${esc(t('ruqyaTitle'))}</h1></div>`;
-      return head + cats.map((c, i) => rqSectionHTML(c, i < 2)).join('') + rqMethodHTML()
+      const repNote = rqData.repeatNote ? `<div class="pg-card rq-repnote">${pgSvg('refresh')}<span>${esc(rqData.repeatNote[lang])}</span></div>` : '';
+      return head + repNote + cats.map((c, i) => rqSectionHTML(c, i < 2)).join('') + rqMethodHTML()
         + `<p class="pg-sub" style="line-height:1.7">${esc(rqData.disclaimer[lang])}</p>`
         + (rqState.stage === 'result' ? `<button type="button" class="pg-btn ghost" data-act="start">${esc(t('ruqyaRestart'))}</button>` : '');
     }
@@ -7373,6 +7426,17 @@
       }
       if (act === 'read') return openReader(+b.dataset.s, +b.dataset.a);
       if (act === 'hisn') return openAdhkar(+b.dataset.id);
+      if (act === 'rqcount' || act === 'rqundo') {
+        const box = b.closest('.rq-rep'), key = box.dataset.key, max = +box.dataset.max;
+        if (rqCounts.day !== today()) rqCounts = { day: today(), counts: {} };
+        const n = rqCount(key) + (act === 'rqcount' ? 1 : -1);
+        if (n > max) return;
+        if (n > 0) rqCounts.counts[key] = n; else delete rqCounts.counts[key];
+        lsSet('ruqyaCounts', rqCounts);
+        try { navigator.vibrate?.(act === 'rqcount' && n === max ? 40 : 10); } catch { }
+        box.outerHTML = rqRepeatHTML(key, max); // mise à jour sur place : la page ne bouge pas
+        return;
+      }
       if (act === 'listen') {
         const cat = rqData.categories.find(c => c.id === b.dataset.cat);
         const key = 'ruqya:' + cat.id;

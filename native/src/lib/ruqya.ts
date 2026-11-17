@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 import type { Lang } from '@/stores/settings';
 import { zustandStorage } from '@/lib/storage';
+import { today } from '@/stores/reading';
 
 // Ruqya shar'iyya : catégories (versets, invocations, chapitres de Hisn al-Muslim) et
 // questionnaire d'orientation. Données : assets/data/ruqya.json (aussi utilisées par le site).
@@ -12,10 +13,10 @@ export type RuqyaCategory = {
   icon: string;
   title: Txt2;
   desc: Txt2;
-  /** [sourate, premier verset, dernier verset] */
-  verses: [number, number, number][];
+  /** [sourate, premier verset, dernier verset, nombre de répétitions] */
+  verses: [number, number, number, number][];
   note: Txt2;
-  duas: { text: string; source: Txt2 }[];
+  duas: { text: string; source: Txt2; repeat: number }[];
   /** Chapitres de Hisn al-Muslim liés (voir assets/data/adhkar.json) */
   hisn: number[];
 };
@@ -25,6 +26,8 @@ type RuqyaData = {
   method: Record<Lang, string[]>;
   categories: RuqyaCategory[];
   questions: RuqyaQuestion[];
+  /** D'où viennent les nombres de répétitions */
+  repeatNote: Txt2;
 };
 
 let data: RuqyaData | null = null;
@@ -65,3 +68,33 @@ export const useRuqya = create<{ answers: Record<string, Answer> | null; save: (
     { name: 'ruqya', storage: zustandStorage, version: 1 },
   ),
 );
+
+/** Compteurs de répétitions du jour (remis à zéro chaque jour, comme les adhkar). Clé : « cat:s:a » ou « cat:d0 ». */
+export const useRuqyaCount = create<{
+  day: string;
+  counts: Record<string, number>;
+  add: (key: string, max: number) => void;
+  undo: (key: string) => void;
+}>()(
+  persist(
+    (set, get) => ({
+      day: today(),
+      counts: {},
+      add: (key, max) => {
+        const counts = get().day === today() ? { ...get().counts } : {};
+        counts[key] = Math.min(max, (counts[key] ?? 0) + 1);
+        set({ day: today(), counts });
+      },
+      undo: key => {
+        if (get().day !== today()) return;
+        const counts = { ...get().counts };
+        const n = (counts[key] ?? 0) - 1;
+        if (n > 0) counts[key] = n;
+        else delete counts[key];
+        set({ counts });
+      },
+    }),
+    { name: 'ruqyaCounts', storage: zustandStorage, version: 1 },
+  ),
+);
+export const useRepeatCount = (key: string) => useRuqyaCount(s => (s.day === today() ? (s.counts[key] ?? 0) : 0));

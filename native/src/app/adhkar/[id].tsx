@@ -170,7 +170,7 @@ function DhikrCard({ d, index, playing, onPlay, onComplete }: { d: Dhikr; index:
               </Txt>
             </>
           ) : (
-            <Txt weight="bold" color="#fff" style={{ fontSize: 17 }}>
+            <Txt weight="bold" color="#fff" style={{ fontSize: 17, writingDirection: 'ltr', direction: 'ltr' }}>
               {d.repeat > 1 ? `${count} / ${d.repeat}` : '✓'}
             </Txt>
           )}
