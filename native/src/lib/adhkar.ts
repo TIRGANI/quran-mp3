@@ -41,6 +41,8 @@ type AdhkarState = {
   day: string;
   counts: Record<number, number>;
   increment: (d: Dhikr) => void;
+  /** Annule la dernière répétition (erreur de toucher) */
+  decrement: (d: Dhikr) => void;
   resetChapter: (c: Chapter) => void;
 };
 
@@ -54,6 +56,14 @@ export const useAdhkar = create<AdhkarState>()(
         const counts = fresh ? {} : { ...get().counts };
         counts[d.id] = Math.min(d.repeat, (counts[d.id] ?? 0) + 1);
         set({ day: today(), counts });
+      },
+      decrement: d => {
+        if (get().day !== today()) return;
+        const counts = { ...get().counts };
+        const n = (counts[d.id] ?? 0) - 1;
+        if (n > 0) counts[d.id] = n;
+        else delete counts[d.id];
+        set({ counts });
       },
       resetChapter: c => {
         const counts = { ...get().counts };
@@ -69,6 +79,15 @@ export const useAdhkar = create<AdhkarState>()(
 export const useCount = (id: number) => useAdhkar(s => (s.day === today() ? (s.counts[id] ?? 0) : 0));
 
 export function chapterProgress(c: Chapter, counts: Record<number, number>, day: string) {
-  if (day !== today()) return { done: 0, total: c.items.length };
-  return { done: c.items.filter(d => (counts[d.id] ?? 0) >= d.repeat).length, total: c.items.length };
+  const fresh = day !== today();
+  const n = (d: Dhikr) => (fresh ? 0 : Math.min(d.repeat, counts[d.id] ?? 0));
+  return {
+    done: c.items.filter(d => n(d) >= d.repeat).length,
+    total: c.items.length,
+    // Répétitions faites / à faire sur toute la section (avancement plus fin que le nombre d'adhkar)
+    reps: c.items.reduce((s, d) => s + n(d), 0),
+    totalReps: c.items.reduce((s, d) => s + d.repeat, 0),
+    /** Premier dhikr pas encore terminé (pour « Reprendre ») */
+    nextIndex: c.items.findIndex(d => n(d) < d.repeat),
+  };
 }

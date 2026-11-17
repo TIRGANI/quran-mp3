@@ -2981,6 +2981,90 @@
       background: var(--green);
     }
 
+    .dh-card.done {
+      border-width: 2px;
+    }
+
+    .dh-card.done .dh-text {
+      opacity: .6;
+    }
+
+    .dh-bar {
+      height: 4px;
+      background: var(--line);
+    }
+
+    .dh-bar i {
+      display: block;
+      height: 100%;
+      background: var(--color-accent);
+      transition: width .25s ease;
+    }
+
+    .dh-card.done .dh-bar i {
+      background: var(--green);
+    }
+
+    .count-btn:active {
+      transform: scale(.94);
+    }
+
+    .ad-summary {
+      position: sticky;
+      top: -18px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: -18px -16px 0;
+      padding: 12px 16px;
+      background: #123b2b;
+      color: #fff;
+    }
+
+    .ad-summary .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ad-summary b {
+      color: var(--color-accent);
+      font-size: 14px;
+    }
+
+    .ad-summary b.ok {
+      color: #8fd3ae;
+    }
+
+    .ad-summary small {
+      display: block;
+      opacity: .75;
+      font-size: 12px;
+    }
+
+    .ad-summary .resume {
+      margin-inline-start: auto;
+      border: 1px solid var(--color-accent);
+      background: none;
+      color: var(--color-accent);
+      border-radius: 33px;
+      padding: 5px 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ad-summary .pline2 {
+      height: 6px;
+      background: rgba(255, 255, 255, .15);
+    }
+
+    .ad-summary.ok .pline2 i {
+      background: #5fa47f;
+    }
+
     /* Ruqya */
     .rq-answers {
       display: flex;
@@ -3848,7 +3932,7 @@
         installTitle: "Installer l'application sur votre téléphone",
         installHowDefault: "Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.",
         installHowIOS: icon => `Dans Safari, touchez ${icon} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`,
-        installHowAndroid: 'Téléchargez l’application Android (64 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.',
+        installHowAndroid: 'Téléchargez l’application Android (61 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.',
         installBtn: 'Installer', apkLink: 'Télécharger l’APK', close: 'Fermer',
         hifdhPromoTitle: 'Mode Hifdh', hifdhPromoNew: 'Nouveau',
         hifdhPromoDesc: 'Mémorisez le Coran verset par verset : répétitions au nombre de votre choix, texte affiché et surligné mot par mot pendant la lecture.',
@@ -3863,7 +3947,8 @@
         pgError: 'Chargement impossible. Vérifiez votre connexion.',
         adhkarTitle: 'Adhkar', adhkarSub: 'Hisn al-Muslim — invocations et rappels du Prophète ﷺ', adhkarSearch: 'Rechercher un dhikr…',
         adhkarAll: 'Tous les chapitres', adhkarTimes: n => `${n} fois`, adhkarReset: 'Recommencer', adhkarAllDone: 'Qu’Allah accepte vos adhkar.',
-        adhkarTap: 'Touchez pour compter', adhkarPlay: 'Écouter',
+        adhkarTap: 'Touchez pour compter', adhkarPlay: 'Écouter', adhkarUndo: 'Annuler une répétition', adhkarReps: 'Répétitions',
+        adhkarDoneCount: (d, n) => `${d} / ${n} adhkar terminés`, adhkarResume: 'Reprendre', adhkarDhikrDone: 'Terminé',
         ruqyaCard: 'La ruqya selon votre situation : mauvais œil, sorcellerie, sommeil, soucis…',
         ruqyaTitle: 'Ruqya sharʿiyya', ruqyaSub: 'Les versets et invocations de guérison, selon votre situation', ruqyaWarning: 'À lire avant de commencer',
         ruqyaStart: 'Répondre au questionnaire', ruqyaLast: 'Voir mes derniers résultats', ruqyaAll: 'Voir toute la ruqya',
@@ -3985,7 +4070,7 @@
         installTitle: 'ثبّت التطبيق على هاتفك',
         installHowDefault: 'وصول مباشر من الشاشة الرئيسية، وضع ملء الشاشة، واستماع بدون اتصال بالإنترنت.',
         installHowIOS: icon => `في Safari، اضغط على ${icon} <b>مشاركة</b>، ثم <b>«إضافة إلى الشاشة الرئيسية»</b>.`,
-        installHowAndroid: 'نزّل تطبيق أندرويد (64 م.ب)، افتح الملف ثم اضغط <b>تثبيت</b>. اسمح بالتثبيت من المتصفح إذا طلب ذلك أندرويد.',
+        installHowAndroid: 'نزّل تطبيق أندرويد (61 م.ب)، افتح الملف ثم اضغط <b>تثبيت</b>. اسمح بالتثبيت من المتصفح إذا طلب ذلك أندرويد.',
         installBtn: 'تثبيت', apkLink: 'تنزيل APK', close: 'إغلاق',
         hifdhPromoTitle: 'وضع الحفظ', hifdhPromoNew: 'جديد',
         hifdhPromoDesc: 'احفظ القرآن آية آية: عدد التكرار الذي تختاره، مع عرض النص وإبرازه كلمةً كلمة أثناء الاستماع.',
@@ -4000,7 +4085,8 @@
         pgError: 'تعذّر التحميل. تحقّق من الاتصال.',
         adhkarTitle: 'الأذكار', adhkarSub: 'حصن المسلم — من أذكار الكتاب والسنة', adhkarSearch: 'ابحث عن ذكر…',
         adhkarAll: 'جميع الأبواب', adhkarTimes: n => `${n} مرة`, adhkarReset: 'إعادة', adhkarAllDone: 'تقبّل الله أذكارك.',
-        adhkarTap: 'المس للعدّ', adhkarPlay: 'استماع',
+        adhkarTap: 'المس للعدّ', adhkarPlay: 'استماع', adhkarUndo: 'إلغاء تكرار', adhkarReps: 'التكرارات',
+        adhkarDoneCount: (d, n) => `${d} من ${n} أذكار مكتملة`, adhkarResume: 'متابعة', adhkarDhikrDone: 'تم',
         ruqyaCard: 'الرقية بحسب حالتك: العين، السحر، النوم، الهم…',
         ruqyaTitle: 'الرقية الشرعية', ruqyaSub: 'آيات وأدعية الشفاء بحسب حالتك', ruqyaWarning: 'تنبيه',
         ruqyaStart: 'ابدأ الاستبيان', ruqyaLast: 'عرض نتائجي الأخيرة', ruqyaAll: 'عرض الرقية كاملة',
@@ -6166,6 +6252,7 @@
       volume: 'M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z',
       check: 'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z',
       chevron: 'M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z',
+      undo: 'M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62A7.95 7.95 0 0 1 12.5 10c3.54 0 6.55 2.31 7.6 5.5l2.37-.78A10.02 10.02 0 0 0 12.5 8z',
       refresh: 'M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z',
       help: 'M11 18h2v-2h-2v2zm1-16a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm0-14a4 4 0 0 0-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z',
     };
@@ -6282,8 +6369,9 @@
       adLoad().then(() => {
         const ch = adView.chapter && adData.find(c => c.id === adView.chapter);
         $('adhkarBarTitle').textContent = ch ? ch.title : t('adhkarTitle');
-        $('adhkarCount').textContent = ch ? `${adDone(ch)}/${ch.items.length}` : '';
-        $('adhkarProgress').style.width = ch ? `${(adDone(ch) / ch.items.length) * 100}%` : '0';
+        const sp = ch && adSectionProgress(ch);
+        $('adhkarCount').textContent = ch ? `${sp.done}/${ch.items.length}` : '';
+        $('adhkarProgress').style.width = ch && sp.totalReps ? `${(sp.reps / sp.totalReps) * 100}%` : '0';
         inner.innerHTML = ch ? adChapterHTML(ch) : adHomeHTML();
         if (!ch) renderAdhkarList();
         if (scrollTop) $('adhkarScroll').scrollTop = 0;
@@ -6313,22 +6401,47 @@
         return `<button type="button" data-act="open" data-id="${c.id}"><span class="t">${esc(c.title)}</span><span class="n">${done ? '✓' : c.items.length}</span></button>`;
       }).join('') || `<p class="pg-sub" style="padding:16px">${esc(t('emptyMsg'))}</p>`;
     }
+    /** Avancement d'une section : adhkar terminés, répétitions faites / à faire, premier non terminé. */
+    function adSectionProgress(ch) {
+      const n = d => Math.min(d.repeat, adCount(d.id));
+      return {
+        done: ch.items.filter(d => n(d) >= d.repeat).length,
+        reps: ch.items.reduce((x, d) => x + n(d), 0),
+        totalReps: ch.items.reduce((x, d) => x + d.repeat, 0),
+        next: ch.items.findIndex(d => n(d) < d.repeat),
+      };
+    }
     function adChapterHTML(ch) {
+      const p = adSectionProgress(ch), complete = p.done === ch.items.length;
+      const summary = `<div class="ad-summary${complete ? ' ok' : ''}"><div class="row"><span>`
+        + `<b class="${complete ? 'ok' : ''}">${esc(complete ? '✓ ' + t('adhkarAllDone') : t('adhkarDoneCount', p.done, ch.items.length))}</b>`
+        + `<small>${esc(t('adhkarReps'))} : ${p.reps} / ${p.totalReps}</small></span>`
+        + (!complete && p.reps > 0 ? `<button type="button" class="resume" data-act="resume">↓ ${esc(t('adhkarResume'))}</button>` : '')
+        + `</div><div class="pline2"><i style="width:${p.totalReps ? (p.reps / p.totalReps) * 100 : 0}%"></i></div></div>`;
       const cards = ch.items.map((d, i) => {
         const n = adCount(d.id), done = n >= d.repeat;
         const playing = pgQueue?.key === 'dhikr:' + d.id;
-        return `<div class="dh-card${done ? ' done' : ''}" data-id="${d.id}">`
+        return `<div class="dh-card${done ? ' done' : ''}" id="dh-${d.id}" data-id="${d.id}">`
           + `<button type="button" class="dh-text" data-act="count" data-id="${d.id}" lang="ar">${esc(d.text)}</button>`
+          + (d.repeat > 1 ? `<div class="dh-bar"><i style="width:${(n / d.repeat) * 100}%"></i></div>` : '')
           + `<div class="dh-foot"><span class="idx">${arNum(i + 1)}</span>`
           + `<button type="button" class="round-btn" data-act="play" data-id="${d.id}" aria-label="${esc(t('adhkarPlay'))}">${pgSvg(playing ? 'stop' : 'volume')}</button>`
-          + (d.repeat > 1 ? `<span class="times">${esc(t('adhkarTimes', d.repeat))}</span>` : '<span class="times"></span>')
-          + `<button type="button" class="count-btn" data-act="count" data-id="${d.id}" aria-label="${esc(t('adhkarTap'))} ${n}/${d.repeat}">${done ? '✓' : d.repeat > 1 ? `${n}/${d.repeat}` : '✓'}</button>`
+          + (n > 0 ? `<button type="button" class="round-btn" data-act="undo" data-id="${d.id}" aria-label="${esc(t('adhkarUndo'))}" title="${esc(t('adhkarUndo'))}">${pgSvg('undo')}</button>` : '')
+          + `<span class="times">${d.repeat > 1 && !done ? esc(t('adhkarTimes', d.repeat)) : ''}</span>`
+          + `<button type="button" class="count-btn" data-act="count" data-id="${d.id}" aria-label="${esc(t('adhkarTap'))} ${n}/${d.repeat}">${done ? '✓ ' + esc(t('adhkarDhikrDone')) : d.repeat > 1 ? `${n} / ${d.repeat}` : '✓'}</button>`
           + `</div></div>`;
       }).join('');
-      const all = adDone(ch) === ch.items.length;
-      return cards
-        + (all ? `<p class="pg-sub" style="text-align:center;color:var(--green);font-weight:600">${esc(t('adhkarAllDone'))}</p>` : '')
+      return summary + cards
+        + (complete ? `<p class="pg-sub" style="text-align:center;color:var(--green);font-weight:600">${esc(t('adhkarAllDone'))}</p>` : '')
         + `<div style="text-align:center"><button type="button" class="pg-btn ghost" data-act="reset">${pgSvg('refresh')}${esc(t('adhkarReset'))}</button></div>`;
+    }
+    /** Défile jusqu'au prochain dhikr à faire (après celui qui vient d'être terminé). */
+    function adScrollToNext(ch, fromIndex) {
+      const todo = (d, i) => i > fromIndex && adCount(d.id) < d.repeat;
+      let idx = ch.items.findIndex(todo);
+      if (idx < 0) idx = ch.items.findIndex(d => adCount(d.id) < d.repeat);
+      if (idx < 0) return toast(t('adhkarAllDone'));
+      setTimeout(() => $('dh-' + ch.items[idx].id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
     }
     const normText = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ً-ٰٟۖ-ۭ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
 
@@ -6351,8 +6464,19 @@
         if (adCounts.day !== today()) adCounts = { day: today(), counts: {} };
         adCounts.counts[id] = adCount(id) + 1;
         lsSet('adhkarCounts', adCounts);
-        try { navigator.vibrate?.(adCounts.counts[id] >= d.repeat ? 30 : 10); } catch { }
+        const finished = adCounts.counts[id] >= d.repeat;
+        try { navigator.vibrate?.(finished ? 40 : 10); } catch { }
         renderAdhkar(false);
+        if (finished) adScrollToNext(ch, ch.items.indexOf(d));
+      } else if (act === 'undo') {
+        const n = adCount(id) - 1;
+        if (n > 0) adCounts.counts[id] = n; else delete adCounts.counts[id];
+        lsSet('adhkarCounts', adCounts);
+        try { navigator.vibrate?.(10); } catch { }
+        renderAdhkar(false);
+      } else if (act === 'resume') {
+        const p = adSectionProgress(ch);
+        if (p.next >= 0) $('dh-' + ch.items[p.next].id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (act === 'play') {
         const d = ch.items.find(x => x.id === id);
         if (pgQueue?.key === 'dhikr:' + id) pgStop();
