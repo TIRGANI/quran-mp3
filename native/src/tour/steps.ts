@@ -17,6 +17,7 @@ export type TourKey =
   | 'back'
   | 'tabHifdh'
   | 'tabAdhkar'
+  | 'tabRuqya'
   | 'tabSettings';
 
 export type TourStep = {
@@ -29,6 +30,8 @@ export type TourStep = {
   onNext?: () => void;
   /** Étape ignorée si l'élément n'est pas à l'écran (ex. pas de téléchargement sur le web) */
   optional?: boolean;
+  /** Préparation à l'arrivée sur l'étape (ex. revenir à l'écran où se trouve l'élément) */
+  before?: () => void;
 };
 
 export const STEPS: TourStep[] = [
@@ -45,7 +48,8 @@ export const STEPS: TourStep[] = [
   { key: 'back', target: 'reader.back', waitFor: 'reader:close', onNext: () => router.back(), optional: true },
   { key: 'tabHifdh', target: 'tab.hifdh' },
   { key: 'tabAdhkar', target: 'tab.adhkar' },
-  { key: 'tabSettings', target: 'tab.settings' },
+  { key: 'tabRuqya', target: 'tab.ruqya' },
+  { key: 'tabSettings', target: 'listen.settings', before: () => router.navigate('/') },
 ];
 
 export function startTour() {
@@ -63,5 +67,6 @@ export function endTour() {
 export function nextStep() {
   const { step } = useTour.getState();
   if (step >= STEPS.length - 1) return endTour();
+  STEPS[step + 1].before?.();
   useTour.setState({ step: step + 1 });
 }

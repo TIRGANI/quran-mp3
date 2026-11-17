@@ -6,7 +6,7 @@ import { CAN_DOWNLOAD, deleteAll, usedBytes, useDownloads } from '@/audio/downlo
 import { setRate } from '@/audio/player';
 import { Tip } from '@/components/Tip';
 import { Button, Card, Row, Screen, Segmented, Txt } from '@/components/ui';
-import { useT } from '@/i18n';
+import { useIsRTL, useT } from '@/i18n';
 import { toast } from '@/lib/toast';
 import { CAN_NOTIFY, ensurePermission } from '@/notifications/reminders';
 import { useSettings, type ReminderKey } from '@/stores/settings';
@@ -17,6 +17,7 @@ import { useColors } from '@/theme/colors';
 export default function SettingsScreen() {
   const c = useColors();
   const t = useT();
+  const rtl = useIsRTL();
   const { lang, theme, rate, autoNext, repeat, autoSave, reminders, set } = useSettings();
   const done = useDownloads(s => s.done);
   const [armed, setArmed] = useState(false);
@@ -33,9 +34,14 @@ export default function SettingsScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 30 }}>
-        <Txt variant="title" style={{ color: c.primary }}>
-          {t.tabSettings}
-        </Txt>
+        <Row gap={6}>
+          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityLabel={t.back} style={{ padding: 4 }}>
+            <Ionicons name={rtl ? 'chevron-forward' : 'chevron-back'} size={26} color={c.text} />
+          </Pressable>
+          <Txt variant="title" style={{ color: c.primary }}>
+            {t.tabSettings}
+          </Txt>
+        </Row>
         <Tip id="settings" />
 
         <Card style={{ gap: 12 }}>

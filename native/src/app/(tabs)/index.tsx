@@ -45,9 +45,21 @@ export default function ListenScreen() {
 
   const header = (
     <View style={{ gap: 14, paddingBottom: 10 }}>
-      <Txt variant="title" style={{ fontFamily: rtl ? FONTS.arabicBold : FONTS.uiBold, color: c.primary }}>
-        {t.appName}
-      </Txt>
+      <Row style={{ justifyContent: 'space-between' }}>
+        <Txt variant="title" style={{ fontFamily: rtl ? FONTS.arabicBold : FONTS.uiBold, color: c.primary }}>
+          {t.appName}
+        </Txt>
+        <TourTarget id="listen.settings">
+          <Pressable
+            onPress={() => router.push('/settings')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t.tabSettings}
+            style={{ width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: c.line, backgroundColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="settings-sharp" size={20} color={c.text} />
+          </Pressable>
+        </TourTarget>
+      </Row>
       <Tip id="listen" />
       <TourTarget id="listen.reciter">
         <Pressable

@@ -30,7 +30,7 @@ export default function AdhkarScreen() {
       </View>
       <Tip id="adhkar" />
       <Pressable
-        onPress={() => router.push('/ruqya')}
+        onPress={() => router.navigate('/ruqya')}
         accessibilityRole="button"
         style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.hero, borderRadius: 18, padding: 16, opacity: pressed ? 0.85 : 1 })}>
         <View style={{ width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>

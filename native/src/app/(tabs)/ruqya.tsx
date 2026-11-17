@@ -46,13 +46,13 @@ export default function RuqyaScreen() {
     <View style={{ flex: 1, backgroundColor: c.background }}>
       <SafeAreaView edges={['top']} style={{ backgroundColor: c.hero }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, direction: rtl ? 'rtl' : 'ltr' }}>
-          <Pressable
-            onPress={() => (stage === 'intro' ? router.back() : setStage('intro'))}
-            hitSlop={10}
-            accessibilityLabel={t.close}
-            style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={rtl ? 'chevron-forward' : 'chevron-back'} size={24} color="#fff" />
-          </Pressable>
+          {stage === 'intro' ? (
+            <View style={{ width: 40 }} />
+          ) : (
+            <Pressable onPress={() => setStage('intro')} hitSlop={10} accessibilityLabel={t.back} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name={rtl ? 'chevron-forward' : 'chevron-back'} size={24} color="#fff" />
+            </Pressable>
+          )}
           <Text style={{ flex: 1, textAlign: 'center', fontFamily: FONTS.arabicBold, fontSize: 21, lineHeight: 36, color: '#fff' }}>الرقية الشرعية</Text>
           <View style={{ width: 40 }} />
         </View>
@@ -179,7 +179,7 @@ function Method() {
       {getRuqya().method[lang].map((line, i) => (
         <Row key={i} style={{ alignItems: 'flex-start' }}>
           <Txt weight="bold" color={c.accentStrong}>
-            {arNum(i + 1)}
+            {lang === 'ar' ? arNum(i + 1) : `${i + 1}.`}
           </Txt>
           <Txt variant="label" weight="regular" style={{ flex: 1, lineHeight: 21 }}>
             {line}

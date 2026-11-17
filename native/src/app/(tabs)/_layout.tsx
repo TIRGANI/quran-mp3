@@ -48,8 +48,8 @@ export default function TabsLayout() {
         options={{ title: t.tabAdhkar, tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color as string} size={size} /> }}
       />
       <Tabs.Screen
-        name="settings"
-        options={{ title: t.tabSettings, tabBarIcon: ({ color, size }) => <Ionicons name="settings-sharp" color={color as string} size={size} /> }}
+        name="ruqya"
+        options={{ title: t.tabRuqya, tabBarIcon: ({ color, size }) => <Ionicons name="shield-checkmark" color={color as string} size={size} /> }}
       />
     </Tabs>
   );
