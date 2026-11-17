@@ -1,20 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, Row, Screen, Txt } from '@/components/ui';
 import { useIsRTL, useT } from '@/i18n';
 import { clearCrash, lastCrash } from '@/lib/crash';
+import { isEmail, sendFeedback } from '@/lib/feedback';
 import { toast } from '@/lib/toast';
 import { FONTS, useColors } from '@/theme/colors';
 
-// Numéro déjà public sur wirdan.app (pied de page) et dans la politique de confidentialité
-const WHATSAPP = '212602834831';
 type Kind = 'bug' | 'idea' | 'thanks' | 'other';
 
-/** Avis de l'utilisateur, envoyé par WhatsApp (aucun serveur, rien n'est envoyé sans son accord). */
+/** Avis de l'utilisateur, envoyé directement depuis l'app (formulaire Formspree, voir lib/feedback). */
 export default function FeedbackScreen() {
   const c = useColors();
   const t = useT();
@@ -25,24 +23,29 @@ export default function FeedbackScreen() {
   const [crash] = useState(lastCrash);
   const [attach, setAttach] = useState(true);
 
-  const send = () => {
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const send = async () => {
+    if (sending) return;
     if (!message.trim() && !rating) return toast(t.feedbackEmpty);
+    if (email.trim() && !isEmail(email.trim())) return toast(t.feedbackBadEmail);
     const label = { bug: t.feedbackBug, idea: t.feedbackIdea, thanks: t.feedbackThanks, other: t.feedbackOther }[kind];
-    const text = [
-      `Wirdan — ${t.feedback}`,
-      rating ? `${t.feedbackRating} : ${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}` : '',
-      `${t.feedbackType} : ${label}`,
-      message.trim(),
-      `— ${Platform.OS} ${Platform.Version} · v${Constants.expoConfig?.version ?? ''}`,
-      crash && attach ? `\n[${t.crashReportTitle} · ${crash.time}]\n${crash.message}\n${crash.stack}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
-    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`)
-      .then(() => {
-        if (crash && attach) clearCrash();
-      })
-      .catch(() => toast(t.playbackError));
+    const withCrash = !!crash && attach;
+    setSending(true);
+    const ok = await sendFeedback({
+      subject: `Wirdan — ${label}${rating ? ` · ${rating}/5` : ''}`,
+      message: message.trim(),
+      email: email.trim() || undefined,
+      rating,
+      type: label,
+      crash: withCrash ? `${crash.time}\n${crash.message}\n${crash.stack}` : undefined,
+    });
+    setSending(false);
+    if (!ok) return toast(t.feedbackFail);
+    if (withCrash) clearCrash();
+    toast(t.feedbackSent);
+    router.back();
   };
 
   return (
@@ -90,6 +93,18 @@ export default function FeedbackScreen() {
             textAlignVertical="top"
             style={{ minHeight: 130, borderWidth: 1, borderColor: c.line, borderRadius: 14, padding: 12, color: c.text, fontFamily: FONTS.ui, fontSize: 15, textAlign: rtl ? 'right' : 'left', backgroundColor: c.background }}
           />
+          <Txt variant="label">{t.feedbackEmail}</Txt>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="nom@exemple.com"
+            placeholderTextColor={c.muted}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            style={{ borderWidth: 1, borderColor: c.line, borderRadius: 14, padding: 12, color: c.text, fontFamily: FONTS.ui, fontSize: 15, textAlign: 'left', backgroundColor: c.background }}
+          />
         </Card>
 
         {crash && (
@@ -100,7 +115,7 @@ export default function FeedbackScreen() {
             </Txt>
           </Pressable>
         )}
-        <Button label={t.feedbackSend} icon={<Ionicons name="logo-whatsapp" size={18} color="#fff" />} onPress={send} />
+        <Button label={sending ? t.feedbackSending : t.feedbackSend} icon={sending ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="send" size={18} color="#fff" />} onPress={send} />
         <Txt variant="small" style={{ textAlign: 'center' }}>
           {t.feedbackNote}
         </Txt>

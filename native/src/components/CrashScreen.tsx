@@ -1,24 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Linking, ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Txt } from '@/components/ui';
 import { useIsRTL, useT } from '@/i18n';
-import type { CrashInfo } from '@/lib/crash';
+import { clearCrash, type CrashInfo } from '@/lib/crash';
+import { sendFeedback } from '@/lib/feedback';
 import { useColors } from '@/theme/colors';
-
-const WHATSAPP = '212602834831';
 
 /** Écran affiché à la place d'une fermeture brutale de l'app. */
 export function CrashScreen({ error, onRetry }: { error: CrashInfo; onRetry: () => void }) {
   const c = useColors();
   const t = useT();
   const rtl = useIsRTL();
-  const report = () => {
-    const text = `Wirdan — ${t.crashReportTitle}\n${error.message}\n${error.platform} · v${error.version}\n\n${error.stack}`;
-    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`).catch(() => {});
+  const [sent, setSent] = useState<'idle' | 'sending' | 'ok' | 'fail'>('idle');
+  const report = async () => {
+    if (sent === 'sending' || sent === 'ok') return;
+    setSent('sending');
+    const ok = await sendFeedback({
+      subject: `Wirdan — ${t.crashReportTitle}`,
+      message: error.message,
+      crash: `${error.time}\n${error.platform} · v${error.version}\n\n${error.stack}`,
+    });
+    if (ok) clearCrash();
+    setSent(ok ? 'ok' : 'fail');
   };
+  const reportLabel = { idle: t.crashReport, sending: t.feedbackSending, ok: t.crashReportSent, fail: t.feedbackFail }[sent];
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.background, direction: rtl ? 'rtl' : 'ltr' }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24, gap: 16, maxWidth: 520, width: '100%', alignSelf: 'center' }}>
@@ -43,7 +52,7 @@ export function CrashScreen({ error, onRetry }: { error: CrashInfo; onRetry: () 
             }
           }}
         />
-        <Button label={t.crashReport} kind="ghost" icon={<Ionicons name="logo-whatsapp" size={18} color={c.text} />} onPress={report} />
+        <Button label={reportLabel} kind="ghost" icon={<Ionicons name={sent === 'ok' ? 'checkmark-circle' : 'send'} size={18} color={c.text} />} onPress={report} />
         <Txt variant="small" style={{ textAlign: 'center' }}>
           {error.message}
         </Txt>
