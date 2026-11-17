@@ -3353,6 +3353,133 @@
       cursor: pointer;
       margin-top: 4px;
     }
+
+    /* ---------- Bouton flottant « Installer l'app » (suit le défilement) ---------- */
+    .install-fab {
+      position: fixed;
+      right: 16px;
+      bottom: calc(var(--tabbar-h) + var(--player-h, 76px) + 14px);
+      z-index: 11;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 52px;
+      max-width: 260px;
+      padding: 0 18px 0 8px;
+      border: 0;
+      border-radius: 26px;
+      background: var(--color-accent-btn);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 10px 26px rgba(11, 41, 32, .35);
+      cursor: pointer;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: max-width .3s ease, padding .3s ease, transform .2s ease, opacity .2s ease;
+      animation: fabIn .5s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    html[dir="rtl"] .install-fab {
+      right: auto;
+      left: 16px;
+      padding: 0 8px 0 18px;
+    }
+
+    .install-fab img {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+    }
+
+    .install-fab:hover {
+      transform: translateY(-2px);
+      background: var(--color-accent-btn-hover);
+    }
+
+    /* En descendant : seulement l'icône, pour ne pas gêner la lecture */
+    .install-fab.mini {
+      max-width: 52px;
+      padding: 0 8px;
+    }
+
+    .install-fab::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: 0 0 0 0 rgba(198, 164, 92, .6);
+      animation: fabPulse 2.4s ease-out 1s 3;
+      pointer-events: none;
+    }
+
+    @keyframes fabIn {
+      from { transform: translateY(30px) scale(.8); opacity: 0; }
+    }
+
+    @keyframes fabPulse {
+      0% { box-shadow: 0 0 0 0 rgba(198, 164, 92, .6); }
+      100% { box-shadow: 0 0 0 16px rgba(198, 164, 92, 0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .install-fab, .install-fab::after { animation: none; transition: none; }
+    }
+
+    .inst-steps {
+      margin: 0;
+      padding-inline-start: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      counter-reset: st;
+    }
+
+    .inst-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .inst-steps li::before {
+      counter-increment: st;
+      content: counter(st);
+      flex: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--orange-soft);
+      color: var(--color-accent-btn);
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .inst-steps svg.share {
+      width: 16px;
+      height: 16px;
+      vertical-align: -3px;
+      fill: currentColor;
+    }
+
+    .inst-qr {
+      align-self: center;
+      width: min(260px, 70vw);
+      border-radius: 16px;
+    }
+
+    .inst-big {
+      text-decoration: none;
+      justify-content: center;
+      font-size: 16px;
+      padding: 14px 20px;
+    }
   </style>
 </head>
 
@@ -3672,6 +3799,21 @@
     </button>
   </nav>
 
+  <!-- Bouton flottant d'installation + fenêtre d'aide (Android : APK, iPhone : écran d'accueil, ordinateur : QR code) -->
+  <button type="button" class="install-fab" id="installFab" hidden>
+    <img src="icon-192.png" alt="">
+    <span id="installFabLabel">Installer l'app</span>
+  </button>
+  <div class="fb-modal" id="instModal" role="dialog" aria-modal="true" aria-labelledby="instTitle" hidden>
+    <div class="fb-box">
+      <div class="fb-head">
+        <h3 id="instTitle">Installer Wirdan</h3>
+        <button type="button" class="fb-close" id="instClose" aria-label="Fermer">×</button>
+      </div>
+      <div id="instBody" style="display:flex;flex-direction:column;gap:14px"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" hidden></div>
 
   <div class="player" id="player">
@@ -3932,7 +4074,7 @@
         installTitle: "Installer l'application sur votre téléphone",
         installHowDefault: "Accès direct depuis l'écran d'accueil, plein écran, et écoute hors connexion.",
         installHowIOS: icon => `Dans Safari, touchez ${icon} <b>Partager</b>, puis <b>« Sur l’écran d’accueil »</b>.`,
-        installHowAndroid: 'Téléchargez l’application Android (61 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.',
+        installHowAndroid: 'Téléchargez l’application Android (62 Mo), ouvrez le fichier puis touchez <b>Installer</b>. Autorisez l’installation depuis votre navigateur si Android le demande.',
         installBtn: 'Installer', apkLink: 'Télécharger l’APK', close: 'Fermer',
         hifdhPromoTitle: 'Mode Hifdh', hifdhPromoNew: 'Nouveau',
         hifdhPromoDesc: 'Mémorisez le Coran verset par verset : répétitions au nombre de votre choix, texte affiché et surligné mot par mot pendant la lecture.',
@@ -4032,6 +4174,23 @@
         downloadFailed: n => `Échec du téléchargement de la sourate ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'Warsh' : 'Hafs'}`,
         appInstalled: 'Application installée ✓',
+        fabInstall: 'Installer l’app', fabPhone: 'L’app sur mon téléphone', instTitle: 'Installer Wirdan',
+        instAndroidIntro: 'L’application Android complète, gratuite et sans publicité : écoute hors connexion, rappels, adhkar, ruqya…',
+        instAndroidBtn: 'Télécharger l’application (62 Mo)',
+        instAndroid1: 'Touchez <b>Télécharger l’application</b> ci-dessus.',
+        instAndroid2: 'Ouvrez le fichier <b>Wirdan.apk</b> une fois téléchargé (notification ou dossier Téléchargements).',
+        instAndroid3: 'Touchez <b>Installer</b>. Si Android le demande, autorisez l’installation depuis votre navigateur.',
+        instAndroidNote: 'Déjà installée ? Téléchargez-la à nouveau pour la mettre à jour : vos données sont conservées.',
+        instDownloading: 'Téléchargement lancé : ouvrez Wirdan.apk à la fin.',
+        instIosIntro: 'Sur iPhone, Wirdan s’installe depuis Safari, en quelques secondes :',
+        instIos1: 'Ouvrez cette page dans <b>Safari</b>.',
+        instIos2: icon => `Touchez ${icon} <b>Partager</b> en bas de l’écran.`,
+        instIos3: 'Choisissez <b>« Sur l’écran d’accueil »</b>, puis <b>Ajouter</b>.',
+        instIosNote: 'L’icône Wirdan apparaît sur votre écran d’accueil, comme une application.',
+        instIosStore: 'Télécharger sur l’App Store',
+        instDesktopIntro: 'Scannez ce code avec l’appareil photo de votre téléphone pour installer Wirdan.',
+        instDesktopNote: 'Android : application à télécharger · iPhone : ajout à l’écran d’accueil.',
+        instQrAlt: 'QR code vers wirdan.app',
         juzAmmaDownloading: 'Téléchargement du Juz ‘Amma (78 à 114) pour l’écoute hors connexion…',
         offCount: (n, size) => `${n} / 114 sourates (${size})`,
         dlAllRest: size => `Télécharger le reste (${size})`,
@@ -4073,7 +4232,7 @@
         installTitle: 'ثبّت التطبيق على هاتفك',
         installHowDefault: 'وصول مباشر من الشاشة الرئيسية، وضع ملء الشاشة، واستماع بدون اتصال بالإنترنت.',
         installHowIOS: icon => `في Safari، اضغط على ${icon} <b>مشاركة</b>، ثم <b>«إضافة إلى الشاشة الرئيسية»</b>.`,
-        installHowAndroid: 'نزّل تطبيق أندرويد (61 م.ب)، افتح الملف ثم اضغط <b>تثبيت</b>. اسمح بالتثبيت من المتصفح إذا طلب ذلك أندرويد.',
+        installHowAndroid: 'نزّل تطبيق أندرويد (62 م.ب)، افتح الملف ثم اضغط <b>تثبيت</b>. اسمح بالتثبيت من المتصفح إذا طلب ذلك أندرويد.',
         installBtn: 'تثبيت', apkLink: 'تنزيل APK', close: 'إغلاق',
         hifdhPromoTitle: 'وضع الحفظ', hifdhPromoNew: 'جديد',
         hifdhPromoDesc: 'احفظ القرآن آية آية: عدد التكرار الذي تختاره، مع عرض النص وإبرازه كلمةً كلمة أثناء الاستماع.',
@@ -4173,6 +4332,23 @@
         downloadFailed: n => `فشل تنزيل السورة رقم ${n}.`,
         reciterSwitch: (name, warsh) => `${name} · ${warsh ? 'ورش' : 'حفص'}`,
         appInstalled: 'تم تثبيت التطبيق ✓',
+        fabInstall: 'ثبّت التطبيق', fabPhone: 'التطبيق على هاتفي', instTitle: 'تثبيت وِردان',
+        instAndroidIntro: 'تطبيق أندرويد كامل، مجاني وبلا إعلانات: استماع دون اتصال، تذكيرات، أذكار، رقية…',
+        instAndroidBtn: 'تنزيل التطبيق (62 م.ب)',
+        instAndroid1: 'اضغط على <b>تنزيل التطبيق</b> أعلاه.',
+        instAndroid2: 'افتح ملف <b>Wirdan.apk</b> بعد التنزيل (من الإشعار أو مجلد التنزيلات).',
+        instAndroid3: 'اضغط <b>تثبيت</b>. وإذا طلب أندرويد ذلك، اسمح بالتثبيت من المتصفح.',
+        instAndroidNote: 'مثبّت من قبل؟ نزّله من جديد لتحديثه، وتبقى بياناتك محفوظة.',
+        instDownloading: 'بدأ التنزيل: افتح Wirdan.apk عند انتهائه.',
+        instIosIntro: 'على الآيفون، يُثبَّت وِردان من Safari في ثوانٍ:',
+        instIos1: 'افتح هذه الصفحة في <b>Safari</b>.',
+        instIos2: icon => `اضغط على ${icon} <b>مشاركة</b> أسفل الشاشة.`,
+        instIos3: 'اختر <b>«إضافة إلى الشاشة الرئيسية»</b> ثم <b>إضافة</b>.',
+        instIosNote: 'تظهر أيقونة وِردان على شاشتك الرئيسية كأي تطبيق.',
+        instIosStore: 'التنزيل من App Store',
+        instDesktopIntro: 'امسح هذا الرمز بكاميرا هاتفك لتثبيت وِردان.',
+        instDesktopNote: 'أندرويد: تطبيق للتنزيل · آيفون: إضافة إلى الشاشة الرئيسية.',
+        instQrAlt: 'رمز QR إلى wirdan.app',
         juzAmmaDownloading: 'جارٍ تنزيل جزء عمّ (78 إلى 114) للاستماع بدون اتصال…',
         offCount: (n, size) => `${n} / 114 سورة (${size})`,
         dlAllRest: size => `تنزيل الباقي (${size})`,
@@ -4280,6 +4456,7 @@
       }
       applyReaderLang();
       if (typeof pgAudio !== 'undefined') applyPagesLang();
+      if (typeof fabDevice !== 'undefined') fabRender();
       renderInstallHow();
       updateOnline();
       applyFilter();
@@ -6762,6 +6939,67 @@
     }
     applyPagesLang();
     updateTabbar();
+
+
+    /* ---------- Bouton flottant « Installer l'app » ----------
+       Toujours à portée de main pendant le défilement (réduit à l'icône en descendant, déplié en
+       remontant). Il ouvre une aide adaptée à l'appareil. Caché si l'app est déjà installée, dans
+       l'application elle-même, ou quand une page plein écran est ouverte. */
+    const fabDevice = isAndroid ? 'android' : isIOS ? 'ios' : 'desktop';
+    const fabUseful = !installed; // déjà installée (écran d'accueil ou application) : inutile
+    function fabRender() {
+      $('installFabLabel').textContent = t(fabDevice === 'desktop' ? 'fabPhone' : 'fabInstall');
+      $('installFab').setAttribute('aria-label', t('fabInstall'));
+    }
+    function fabVisibility() {
+      const overlay = !$('reader').hidden || !$('adhkarPage').hidden || !$('ruqyaPage').hidden || !$('fbModal').hidden || !$('instModal').hidden;
+      $('installFab').hidden = !fabUseful || overlay;
+    }
+    function instBodyHTML() {
+      if (fabDevice === 'android') {
+        return `<p class="pg-sub">${esc(t('instAndroidIntro'))}</p>`
+          + `<a class="pg-btn inst-big" href="Wirdan.apk" download id="instApk">${esc(t('instAndroidBtn'))}</a>`
+          + `<ol class="inst-steps"><li>${t('instAndroid1')}</li><li>${t('instAndroid2')}</li><li>${t('instAndroid3')}</li></ol>`
+          + `<p class="fb-note">${esc(t('instAndroidNote'))}</p>`;
+      }
+      if (fabDevice === 'ios') {
+        if (IOS_APP_URL) return `<a class="pg-btn inst-big" href="${IOS_APP_URL}" target="_blank" rel="noopener">${esc(t('instIosStore'))}</a>`;
+        return `<p class="pg-sub">${esc(t('instIosIntro'))}</p>`
+          + `<ol class="inst-steps"><li>${t('instIos1')}</li><li>${t('instIos2', SHARE_ICON)}</li><li>${t('instIos3')}</li></ol>`
+          + `<p class="fb-note">${esc(t('instIosNote'))}</p>`;
+      }
+      return `<p class="pg-sub" style="text-align:center">${esc(t('instDesktopIntro'))}</p>`
+        + `<img class="inst-qr" src="qr/wirdan-qr.png" alt="${esc(t('instQrAlt'))}">`
+        + `<p class="fb-note">${esc(t('instDesktopNote'))}</p>`;
+    }
+    function openInstall() {
+      $('instTitle').textContent = t('instTitle');
+      $('instClose').setAttribute('aria-label', t('close'));
+      $('instBody').innerHTML = instBodyHTML();
+      $('instModal').hidden = false;
+      $('instApk')?.addEventListener('click', () => setTimeout(() => toast(t('instDownloading')), 300));
+    }
+    $('installFab').onclick = openInstall;
+    $('instClose').onclick = () => { $('instModal').hidden = true; };
+    $('instModal').addEventListener('click', e => { if (e.target === $('instModal')) $('instModal').hidden = true; });
+    $('instModal').addEventListener('keydown', e => { if (e.key === 'Escape') $('instModal').hidden = true; });
+
+    // Réduit en descendant, déplié en remontant ou à l'arrêt du défilement
+    let fabLastY = scrollY, fabIdle;
+    addEventListener('scroll', () => {
+      const y = scrollY;
+      if (Math.abs(y - fabLastY) > 8) $('installFab').classList.toggle('mini', y > fabLastY && y > 200);
+      fabLastY = y;
+      clearTimeout(fabIdle);
+      fabIdle = setTimeout(() => $('installFab').classList.remove('mini'), 1800);
+    }, { passive: true });
+    // Le bouton se place juste au-dessus du lecteur, quelle que soit sa hauteur (replié / déplié)
+    new ResizeObserver(() => document.documentElement.style.setProperty('--player-h', $('player').offsetHeight + 'px')).observe($('player'));
+    const fabObserver = new MutationObserver(fabVisibility);
+    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'fbModal', 'instModal']) fabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
+    addEventListener('appinstalled', () => { $('installFab').hidden = true; });
+    fabRender();
+    fabVisibility();
 
     /* ---------- Démarrage ---------- */
     (async () => {
