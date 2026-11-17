@@ -18,6 +18,7 @@ export type TourKey =
   | 'tabHifdh'
   | 'tabAdhkar'
   | 'tabRuqya'
+  | 'tabAdhan'
   | 'tabSettings';
 
 export type TourStep = {
@@ -48,6 +49,7 @@ export const STEPS: TourStep[] = [
   { key: 'back', target: 'reader.back', waitFor: 'reader:close', onNext: () => router.back(), optional: true },
   { key: 'tabHifdh', target: 'tab.hifdh' },
   { key: 'tabAdhkar', target: 'tab.adhkar' },
+  { key: 'tabAdhan', target: 'tab.adhan' },
   { key: 'tabRuqya', target: 'tab.ruqya' },
   { key: 'tabSettings', target: 'listen.settings', before: () => router.navigate('/') },
 ];

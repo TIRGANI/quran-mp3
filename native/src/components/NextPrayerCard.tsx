@@ -25,7 +25,7 @@ export function NextPrayerCard() {
 
   return (
     <Pressable
-      onPress={() => router.push('/adhan')}
+      onPress={() => router.navigate('/adhan')}
       accessibilityRole="button"
       accessibilityLabel={next ? `${t.nextPrayer} : ${t.prayerNames[next.name]} ${fmtClock(next.time)}` : t.adhanTitle}
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.hero, borderRadius: 18, padding: 14, opacity: pressed ? 0.88 : 1 })}>

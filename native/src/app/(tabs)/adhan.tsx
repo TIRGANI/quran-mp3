@@ -1,12 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Card, Chip, Row, Segmented, Txt } from '@/components/ui';
 import { useIsRTL, useT } from '@/i18n';
-import { CITIES, fmtClock, locateMe, METHODS, nextPrayer, PRAYERS, SALAT, timesFor, usePrayer, type PrayerName, type SalatName } from '@/lib/prayer';
+import { CITIES, fmtClock, hijriDate, locateMe, METHODS, nextPrayer, PRAYER_ICONS, PRAYERS, prevPrayer, SALAT, timesFor, usePrayer, type PrayerName, type SalatName } from '@/lib/prayer';
 import { toast } from '@/lib/toast';
 import { CAN_NOTIFY, ensurePermission } from '@/notifications/reminders';
 import { useSettings } from '@/stores/settings';
@@ -34,6 +33,11 @@ export default function AdhanScreen() {
   const [showAdjust, setShowAdjust] = useState(false);
   const times = timesFor(now, p);
   const next = p.place ? nextPrayer(now) : null;
+  const prev = p.place ? prevPrayer(now) : null;
+  // Avancement entre la prière précédente et la suivante (barre du haut)
+  const span = next && prev ? next.time.getTime() - prev.time.getTime() : 0;
+  const progress = span > 0 ? Math.min(1, (now.getTime() - prev!.time.getTime()) / span) : 0;
+  const hijri = hijriDate(now, lang);
   const left = next ? Math.max(0, Math.round((next.time.getTime() - now.getTime()) / 60000)) : 0;
 
   const useMyLocation = async () => {
@@ -63,12 +67,13 @@ export default function AdhanScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.background }}>
       <SafeAreaView edges={['top']} style={{ backgroundColor: c.hero }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, direction: rtl ? 'rtl' : 'ltr' }}>
-          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityLabel={t.back} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={rtl ? 'chevron-forward' : 'chevron-back'} size={24} color="#fff" />
-          </Pressable>
-          <Text style={{ flex: 1, textAlign: 'center', fontFamily: FONTS.arabicBold, fontSize: 21, lineHeight: 36, color: '#fff' }}>مواقيت الصلاة</Text>
-          <View style={{ width: 40 }} />
+        <View style={{ alignItems: 'center', paddingTop: 10, paddingHorizontal: 16 }}>
+          <Text style={{ fontFamily: FONTS.arabicBold, fontSize: 21, lineHeight: 36, color: '#fff' }}>مواقيت الصلاة</Text>
+          {hijri && (
+            <Txt variant="small" color="rgba(255,255,255,0.7)">
+              {hijri}
+            </Txt>
+          )}
         </View>
 
         {/* Prochaine prière, en grand */}
@@ -84,6 +89,18 @@ export default function AdhanScreen() {
             <Txt variant="label" color="rgba(255,255,255,0.8)">
               {t.inTime(Math.floor(left / 60), left % 60)}
             </Txt>
+            {/* Temps écoulé depuis la prière précédente */}
+            {prev && (
+              <View style={{ width: '78%', maxWidth: 420, marginTop: 10, gap: 4 }}>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.15)', overflow: 'hidden', direction: 'ltr' }}>
+                  <View style={{ width: `${progress * 100}%`, height: '100%', borderRadius: 3, backgroundColor: c.accent }} />
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', direction: 'ltr' }}>
+                  <Txt variant="small" color="rgba(255,255,255,0.6)">{`${t.prayerNames[prev.name]} ${fmtClock(prev.time)}`}</Txt>
+                  <Txt variant="small" color="rgba(255,255,255,0.6)">{`${t.prayerNames[next.name]} ${fmtClock(next.time)}`}</Txt>
+                </View>
+              </View>
+            )}
           </View>
         )}
       </SafeAreaView>
@@ -143,6 +160,9 @@ export default function AdhanScreen() {
                 <View
                   key={name}
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 13, borderTopWidth: i ? 1 : 0, borderTopColor: c.line, backgroundColor: isNext ? c.accentSoft : 'transparent' }}>
+                  <View style={{ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: isNext ? c.accent : c.background }}>
+                    <Ionicons name={PRAYER_ICONS[name]} size={18} color={isNext ? '#fff' : salat ? c.accentStrong : c.muted} />
+                  </View>
                   <Text style={{ flex: 1, fontFamily: rtl ? FONTS.arabicBold : FONTS.uiBold, fontSize: rtl ? 19 : 16, lineHeight: rtl ? 32 : 24, color: salat ? c.text : c.muted }}>{t.prayerNames[name]}</Text>
                   <Txt weight="bold" style={{ fontSize: 17, direction: 'ltr' }} color={isNext ? c.accentStrong : c.text}>
                     {fmtClock(times[name])}

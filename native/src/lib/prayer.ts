@@ -167,3 +167,36 @@ export async function locateMe(): Promise<{ lat: number; lng: number; label: str
   }
   return { lat, lng, label };
 }
+
+/** Dernière prière passée (Isha de la veille avant Fajr), pour mesurer l'avancement vers la suivante. */
+export function prevPrayer(now = new Date()): { name: SalatName; time: Date } | null {
+  const today = timesFor(now);
+  if (!today) return null;
+  let found: { name: SalatName; time: Date } | null = null;
+  for (const name of SALAT) if (today[name] <= now) found = { name, time: today[name] };
+  if (found) return found;
+  const y = new Date(now);
+  y.setDate(y.getDate() - 1);
+  const t = timesFor(y);
+  return t ? { name: 'isha', time: t.isha } : null;
+}
+
+/** Date de l'hégire (calendrier Umm al-Qura) si le moteur la connaît, sinon null. */
+export function hijriDate(date: Date, lang: 'ar' | 'fr'): string | null {
+  try {
+    const f = new Intl.DateTimeFormat(lang === 'ar' ? 'ar-SA-u-ca-islamic-umalqura-nu-arab' : 'fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' });
+    return f.resolvedOptions().calendar?.startsWith('islamic') ? f.format(date) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Icône de chaque moment de la journée */
+export const PRAYER_ICONS: Record<PrayerName, 'cloudy-night-outline' | 'sunny-outline' | 'sunny' | 'partly-sunny' | 'cloudy-night' | 'moon'> = {
+  fajr: 'cloudy-night-outline',
+  sunrise: 'sunny-outline',
+  dhuhr: 'sunny',
+  asr: 'partly-sunny',
+  maghrib: 'cloudy-night',
+  isha: 'moon',
+};

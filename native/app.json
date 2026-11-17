@@ -2,7 +2,7 @@
   "expo": {
     "name": "Wirdan",
     "slug": "wirdan",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "wirdan",
@@ -14,7 +14,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "6"
+      "buildNumber": "7"
     },
     "android": {
       "package": "com.tirgani.coranmp3",
@@ -25,7 +25,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.FOREGROUND_SERVICE",

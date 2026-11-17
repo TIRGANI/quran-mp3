@@ -29,7 +29,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: c.accentStrong,
         tabBarInactiveTintColor: c.muted,
         tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.line, direction: rtl ? 'rtl' : 'ltr' },
-        tabBarLabelStyle: { fontFamily: FONTS.uiMedium, fontSize: 12 },
+        tabBarLabelStyle: { fontFamily: FONTS.uiMedium, fontSize: 11 },
       }}>
       <Tabs.Screen
         name="index"
@@ -46,6 +46,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="adhkar"
         options={{ title: t.tabAdhkar, tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color as string} size={size} /> }}
+      />
+      <Tabs.Screen
+        name="adhan"
+        options={{ title: t.tabAdhan, tabBarIcon: ({ color, size }) => <Ionicons name="time" color={color as string} size={size} /> }}
       />
       <Tabs.Screen
         name="ruqya"

@@ -1,22 +1,25 @@
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import { Changa_400Regular, Changa_500Medium, Changa_600SemiBold } from '@expo-google-fonts/changa';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/audio/hifdh'; // enregistre le mode Hifdh auprès du lecteur
 import { initAudio } from '@/audio/player';
+import { CrashScreen } from '@/components/CrashScreen';
 import { Onboarding } from '@/components/Onboarding';
+import { installCrashGuard, recordError, useCrash } from '@/lib/crash';
 import { Toast } from '@/components/Toast';
 import { handleNotificationTaps, syncReminders } from '@/notifications/reminders';
 import { useSettings } from '@/stores/settings';
 import { TourOverlay } from '@/tour/TourOverlay';
 import { useIsDark, useColors } from '@/theme/colors';
 
+installCrashGuard(); // une erreur ne ferme plus l'app : écran de reprise à la place
 SplashScreen.preventAutoHideAsync();
 initAudio();
 syncReminders();
@@ -26,6 +29,7 @@ export default function RootLayout() {
   const c = useColors();
   const dark = useIsDark();
   const onboarded = useSettings(s => s.onboarded);
+  const crash = useCrash(s => s.error);
 
   const ready = fontsLoaded || !!fontError;
   useEffect(() => {
@@ -50,10 +54,14 @@ export default function RootLayout() {
             <Stack.Screen name="player" options={{ presentation: 'modal' }} />
             <Stack.Screen name="reciters" options={{ presentation: 'modal' }} />
             <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
-            <Stack.Screen name="adhan" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="feedback" options={{ presentation: 'modal' }} />
           </Stack>
           <Toast />
+          {crash && (
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 200 }}>
+              <CrashScreen error={crash} onRetry={() => useCrash.setState({ error: null })} />
+            </View>
+          )}
           <TourOverlay />
           {!onboarded && <Onboarding />}
         </View>
@@ -61,4 +69,10 @@ export default function RootLayout() {
       </ThemeProvider>
     </GestureHandlerRootView>
   );
+}
+
+/** Erreur pendant l'affichage d'un écran : écran de reprise au lieu d'une fermeture de l'app. */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const [info] = useState(() => recordError(error));
+  return <CrashScreen error={info} onRetry={() => retry()} />;
 }

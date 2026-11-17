@@ -6,6 +6,7 @@ import { Linking, Platform, Pressable, ScrollView, TextInput, View } from 'react
 
 import { Button, Card, Chip, Row, Screen, Txt } from '@/components/ui';
 import { useIsRTL, useT } from '@/i18n';
+import { clearCrash, lastCrash } from '@/lib/crash';
 import { toast } from '@/lib/toast';
 import { FONTS, useColors } from '@/theme/colors';
 
@@ -21,6 +22,8 @@ export default function FeedbackScreen() {
   const [rating, setRating] = useState(0);
   const [kind, setKind] = useState<Kind>('idea');
   const [message, setMessage] = useState('');
+  const [crash] = useState(lastCrash);
+  const [attach, setAttach] = useState(true);
 
   const send = () => {
     if (!message.trim() && !rating) return toast(t.feedbackEmpty);
@@ -30,11 +33,16 @@ export default function FeedbackScreen() {
       rating ? `${t.feedbackRating} : ${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}` : '',
       `${t.feedbackType} : ${label}`,
       message.trim(),
-      `— ${Platform.OS} · v${Constants.expoConfig?.version ?? ''}`,
+      `— ${Platform.OS} ${Platform.Version} · v${Constants.expoConfig?.version ?? ''}`,
+      crash && attach ? `\n[${t.crashReportTitle} · ${crash.time}]\n${crash.message}\n${crash.stack}` : '',
     ]
       .filter(Boolean)
       .join('\n');
-    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`).catch(() => toast(t.playbackError));
+    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`)
+      .then(() => {
+        if (crash && attach) clearCrash();
+      })
+      .catch(() => toast(t.playbackError));
   };
 
   return (
@@ -84,6 +92,14 @@ export default function FeedbackScreen() {
           />
         </Card>
 
+        {crash && (
+          <Pressable onPress={() => setAttach(!attach)} accessibilityRole="checkbox" accessibilityState={{ checked: attach }} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Ionicons name={attach ? 'checkbox' : 'square-outline'} size={22} color={c.accentStrong} />
+            <Txt variant="label" weight="regular" style={{ flex: 1 }}>
+              {t.feedbackAttachCrash}
+            </Txt>
+          </Pressable>
+        )}
         <Button label={t.feedbackSend} icon={<Ionicons name="logo-whatsapp" size={18} color="#fff" />} onPress={send} />
         <Txt variant="small" style={{ textAlign: 'center' }}>
           {t.feedbackNote}

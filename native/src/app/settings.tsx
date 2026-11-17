@@ -95,7 +95,7 @@ export default function SettingsScreen() {
               {t.reminders}
             </Txt>
             <Txt variant="small">{t.remindersNote}</Txt>
-            <Button label={t.adhanTitle} kind="ghost" icon={<Ionicons name="time" size={16} color={c.text} />} onPress={() => router.push('/adhan')} style={{ alignSelf: 'flex-start', marginVertical: 4 }} />
+            <Button label={t.adhanTitle} kind="ghost" icon={<Ionicons name="time" size={16} color={c.text} />} onPress={() => router.navigate('/adhan')} style={{ alignSelf: 'flex-start', marginVertical: 4 }} />
             {(
               [
                 ['morning', t.reminderMorning],

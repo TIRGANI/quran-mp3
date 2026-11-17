@@ -2567,15 +2567,16 @@
       background: none;
       color: var(--muted);
       font: inherit;
-      font-size: 11.5px;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
       transition: color .15s;
+      min-width: 0;
     }
 
     .tabbar button svg {
-      width: 24px;
-      height: 24px;
+      width: 23px;
+      height: 23px;
       fill: currentColor;
     }
 
@@ -3766,6 +3767,68 @@
       background: var(--orange-soft);
     }
 
+    .ad-hero .hijri {
+      opacity: .7;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .ad-span {
+      max-width: 420px;
+      margin: 12px auto 0;
+      direction: ltr;
+    }
+
+    .ad-span .bar {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .15);
+      overflow: hidden;
+    }
+
+    .ad-span .bar i {
+      display: block;
+      height: 100%;
+      border-radius: 3px;
+      background: var(--color-accent);
+    }
+
+    .ad-span .ends {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: .65;
+      margin-top: 4px;
+    }
+
+    .pr-row .pic {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+    }
+
+    .pr-row .pic svg {
+      width: 19px;
+      height: 19px;
+      fill: var(--color-accent-btn);
+    }
+
+    .pr-row.next .pic {
+      background: var(--color-accent);
+    }
+
+    .pr-row.next .pic svg {
+      fill: #fff;
+    }
+
+    .pr-row.sun .pic svg {
+      fill: var(--muted);
+    }
+
     .pr-row .n {
       flex: 1;
       font-weight: 600;
@@ -4149,6 +4212,12 @@
       </svg>
       <span>Adhkar</span>
     </button>
+    <button type="button" data-tab="adhan">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+      </svg>
+      <span>Adhan</span>
+    </button>
     <button type="button" data-tab="ruqya">
       <svg viewBox="0 0 24 24">
         <path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
@@ -4468,7 +4537,7 @@
         cancelBtn: 'Annuler', removeAllBtn: 'Tout supprimer', confirmRemove: 'Confirmer la suppression ?',
         surahCount: n => `${n} sourate${n > 1 ? 's' : ''}`,
         emptyMsg: 'Aucune sourate ne correspond.',
-        tabListen: 'Écouter', tabRead: 'Lire', tabHifdh: 'Hifdh', tabAdhkar: 'Adhkar', tabRuqya: 'Ruqya', tabsNav: 'Navigation', back: 'Retour',
+        tabListen: 'Écouter', tabRead: 'Lire', tabHifdh: 'Hifdh', tabAdhkar: 'Adhkar', tabRuqya: 'Ruqya', tabAdhan: 'Adhan', tabsNav: 'Navigation', back: 'Retour',
         pgError: 'Chargement impossible. Vérifiez votre connexion.',
         adhkarTitle: 'Adhkar', adhkarSub: 'Hisn al-Muslim — invocations et rappels du Prophète ﷺ', adhkarSearch: 'Rechercher un dhikr…',
         adhkarAll: 'Tous les chapitres', adhkarTimes: n => `${n} fois`, adhkarReset: 'Recommencer', adhkarAllDone: 'Qu’Allah accepte vos adhkar.',
@@ -4636,7 +4705,7 @@
         cancelBtn: 'إلغاء', removeAllBtn: 'حذف الكل', confirmRemove: 'تأكيد الحذف؟',
         surahCount: n => `${n} سورة`,
         emptyMsg: 'لا توجد سورة مطابقة.',
-        tabListen: 'استماع', tabRead: 'قراءة', tabHifdh: 'الحفظ', tabAdhkar: 'الأذكار', tabRuqya: 'الرقية', tabsNav: 'التنقل', back: 'رجوع',
+        tabListen: 'استماع', tabRead: 'قراءة', tabHifdh: 'الحفظ', tabAdhkar: 'الأذكار', tabRuqya: 'الرقية', tabAdhan: 'الأذان', tabsNav: 'التنقل', back: 'رجوع',
         pgError: 'تعذّر التحميل. تحقّق من الاتصال.',
         adhkarTitle: 'الأذكار', adhkarSub: 'حصن المسلم — من أذكار الكتاب والسنة', adhkarSearch: 'ابحث عن ذكر…',
         adhkarAll: 'جميع الأبواب', adhkarTimes: n => `${n} مرة`, adhkarReset: 'إعادة', adhkarAllDone: 'تقبّل الله أذكارك.',
@@ -7023,6 +7092,7 @@
       if (!$('reader').hidden) return 'read';
       if (!$('adhkarPage').hidden) return 'adhkar';
       if (!$('ruqyaPage').hidden) return 'ruqya';
+      if (!$('adhanPage').hidden) return 'adhan';
       if (!$('hifdhBar').hidden) return 'hifdh';
       return 'listen';
     }
@@ -7035,7 +7105,7 @@
       }
     }
     const tabObserver = new MutationObserver(updateTabbar);
-    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'hifdhBar']) tabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
+    for (const id of ['reader', 'adhkarPage', 'ruqyaPage', 'adhanPage', 'hifdhBar']) tabObserver.observe($(id), { attributes: true, attributeFilter: ['hidden'] });
     $('tabbar').addEventListener('click', e => {
       const tab = e.target.closest('button')?.dataset.tab;
       if (!tab) return;
@@ -7047,6 +7117,7 @@
       else if (tab === 'hifdh') { closeOverlays(); openHifdhPanel(); }
       else if (tab === 'adhkar') openAdhkar();
       else if (tab === 'ruqya') openRuqya();
+      else if (tab === 'adhan') openAdhan();
     });
 
     /* --- Adhkar (Hisn al-Muslim) --- */
@@ -7412,6 +7483,27 @@
       const tm = new Date(now); tm.setDate(tm.getDate() + 1);
       return { name: 'fajr', time: prTimes(tm).fajr };
     }
+    const PR_ICONS = {
+      twilight: 'M16.95 10.23l1.41-1.41 2.12 2.12-1.41 1.41zM18 18H6c0-3.31 2.69-6 6-6s6 2.69 6 6zM11 4h2v3h-2zM3.51 10.94l2.12-2.12 1.41 1.41-2.12 2.12zM2 20h20v2H2z',
+      sun: 'M6.76 4.84 4.96 3.05 3.55 4.46l1.79 1.79zM4 10.5H1v2h3zm9-9.95h-2V3.5h2zm7.45 3.91-1.41-1.41-1.79 1.79 1.41 1.41zm-3.21 13.7 1.79 1.8 1.41-1.41-1.8-1.79zM20 10.5v2h3v-2zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2zm-7.45-3.91 1.41 1.41 1.79-1.8-1.41-1.41z',
+      moon: 'M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z',
+    };
+    const PR_ICON_OF = { fajr: 'twilight', sunrise: 'twilight', dhuhr: 'sun', asr: 'sun', maghrib: 'twilight', isha: 'moon' };
+    function prPrev(now = new Date()) {
+      const today = prTimes(now);
+      if (!today) return null;
+      let found = null;
+      for (const n of PR_SALAT) if (today[n] <= now) found = { name: n, time: today[n] };
+      if (found) return found;
+      const y = new Date(now); y.setDate(y.getDate() - 1);
+      return { name: 'isha', time: prTimes(y).isha };
+    }
+    function prHijri(date) {
+      try {
+        const f = new Intl.DateTimeFormat(lang === 'ar' ? 'ar-SA-u-ca-islamic-umalqura-nu-arab' : 'fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' });
+        return f.resolvedOptions().calendar.startsWith('islamic') ? f.format(date) : '';
+      } catch { return ''; }
+    }
     const prClock = d => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     const prLeft = time => { const m = Math.max(0, Math.round((time - Date.now()) / 60000)); return t('prIn', Math.floor(m / 60), m % 60); };
 
@@ -7436,10 +7528,12 @@
         + `</div>`;
       if (!times) { inner.innerHTML = `<div><h1 class="pg-title">${esc(t('prTitle'))}</h1><p class="pg-sub">${esc(t('prSub'))}</p></div>` + placeCard; return; }
       const sameDay = next.time.getDate() === now.getDate();
-      const rows = PR_NAMES.map(n => `<div class="pr-row${n === 'sunrise' ? ' sun' : ''}${sameDay && next.name === n ? ' next' : ''}"><span class="n">${esc(t('prNames')[n])}</span><span class="tm">${prClock(times[n])}</span></div>`).join('');
+      const rows = PR_NAMES.map(n => `<div class="pr-row${n === 'sunrise' ? ' sun' : ''}${sameDay && next.name === n ? ' next' : ''}"><span class="pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${PR_ICONS[PR_ICON_OF[n]]}"/></svg></span><span class="n">${esc(t('prNames')[n])}</span><span class="tm">${prClock(times[n])}</span></div>`).join('');
       const methods = PR_METHODS.map(([id, fr, ar]) => `<button type="button" class="chip${pr.method === id ? ' on' : ''}" data-act="method" data-id="${id}">${esc(lang === 'ar' ? ar : fr)}</button>`).join('');
       const adjust = PR_NAMES.map(n => `<div class="adj-row"><span>${esc(t('prNames')[n])}</span><span class="ctl"><button type="button" class="round-btn" data-act="adj" data-n="${n}" data-d="-1" aria-label="-1">−</button><b>${(pr.offsets[n] || 0) > 0 ? '+' : ''}${pr.offsets[n] || 0}</b><button type="button" class="round-btn" data-act="adj" data-n="${n}" data-d="1" aria-label="+1">+</button></span></div>`).join('');
-      inner.innerHTML = `<div class="ad-hero"><small>${esc(t('prNext'))}</small><b>${esc(t('prNames')[next.name])}</b><div class="clock">${prClock(next.time)}</div><small>${esc(prLeft(next.time))}</small></div>`
+      const prev = prPrev(now), span = next.time - prev.time, done = span > 0 ? Math.min(1, (now - prev.time) / span) : 0, hijri = prHijri(now);
+      inner.innerHTML = `<div class="ad-hero">${hijri ? `<div class="hijri">${esc(hijri)}</div>` : ''}<small>${esc(t('prNext'))}</small><b>${esc(t('prNames')[next.name])}</b><div class="clock">${prClock(next.time)}</div><small>${esc(prLeft(next.time))}</small>`
+        + `<div class="ad-span"><div class="bar"><i style="width:${done * 100}%"></i></div><div class="ends"><span>${esc(t('prNames')[prev.name])} ${prClock(prev.time)}</span><span>${esc(t('prNames')[next.name])} ${prClock(next.time)}</span></div></div></div>`
         + placeCard
         + `<div class="pr-list">${rows}</div>`
         + `<div class="pg-card" style="display:flex;flex-direction:column;gap:10px"><label style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600">${esc(t('prNotify'))}<input type="checkbox" id="prNotify" ${pr.notify ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--color-accent-btn)"></label><p class="pg-sub" style="margin:0">${esc(t('prNotifyNote'))}</p></div>`
@@ -7509,7 +7603,7 @@
 
     /* --- Langue de l'interface pour ces nouveautés --- */
     function applyPagesLang() {
-      const labels = { listen: 'tabListen', read: 'tabRead', hifdh: 'tabHifdh', adhkar: 'tabAdhkar', ruqya: 'tabRuqya' };
+      const labels = { listen: 'tabListen', read: 'tabRead', hifdh: 'tabHifdh', adhkar: 'tabAdhkar', ruqya: 'tabRuqya', adhan: 'tabAdhan' };
       for (const b of document.querySelectorAll('#tabbar button')) b.querySelector('span').textContent = t(labels[b.dataset.tab]);
       $('tabbar').setAttribute('aria-label', t('tabsNav'));
       for (const id of ['adhkarBack', 'ruqyaBack']) { $(id).title = t('back'); $(id).setAttribute('aria-label', t('back')); }

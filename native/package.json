@@ -1,6 +1,6 @@
 {
   "name": "wirdan",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo-google-fonts/amiri": "^0.4.1",
